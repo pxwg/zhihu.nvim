@@ -1,3 +1,4 @@
+local fs = require 'vim.fs'
 local uv = require 'luv'
 local M = {}
 --- TODO: Chinese characters should be supported while counting row numbers.
@@ -168,9 +169,9 @@ end
 ---@return string
 function M.get_absolute_path(path, base_dir)
   if string.sub(path, 1, 1) ~= "/" then
-    path = base_dir .. "/" .. path
+    path = fs.joinpath(base_dir, path)
   end
-  return vim.fn.resolve(vim.fn.fnamemodify(path, ":p"))
+  return fs.normalize(fs.abspath(path))
 end
 
 ---Get all patterns from ZhnvimConfigs

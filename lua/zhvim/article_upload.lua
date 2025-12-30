@@ -1,4 +1,5 @@
 local uv = require 'luv'
+local fs = require 'vim.fs'
 local json = require 'vim.json'
 local curl = require("plenary.curl")
 local util = require("zhvim.util")
@@ -301,7 +302,7 @@ end
 ---@param upload_file upload_file File information for the image
 ---@return string|nil New image URL or nil if upload failed
 function M.get_image_link(image_path, upload_token, upload_file)
-  local base_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+  local base_dir = fs.dirname(vim.api.nvim_buf_get_name(0))
   image_path = util.get_absolute_path(image_path, base_dir)
 
   local img_hash = M.read_file_and_hash(image_path)

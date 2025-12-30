@@ -13,14 +13,15 @@ local function get_md_image_changes(root, bufnr, cookies)
 
   local function upload_image(uri)
     local file_path = vim.fn.expand(uri)
-    local base_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+    local base_dir = fn.dirname(vim.api.nvim_buf_get_name(0))
     file_path = util.get_absolute_path(file_path, base_dir)
 
-    local file_exists = vim.fn.filereadable(file_path) == 1
-    if not file_exists then
+    local file = io.read(file_path)
+    if file == nil then
       vim.notify("File does not exist: " .. file_path, vim.log.levels.ERROR)
       return uri
     end
+    file:close()
     local img_hash = upl.read_file_and_hash(file_path)
     if not img_hash then
       return uri

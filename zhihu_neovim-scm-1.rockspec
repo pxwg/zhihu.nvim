@@ -24,7 +24,7 @@ description = {
 
 build_dependencies = {  }
 
-dependencies = { "lua >= 5.1", "lsqlite3", "plenary.nvim" }
+dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "plenary.nvim" }
 
 test_dependencies = {}
 
@@ -48,12 +48,17 @@ build = {
   },
   install = {
     lua = {
+      ["zhvim.auth.scripts.firefox"] = "lua/zhvim/auth/scripts/firefox.sql",
+      ["zhvim.auth.scripts.auth_chrome"] = "lua/zhvim/auth/scripts/auth_chrome.py",
+      ["zhvim.auth.chrome"] = "lua/zhvim/auth/chrome.lua",
+      ["zhvim.auth.firefox"] = "lua/zhvim/auth/firefox.lua",
+      ["zhvim.auth.pychrome"] = "lua/zhvim/auth/pychrome.lua",
+      ["zhvim.auth"] = "lua/zhvim/auth.lua",
       ["zhvim.article_sync"] = "lua/zhvim/article_sync.lua",
       ["zhvim.article_upload"] = "lua/zhvim/article_upload.lua",
       ["zhvim.buf_id"] = "lua/zhvim/buf_id.lua",
       ["zhvim.commands"] = "lua/zhvim/commands.lua",
       ["zhvim.config"] = "lua/zhvim/config.lua",
-      ["zhvim.get_cookie"] = "lua/zhvim/get_cookie.lua",
       ["zhvim.html_md"] = "lua/zhvim/html_md.lua",
       ["zhvim.init"] = "lua/zhvim/init.lua",
       ["zhvim.md_html"] = "lua/zhvim/md_html.lua",

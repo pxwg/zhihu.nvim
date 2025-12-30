@@ -1,6 +1,6 @@
 local uv = require 'luv'
 local M = {}
-local auth = require("zhvim.get_cookie")
+local auth = require("zhvim.auth")
 local buf_id = require("zhvim.buf_id")
 local html = require("zhvim.md_html")
 local md = require("zhvim.html_md")
@@ -235,9 +235,7 @@ function M.setup_commands(opts, err_browser)
     return
   else
     vim.api.nvim_create_user_command("ZhihuAuth", function(cmd_opts)
-      local interface = cmd_opts.fargs[2] or "no-interface"
-      local browser = cmd_opts.fargs[1] or opts.default_browser
-      auth.load_cookie(browser, opts, interface)
+      vim.g.zhvim_cookies = auth.load_cookies()
     end, {
       nargs = "*",
       complete = function(arg_lead, cmd_line, cursor_pos)

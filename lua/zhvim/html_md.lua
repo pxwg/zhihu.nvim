@@ -1,4 +1,5 @@
 local fs = require 'vim.fs'
+local json = require 'vim.json'
 local util = require("zhvim.util")
 local M = {}
 
@@ -41,7 +42,7 @@ function M.parse_zhihu_article(html_content)
     return {}, "Python script execution failed: " .. output
   end
 
-  local result = vim.fn.json_decode(output)
+  local result = json.decode(output)
   if result.error then
     vim.notify("Error: " .. result.error, vim.log.levels.ERROR)
     return {}, result.error

@@ -1,4 +1,5 @@
 local fs = require 'vim.fs'
+local json = require 'vim.json'
 local uv = require 'luv'
 local M = {}
 
@@ -24,7 +25,7 @@ local function load_ids()
   end
   local content = file:read "*a"
   file:close()
-  local isok, ids = pcall(vim.json.decode, content)
+  local isok, ids = pcall(json.decode, content)
   if not isok then
     ids = {}
   end
@@ -34,7 +35,7 @@ end
 ---Save IDs to the JSON file
 ---@param ids table
 local function save_ids(ids)
-  local json_content = vim.json.encode(ids)
+  local json_content = json.encode(ids)
   local file = io.open(id_file, "w")
   if file then
     file:write(json_content)

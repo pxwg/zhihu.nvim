@@ -11,7 +11,7 @@ local M = {
 function M.get_cookies(...)
   for _, auth in ipairs(M.auths) do
     local cookies = auth.get_cookies(...)
-    if #cookies > 0 then
+    if #M.stringify_cookies(cookies) > 0 then
       return cookies
     end
   end

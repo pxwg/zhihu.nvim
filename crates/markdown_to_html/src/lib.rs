@@ -221,7 +221,7 @@ impl EventProcessor for MarkdownEventProcessor {
   }
 }
 
-pub fn markdown_to_html(input: &str, options: Options) -> String {
+pub fn md_to_html(input: &str, options: Options) -> String {
   let parser = Parser::new_ext(input, options);
   let mut processor = MarkdownEventProcessor::new();
 
@@ -279,7 +279,7 @@ pub fn markdown_to_html(input: &str, options: Options) -> String {
 }
 
 #[mlua::lua_module]
-fn markdown_to_html_lib(lua: &Lua) -> Result<mlua::Table> {
+fn markdown_to_html(lua: &Lua) -> Result<mlua::Table> {
   let exports = lua.create_table()?;
   let options = Options::ENABLE_STRIKETHROUGH
     | Options::ENABLE_TABLES
@@ -288,7 +288,7 @@ fn markdown_to_html_lib(lua: &Lua) -> Result<mlua::Table> {
     | Options::ENABLE_MATH;
   exports.set(
     "md_to_html",
-    lua.create_function(move |_, markdown: String| Ok(markdown_to_html(&markdown, options)))?,
+    lua.create_function(move |_, markdown: String| Ok(md_to_html(&markdown, options)))?,
   )?;
   Ok(exports)
 }

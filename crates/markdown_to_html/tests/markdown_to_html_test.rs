@@ -1,4 +1,4 @@
-use markdown_to_html::markdown_to_html;
+use markdown_to_html::md_to_html;
 use pulldown_cmark::Options;
 use std::{fs, process::Output};
 
@@ -11,7 +11,7 @@ fn zhihu_options() -> Options {
 }
 
 fn assert_md_html(input: &str, expected_output: &str) {
-  let output = markdown_to_html(input, zhihu_options());
+  let output = md_to_html(input, zhihu_options());
   assert_eq!(output, expected_output);
 }
 

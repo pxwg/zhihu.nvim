@@ -1,4 +1,4 @@
-local lib = require("lib.md_html")
+local md_to_html = require("markdown_to_html").md_to_html
 local upl = require("zhvim.article_upload")
 local util = require("zhvim.util")
 local M = {}
@@ -6,16 +6,6 @@ local M = {}
 ---@class md_content
 ---@field content string Markdown content to be converted to HTML
 ---@field title string Title of the Markdown content
-
--- Helper function to get the plugin root directory
-local function get_plugin_root()
-  local source = debug.getinfo(2, "S").source
-  local file = string.sub(source, 2) -- Remove the '@' prefix
-  local dir = string.match(file, "(.*/)")
-
-  -- Navigate up two directories: from la/utils/ to the plugin root
-  return string.gsub(dir, "lua/zhvim/$", "")
-end
 
 -- Traverse the syntax tree to find image nodes and collect changes
 local function get_md_image_changes(root, bufnr, cookies)
@@ -113,7 +103,7 @@ end
 ---@return string|nil error
 function M.convert_md_to_html(md_content)
   local title = md_content.title or "Untitled"
-  local content = lib.md_to_html(md_content.content or "")
+  local content = md_to_html(md_content.content or "")
   local result = {
     title = title,
     content = content,

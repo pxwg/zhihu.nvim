@@ -1,21 +1,34 @@
+local uv = require 'luv'
+local chrome_cookie = require'chrome_cookie'
 local interface_boolen = {
   interface = true,
   ["no-interface"] = false,
 }
-local decrypt = require("lib.chrome_cookie")
 local utils = require("zhvim.util")
 local M = {}
+
+---Get Chrome cookies for a specific host.
+---@param cookie_path string
+---@param password string
+---@param host string The host for which to retrieve cookies.
+---@return table<string, string> A table where keys are cookie names and values are cookie values for the specified host.
+function M.get_cookies_for_host(cookie_path, password, host)
+  local cookies = chrome_cookie.get_cookies_for_host(cookie_path, password, host)
+  local result = {}
+  for k, v in pairs(cookies) do
+    -- HACK: Remove the first 56 rubbish characters from the cookie value
+    v = v:sub(57)
+    result[k] = v
+  end
+  return result
+end
 
 ---Get the Firefox cookies.sqlite path for the current user
 ---@return string|nil cookies_path Full path to cookies.sqlite or nil if not found
 local function get_firefox_cookies_path()
-  local home = os.getenv("HOME")
-  if not home then
-    vim.notify("Cannot get HOME environment variable", vim.log.levels.ERROR)
-    return nil
-  end
+  local home = uv.os_homedir()
 
-  local sysname = vim.loop.os_uname().sysname
+  local sysname = uv.os_uname().sysname
   local profile_dir = nil
 
   if sysname == "Darwin" then
@@ -50,13 +63,9 @@ end
 ---Get the Chrome Cookies file path for the current user
 ---@return string|nil cookies_path Full path to Cookies file or nil if not found
 local function get_chrome_cookies_path()
-  local home = os.getenv("HOME")
-  if not home then
-    vim.notify("Cannot get HOME environment variable", vim.log.levels.ERROR)
-    return nil
-  end
+  local home = uv.os_homedir()
 
-  local sysname = vim.loop.os_uname().sysname
+  local sysname = uv.os_uname().sysname
 
   if sysname == "Darwin" then
     -- macOS Chrome Cookies file
@@ -166,12 +175,12 @@ function M.get_zhihu_cookies(browser, opts, interface)
     if interface_bool == false then
       local host_name = ".zhihu.com"
       local cookie_path = get_chrome_cookies_path()
-      local password = decrypt.get_chrome_password()
+      local password = chrome_cookie.get_chrome_password()
       if not cookie_path then
         vim.notify("Could not find Chrome cookies path. Please check your browser installation.", vim.log.levels.ERROR)
         return {}
       end
-      local cookie = decrypt.get_cookies_for_host(cookie_path, password, host_name)
+      local cookie = M.get_cookies_for_host(cookie_path, password, host_name)
       if not cookie or vim.tbl_isempty(cookie) then
         vim.notify("Failed to get Zhihu cookies from Chrome. Please make sure you are logged in.", vim.log.levels.ERROR)
         return {}
@@ -247,8 +256,8 @@ function M.load_cookie(browser, opts, interface)
     else
       vim.notify(
         "Failed to get Zhihu cookies from "
-          .. browser
-          .. ", trying to load from environment variable `ZHIVIM_COOKIES`...",
+        .. browser
+        .. ", trying to load from environment variable `ZHIVIM_COOKIES`...",
         vim.log.levels.WARN
       )
       vim.g.zhvim_cookies = vim.env.ZHIVIM_COOKIES

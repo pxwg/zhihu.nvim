@@ -2,7 +2,6 @@
 local json = require 'vim.json'
 local fn = require 'vim.fn'
 local fs = require 'vim.fs'
-local vim = require 'vim'
 local M = {}
 
 ---Extract Zhihu cookies from Chrome database

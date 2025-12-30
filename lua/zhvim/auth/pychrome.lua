@@ -1,0 +1,58 @@
+---get cookies from chrome by pychrome
+local json = require 'vim.json'
+local fn = require 'vim.fn'
+local fs = require 'vim.fs'
+local vim = require 'vim'
+local M = {}
+
+---Extract Zhihu cookies from Chrome database
+---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
+function M.get_cookies(chrome_path, port, timeout, url)
+  chrome_path = chrome_path or "/usr/bin/chrome"
+  port = port or 9222
+  timeout = timeout or 10
+  url = url or "https://www.zhihu.com/"
+  vim.cmd [[
+    redir => g:py
+    pyx print(sys.executable)
+    redir END
+  ]]
+  local python_executable = fn.trim(vim.g.py)
+  local python_script_chrome = fs.joinpath(
+    fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
+    "scripts", "auth_chrome.py"
+  )
+  local chrome_cmd = {
+    chrome_path,
+    "--remote-debugging-port=" .. port,
+    "--user-data-dir=" .. fn.tempname(),
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--homepage=about:blank",
+    "--disable-default-apps",
+  }
+  local id = fn.jobstart(chrome_cmd, { detach = true })
+
+  local script_cmd = {
+    python_executable,
+    python_script_chrome,
+    "--timeout",
+    tostring(timeout),
+    "--url",
+    url,
+    "--port",
+    tostring(port),
+  }
+  result = vim.system(script_cmd, { text = true }):wait()
+
+  cookie_str = result.stdout or ""
+
+  fn.jobstop(id)
+  if result.code ~= 0 then
+    return {}
+  end
+  cookies = json.decode(cookie_str)
+  return cookies[1]
+end
+
+return M

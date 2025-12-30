@@ -2,6 +2,7 @@
 local json = require 'vim.json'
 local fn = require 'vim.fn'
 local fs = require 'vim.fs'
+local Cookies = require 'zhvim.auth.auth'.Cookies
 local M = {}
 
 ---Extract Zhihu cookies from Chrome database
@@ -42,16 +43,13 @@ function M.get_cookies(chrome_path, port, timeout, url)
     "--port",
     tostring(port),
   }
-  result = vim.system(script_cmd, { text = true }):wait()
-
-  cookie_str = result.stdout or ""
+  local result = vim.system(script_cmd, { text = true }):wait()
 
   fn.jobstop(id)
   if result.code ~= 0 then
     return {}
   end
-  cookies = json.decode(cookie_str)
-  return cookies[1]
+  return Cookies(json.decode(result.stdout or "[]")[1] or {})
 end
 
 return M

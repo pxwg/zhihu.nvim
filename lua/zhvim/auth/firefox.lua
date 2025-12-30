@@ -3,6 +3,7 @@ local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local lsqlite3 = require "lsqlite3"
 local PlatformDirs = require 'platformdirs'.PlatformDirs
+local Cookies = require 'zhvim.auth.auth'.Cookies
 local M = {}
 
 ---Get the Firefox cookies.sqlite path for the current user
@@ -50,7 +51,7 @@ function M.get_cookies(cookie_path)
   for k, v in db:urows(sql) do
     cookies[k] = v
   end
-  return cookies
+  return Cookies(cookies)
 end
 
 return M

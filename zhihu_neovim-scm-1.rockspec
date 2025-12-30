@@ -53,6 +53,7 @@ build = {
       ["zhvim.auth.chrome"] = "lua/zhvim/auth/chrome.lua",
       ["zhvim.auth.firefox"] = "lua/zhvim/auth/firefox.lua",
       ["zhvim.auth.pychrome"] = "lua/zhvim/auth/pychrome.lua",
+      ["zhvim.auth.auth"] = "lua/zhvim/auth/auth.lua",
       ["zhvim.auth"] = "lua/zhvim/auth.lua",
       ["zhvim.article_sync"] = "lua/zhvim/article_sync.lua",
       ["zhvim.article_upload"] = "lua/zhvim/article_upload.lua",

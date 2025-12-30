@@ -1,4 +1,5 @@
 local uv = require 'luv'
+local fs = require 'vim.fs'
 local chrome_cookie = require 'chrome_cookie'
 local interface_boolen = {
   interface = true,
@@ -33,7 +34,7 @@ local function get_firefox_cookies_path()
 
   if sysname == "Darwin" then
     -- macOS Firefox profile directory
-    local base = home .. "/Library/Application Support/Firefox/Profiles"
+    local base = fs.joinpath(home, "Library/Application Support/Firefox/Profiles")
     local handle = io.popen("find '" .. base .. "' -name '*.default-release' -type d 2>/dev/null")
     if handle then
       profile_dir = handle:read("*l")
@@ -41,7 +42,7 @@ local function get_firefox_cookies_path()
     end
   elseif sysname == "Linux" then
     -- Linux Firefox profile directory
-    local base = home .. "/.mozilla/firefox"
+    local base = fs.joinpath(home, ".mozilla/firefox")
     local handle = io.popen("find '" .. base .. "' -name '*.default-release' -type d 2>/dev/null")
     if handle then
       profile_dir = handle:read("*l")
@@ -53,7 +54,7 @@ local function get_firefox_cookies_path()
   end
 
   if profile_dir then
-    return profile_dir .. "/cookies.sqlite"
+    return fs.joinpath(profile_dir, "cookies.sqlite")
   else
     vim.notify("Cannot find Firefox cookies.sqlite", vim.log.levels.ERROR)
     return nil
@@ -69,10 +70,10 @@ local function get_chrome_cookies_path()
 
   if sysname == "Darwin" then
     -- macOS Chrome Cookies file
-    return home .. "/Library/Application Support/Google/Chrome/Default/Cookies"
+    return fs.joinpath(home, "Library/Application Support/Google/Chrome/Default/Cookies")
   elseif sysname == "Linux" then
     -- Linux Chrome Cookies file
-    return home .. "/.config/google-chrome/Default/Cookies"
+    return fs.joinpath(home, ".config/google-chrome/Default/Cookies")
   else
     vim.notify("Unsupported OS: " .. sysname .. ". Only macOS and Linux are supported.", vim.log.levels.ERROR)
     return nil
@@ -132,7 +133,7 @@ function M.get_zhihu_cookies(browser, opts, interface)
   local cookies = {}
   local cookie_str = ""
   local tmp_dir = vim.fn.tempname()
-  local python_executable = plugin_root .. "/.venv/bin/python"
+  local python_executable = fs.joinpath(plugin_root, ".venv/bin/python")
   local interface_bool = nil
   if interface and interface_boolen[interface] ~= nil then
     interface_bool = interface_boolen[interface]
@@ -164,7 +165,7 @@ function M.get_zhihu_cookies(browser, opts, interface)
       end
       return cookie
     else
-      local python_script_chrome = plugin_root .. "util/auth_chrome.py"
+      local python_script_chrome = fs.joinpath(plugin_root, "util/auth_chrome.py")
       local chrome_path = opts.browser["chrome"].path
       local chrome_cmd = {
         chrome_path,

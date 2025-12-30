@@ -1,3 +1,4 @@
+local fs = require 'vim.fs'
 local util = require("zhvim.util")
 local M = {}
 
@@ -19,8 +20,8 @@ function M.parse_zhihu_article(html_content)
     return {}, "Invalid HTML content."
   end
   local plugin_root = get_plugin_root()
-  local python_script = plugin_root .. "util/parse_html.py"
-  local python_executable = plugin_root .. "/.venv/bin/python"
+  local python_script = fs.joinpath(plugin_root, "util/parse_html.py")
+  local python_executable = fs.joinpath(plugin_root, ".venv/bin/python")
 
   local temp_file = "/tmp/nvim_zhihu_html_content.html"
   local file = io.open(temp_file, "w")
@@ -59,8 +60,8 @@ function M.convert_html_to_md(html_content)
     return "", "Invalid HTML content."
   end
   local plugin_root = get_plugin_root()
-  local python_script = plugin_root .. "util/html_md.py"
-  local python_executable = plugin_root .. "/.venv/bin/python"
+  local python_script = fs.joinpath(plugin_root, "util/html_md.py")
+  local python_executable = fs.joinpath(plugin_root, ".venv/bin/python")
 
   local temp_file = "/tmp/nvim_html_to_md_content.html"
   local file = io.open(temp_file, "w")

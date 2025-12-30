@@ -24,7 +24,7 @@ description = {
 
 build_dependencies = {  }
 
-dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "plenary.nvim" }
+dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp" }
 
 test_dependencies = {}
 

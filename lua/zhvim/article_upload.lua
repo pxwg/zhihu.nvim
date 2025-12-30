@@ -1,8 +1,8 @@
 local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local json = require 'vim.json'
-local curl = require("plenary.curl")
-local auth = require'zhvim.auth'
+local requests = require "requests"
+local auth = require 'zhvim.auth'
 local util = require("zhvim.util")
 local M = {}
 
@@ -28,7 +28,7 @@ local M = {}
 
 ---TODO: Reads a file as binary and calculates its SHA256 hash.
 ---@param file_path string The absolute path to the file
----@return string|nil The SHA256 hash of the file content, or nil if an error occurs
+---@return string? The SHA256 hash of the file content, or nil if an error occurs
 function M.read_file_and_hash(file_path)
   local sha256_cmd = "openssl dgst -md5 " .. vim.fn.shellescape(file_path) .. " | awk '{print $2}'"
   local hash = vim.fn.system(sha256_cmd):gsub("%s+", "")
@@ -57,14 +57,14 @@ local function calculate_signature(access_key_secret, string_to_sign)
   local escaped_string_to_sign = string_to_sign:gsub("'", "'\\''")
   local escaped_access_key_secret = access_key_secret:gsub("'", "'\\''")
   local command = string.format(
-    "printf '%s' | openssl dgst -sha1 -hmac '%s' -binary | openssl base64",
+    "printf '%s' | openssl dgst -sha1 -hmac '%s' -binary",
     escaped_string_to_sign,
     escaped_access_key_secret
   )
   local handle = io.popen(command)
   local signature = handle:read("*a"):gsub("%s+", "") -- Remove trailing whitespace/newlines
   handle:close()
-  return signature
+  return vim.base64.encode(signature)
 end
 
 ---Function to initialize a draft on Zhihu
@@ -84,21 +84,26 @@ function M.init_draft(html_content, cookies)
   }
 
   local headers = {
-    ["User-Agent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    ["User-Agent"] =
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     ["Content-Type"] = "application/json",
     ["Cookie"] = cookies,
     ["x-requested-with"] = "fetch",
   }
 
-  local response = curl.post(draft_url, {
+  local isok, response = pcall(requests.post, {
+    url = draft_url,
     headers = headers,
-    body = json.encode(draft_body),
+    data = json.encode(draft_body),
   })
-
-  local draft_response = nil
-  if response and response.body then
-    draft_response = json.decode(response.body)
+  if not isok then
+    return nil, response
   end
+  if response.status_code ~= 200 then
+    return nil, response.status
+  end
+
+  local draft_response = response.json()
 
   if draft_response and draft_response.id then
     return draft_response.id, html_content.content
@@ -125,28 +130,34 @@ function M.update_draft(draft_id, html_content, cookies)
   }
 
   local headers = {
-    ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+    ["User-Agent"] =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
     ["Content-Type"] = "application/json",
     ["Cookie"] = cookies,
     ["x-requested-with"] = "fetch",
   }
 
-  local response = curl.patch(patch_url, {
+  local isok, response = pcall(requests.patch, {
+    url = patch_url,
     headers = headers,
-    body = json.encode(patch_body),
+    data = json.encode(patch_body),
   })
-
-  if response and response.status and response.status >= 200 and response.status < 300 then
-    vim.notify("Updated draft successfully.", vim.log.levels.INFO)
-  else
+  if not isok then
     vim.notify("Error updating draft.", vim.log.levels.ERROR)
+    return
   end
+  if response.status_code ~= 200 then
+    vim.notify("Error updating draft.", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.notify("Updated draft successfully.", vim.log.levels.INFO)
 end
 
 ---Get image ID from hash using Zhihu API.
 ---@param img_hash string Image hash to retrieve ID for
 ---@param cookies string? Authentication cookie for Zhihu API
----@return upload_response|nil
+---@return upload_response?
 function M.get_image_id_from_hash(img_hash, cookies)
   cookies = cookies or auth.load_cookies()
   local url = "https://api.zhihu.com/images"
@@ -161,23 +172,23 @@ function M.get_image_id_from_hash(img_hash, cookies)
     source = "article",
   }
 
-  local response = curl.post(url, {
+  local isok, response = pcall(requests.post, {
+    url = url,
     headers = headers,
-    body = json.encode(body),
+    data = json.encode(body),
   })
-  local result = nil
-  if response and response.body then
-    local parsed_response = json.decode(response.body)
-    result = parsed_response
-    if result then
-      vim.notify("Image ID retrieved successfully.", vim.log.levels.INFO)
-    else
-      vim.notify("Failed to parse response from Zhihu API", vim.log.levels.ERROR)
-    end
-  else
+  if not isok then
     vim.notify("Failed to retrieve image ID.", vim.log.levels.ERROR)
+    return
   end
-  return result
+  if response.status_code ~= 200 then
+    vim.notify("Failed to parse response from Zhihu API", vim.log.levels.ERROR)
+    return
+  end
+
+  local parsed_response = response.json()
+  vim.notify("Image ID retrieved successfully.", vim.log.levels.INFO)
+  return parsed_response
 end
 
 ---Generate a random hash using the system's time and a random number.
@@ -213,11 +224,9 @@ end
 -- print(vim.inspect(M.get_image_id_from_hash(hash, cookie)))
 
 ---Upload an image to Zhihu and return the response
----Since the plenary.curl module does not support binary data upload,
----we use the curl command line tool to upload the image.
 ---@param image_path string Absolute path to the image
 ---@param upload_token upload_token Authentication token for Zhihu API
----@return boolean|nil response
+---@return boolean? response
 function M.upload_image(image_path, upload_token)
   local mime_type = infer_mime_type(image_path)
   if not mime_type then
@@ -255,40 +264,33 @@ function M.upload_image(image_path, upload_token)
     "Authorization: OSS " .. upload_token.access_id .. ":" .. signature,
   }
 
-  -- Prepare headers for curl command
-  local curl_headers = ""
-  for _, header in ipairs(headers) do
-    curl_headers = curl_headers .. string.format('-H "%s" ', header)
-  end
-
   local file = assert(io.open(image_path, "rb"))
   local binary_data = file:read("*all")
   file:close()
 
-  local curl_command = string.format(
-    [[curl -s -X PUT https://zhihu-pics-upload.zhimg.com/v2-%s \
-  %s--data-binary @-]],
-    img_hash,
-    curl_headers
-  )
-
-  -- Sending the binary data to curl command and capturing the response
-  local handle = assert(io.popen(curl_command, "w"))
-  handle:write(binary_data)
-  local response = handle:close()
-  if response then
-    return response
-  else
+  -- Prepare headers for curl command
+  local isok, response = pcall(requests.put, {
+    url = ("https://zhihu-pics-upload.zhimg.com/v2-%s"):format(img_hash),
+    headers = headers,
+    data = binary_data,
+  })
+  if not isok then
     vim.notify("Failed to upload image: " .. image_path, vim.log.levels.ERROR)
-    return nil
+    return
   end
+  if response.status_code ~= 200 then
+    vim.notify("Failed to upload image: " .. image_path, vim.log.levels.ERROR)
+    return
+  end
+
+  return response.text
 end
 
 ---Get the image link from Zhihu API or upload it if it is not uploaded.
 ---@param image_path string Absolute path to the image
 ---@param upload_token upload_token Authentication token for Zhihu API
 ---@param upload_file upload_file File information for the image
----@return string|nil New image URL or nil if upload failed
+---@return string? New image URL or nil if upload failed
 function M.get_image_link(image_path, upload_token, upload_file)
   local base_dir = fs.dirname(vim.api.nvim_buf_get_name(0))
   image_path = util.get_absolute_path(image_path, base_dir)

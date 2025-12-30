@@ -3,6 +3,7 @@ local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local PlatformDirs = require 'platformdirs'.PlatformDirs
 local chrome_cookie = require 'chrome_cookie'
+local Cookies = require 'zhvim.auth.auth'.Cookies
 local M = {}
 
 ---Get the Chrome Cookies file path for the current user
@@ -35,7 +36,7 @@ function M.get_cookies(cookie_path, password, host)
     -- HACK: Remove the first 56 rubbish characters from the cookie value
     cookies[k] = v:sub(57)
   end
-  return cookies
+  return Cookies(cookies)
 end
 
 return M

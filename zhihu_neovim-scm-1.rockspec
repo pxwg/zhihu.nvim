@@ -48,10 +48,6 @@ build = {
   },
   install = {
     lua = {
-      ["auth.chrome"] = "lua/auth/chrome.lua",
-      ["auth.firefox"] = "lua/auth/firefox.lua",
-      ["lib.chrome_cookie"] = "lua/lib/chrome_cookie.lua",
-      ["lib.md_html"] = "lua/lib/md_html.lua",
       ["zhvim.article_sync"] = "lua/zhvim/article_sync.lua",
       ["zhvim.article_upload"] = "lua/zhvim/article_upload.lua",
       ["zhvim.buf_id"] = "lua/zhvim/buf_id.lua",

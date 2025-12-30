@@ -98,7 +98,7 @@ end
 
 ---TODO: better replace based on Treesitter node range
 
----Convert Markdown content to HTML satisfying zhihu structure using a Python script.
+---Convert Markdown content to HTML satisfying zhihu structure
 ---@param md_content md_content Markdown content to be converted
 ---@return html_content html_content content or an error message
 ---@return string|nil error

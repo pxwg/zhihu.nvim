@@ -42,8 +42,6 @@ $ luarocks --lua-version 5.1 --local --tree ~/.local/share/nvim/rocks install zh
 ```lua
 return {
   "pxwg/zhihu_neovim",
-  build = "bash deploy.sh",
-  dependencies = { "nvim-lua/plenary.nvim" },
   main = "zhvim",
   ---@type ZhnvimConfigs
   opts = {
@@ -72,13 +70,6 @@ return {
     },
   },
 }
-```
-
-After building, a DLL will occur in `build/`. Add the following code to your
-`init.lua`:
-
-```lua
-package.cpath = package.cpath .. ';/the/path/of/build/?.so'
 ```
 
 ## Dependency

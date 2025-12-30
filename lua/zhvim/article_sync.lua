@@ -1,12 +1,14 @@
 local curl = require("plenary.curl")
+local auth = require'zhvim.auth'
 local M = {}
 
 --- Helper function to execute a curl command with headers
 ---@param url string The Zhihu article URL
----@return string|nil html_content The HTML content of the article, or nil if an error occurs
----@return string|nil error Error message if the download fails
+---@param cookies string?
+---@return string? html_content The HTML content of the article, or nil if an error occurs
+---@return string? error Error message if the download fails
 function M.download_zhihu_article(url, cookies)
-  cookies = cookies or ""
+  cookies = cookies or auth.load_cookies()
   local headers = {
     ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
     ["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",

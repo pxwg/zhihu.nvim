@@ -1,7 +1,8 @@
-local uv = require 'luv'
+local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local json = require 'vim.json'
 local curl = require("plenary.curl")
+local auth = require'zhvim.auth'
 local util = require("zhvim.util")
 local M = {}
 
@@ -66,28 +67,13 @@ local function calculate_signature(access_key_secret, string_to_sign)
   return signature
 end
 
----Function to execute a curl command and return the response
----@param curl_command string command to execute
----@return string response
-local function execute_curl_command(curl_command)
-  local response = vim.fn.system(curl_command)
-  if vim.v.shell_error ~= 0 then
-    local error_message = table.concat(vim.fn.systemlist(curl_command))
-    vim.notify(
-      "Error executing curl command: " .. curl_command .. "\n Error message: " .. error_message,
-      vim.log.levels.ERROR
-    )
-    return ""
-  end
-  return response
-end
-
 ---Function to initialize a draft on Zhihu
 ---@param html_content html_content HTML content of the article
----@param cookies string Cookies for authentication
----@return string|nil
----@return string|nil
+---@param cookies string? Cookies for authentication
+---@return string?
+---@return string?
 function M.init_draft(html_content, cookies)
+  cookies = cookies or auth.load_cookies()
   local draft_url = "https://zhuanlan.zhihu.com/api/articles/drafts"
 
   local draft_body = {
@@ -125,8 +111,9 @@ end
 ---Function to update a draft on Zhihu
 ---@param draft_id string ID of the draft to update
 ---@param html_content html_content
----@param cookies number
+---@param cookies string? Cookies for authentication
 function M.update_draft(draft_id, html_content, cookies)
+  cookies = cookies or auth.load_cookies()
   local patch_url = string.format("https://zhuanlan.zhihu.com/api/articles/%s/draft", draft_id)
 
   local patch_body = {
@@ -158,15 +145,16 @@ end
 
 ---Get image ID from hash using Zhihu API.
 ---@param img_hash string Image hash to retrieve ID for
----@param cookie string Authentication cookie for Zhihu API
+---@param cookies string? Authentication cookie for Zhihu API
 ---@return upload_response|nil
-function M.get_image_id_from_hash(img_hash, cookie)
+function M.get_image_id_from_hash(img_hash, cookies)
+  cookies = cookies or auth.load_cookies()
   local url = "https://api.zhihu.com/images"
 
   local headers = {
     ["Content-Type"] = "application/json",
     ["Accept-Language"] = "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-    ["Cookie"] = cookie,
+    ["Cookie"] = cookies,
   }
   local body = {
     image_hash = img_hash,

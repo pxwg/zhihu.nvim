@@ -1,5 +1,5 @@
 local uv = require 'luv'
-local chrome_cookie = require'chrome_cookie'
+local chrome_cookie = require 'chrome_cookie'
 local interface_boolen = {
   interface = true,
   ["no-interface"] = false,
@@ -98,45 +98,22 @@ end
 ---@return table<string, string> cookies Table with d_c0 and z_c0 cookies
 local function get_zhihu_cookies_firefox()
   local cookies_db = get_firefox_cookies_path()
-  if not cookies_db then
-    return {}
-  end
-  local query_cmd = {
-    "sqlite3",
-    cookies_db,
-    "SELECT name, value FROM moz_cookies WHERE host='.zhihu.com';",
-  }
-  local res = vim.system(query_cmd, { text = true }):wait()
-
-  if res.code ~= 0 then
-    if res.stderr and res.stderr:match("database is locked") then
-      vim.notify(
-        "The database is locked. Please try closing your browser and reload this plugin.",
-        vim.log.levels.ERROR
-      )
-      return {}
-    end
-    vim.notify("Failed to execute sqlite3 command: " .. (res.stderr or ""), vim.log.levels.ERROR)
-    return {}
-  end
-
   local cookies = {}
-  for line in (res.stdout or ""):gmatch("[^\r\n]+") do
-    local name, value = line:match("^(.-)|(.+)$")
-    if name and value then
-      cookies[name] = value
-    end
+  if not cookies_db then
+    return cookies
   end
-
-  if vim.tbl_isempty(cookies) then
-    if res.stdout and res.stdout:match("database is locked") then
-      vim.notify(
-        "The database is locked. Please try closing your browser and reload this plugin.",
-        vim.log.levels.ERROR
-      )
-    else
-      vim.notify("Failed to get Zhihu cookies, make sure you are logged in via Firefox", vim.log.levels.ERROR)
-    end
+  local lsqlite3 = require "lsqlite3"
+  local db = lsqlite3.open(cookies_db)
+  local sql = "SELECT name, value FROM moz_cookies WHERE host='.zhihu.com' AND name='d_c0' OR name='z_c0';"
+  if db:exec(sql) ~= 0 then
+    vim.notify(
+      db:errmsg() .. " -- Please try closing your browser and reload this plugin.",
+      vim.log.levels.ERROR
+    )
+    return cookies
+  end
+  for k, v in db:urows(sql) do
+    cookies[k] = v
   end
 
   return cookies
@@ -187,7 +164,7 @@ function M.get_zhihu_cookies(browser, opts, interface)
       end
       return cookie
     else
-      local python_script_chrome = plugin_root .. "/util/auth_chrome.py"
+      local python_script_chrome = plugin_root .. "util/auth_chrome.py"
       local chrome_path = opts.browser["chrome"].path
       local chrome_cmd = {
         chrome_path,

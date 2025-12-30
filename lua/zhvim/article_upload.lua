@@ -1,3 +1,4 @@
+local uv = require 'luv'
 local curl = require("plenary.curl")
 local util = require("zhvim.util")
 local M = {}
@@ -192,7 +193,7 @@ end
 ---Generate a random hash using the system's time and a random number.
 ---@return string
 function M.generate_random_hash()
-  local os_name = vim.loop.os_uname().sysname:lower()
+  local os_name = uv.os_uname().sysname:lower()
 
   local md5_command = "md5" -- Default for macOS
   if os_name == "linux" then

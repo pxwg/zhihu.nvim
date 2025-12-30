@@ -1,3 +1,4 @@
+local uv = require 'luv'
 local M = {}
 local auth = require("zhvim.get_cookie")
 local buf_id = require("zhvim.buf_id")
@@ -112,7 +113,7 @@ local function open_draft()
   if file_id then
     vim.api.nvim_echo({ { "Draft ID: " .. file_id, "Msg" } }, true, {})
     local url = "https://zhuanlan.zhihu.com/p/" .. file_id .. "/edit"
-    local sysname = vim.loop.os_uname().sysname
+    local sysname = uv.os_uname().sysname
     if sysname == "Windows_NT" then
       vim.fn.system({ "start", url })
     elseif sysname == "Linux" then

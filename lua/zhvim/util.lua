@@ -1,4 +1,4 @@
-local ts_utils = require("nvim-treesitter.ts_utils")
+local uv = require 'luv'
 local M = {}
 --- TODO: Chinese characters should be supported while counting row numbers.
 
@@ -236,7 +236,7 @@ end
 ---Get system's name
 ---@return "macos"|"linux"|"windows"|"unknown"
 function M.get_system_name()
-  local system = vim.loop.os_uname().sysname:lower()
+  local system = uv.os_uname().sysname:lower()
   if system == "darwin" then
     return "macos"
   elseif system == "linux" then
@@ -291,7 +291,7 @@ function M.get_firefox_cookies_path()
     return nil
   end
 
-  local sysname = vim.loop.os_uname().sysname
+  local sysname = uv.os_uname().sysname
   local profile_dir = nil
 
   if sysname == "Darwin" then

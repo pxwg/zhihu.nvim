@@ -24,7 +24,7 @@ description = {
 
 build_dependencies = {  }
 
-dependencies = { "lua >= 5.1" }
+dependencies = { "lua >= 5.1", "lsqlite3", "plenary.nvim" }
 
 test_dependencies = {}
 
@@ -41,7 +41,7 @@ end
 
 build = {
   type = 'rust-mlua',
-  copy_directories = {},
+  copy_directories = { 'util' },
   modules = {
     "chrome_cookie",
     "markdown_to_html",

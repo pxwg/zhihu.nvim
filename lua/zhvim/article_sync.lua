@@ -1,5 +1,4 @@
 local curl = require("plenary.curl")
-local html_md = require("zhvim.html_md")
 local M = {}
 
 --- Helper function to execute a curl command with headers

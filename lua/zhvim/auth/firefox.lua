@@ -41,7 +41,12 @@ function M.get_cookies(cookie_path)
   local f = io.open(sql_file)
   local sql = ""
   if f ~= nil then
-    sql = f:read "*a"
+    sql = f:read()
+    if sql:sub(1, 2) == "#!" then
+      sql = f:read "*a"
+    else
+      sql = sql .. f:read "*a"
+    end
     f:close()
   end
   if db:exec(sql) ~= 0 then

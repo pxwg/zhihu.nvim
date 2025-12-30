@@ -1,4 +1,5 @@
 local uv = require 'luv'
+local json = require 'vim.json'
 local curl = require("plenary.curl")
 local util = require("zhvim.util")
 local M = {}
@@ -104,12 +105,12 @@ function M.init_draft(html_content, cookies)
 
   local response = curl.post(draft_url, {
     headers = headers,
-    body = vim.fn.json_encode(draft_body),
+    body = json.encode(draft_body),
   })
 
   local draft_response = nil
   if response and response.body then
-    draft_response = vim.fn.json_decode(response.body)
+    draft_response = json.decode(response.body)
   end
 
   if draft_response and draft_response.id then
@@ -144,7 +145,7 @@ function M.update_draft(draft_id, html_content, cookies)
 
   local response = curl.patch(patch_url, {
     headers = headers,
-    body = vim.fn.json_encode(patch_body),
+    body = json.encode(patch_body),
   })
 
   if response and response.status and response.status >= 200 and response.status < 300 then
@@ -173,11 +174,11 @@ function M.get_image_id_from_hash(img_hash, cookie)
 
   local response = curl.post(url, {
     headers = headers,
-    body = vim.fn.json_encode(body),
+    body = json.encode(body),
   })
   local result = nil
   if response and response.body then
-    local parsed_response = vim.fn.json_decode(response.body)
+    local parsed_response = json.decode(response.body)
     result = parsed_response
     if result then
       vim.notify("Image ID retrieved successfully.", vim.log.levels.INFO)

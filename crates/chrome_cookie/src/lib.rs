@@ -328,7 +328,7 @@ pub fn get_cookies(
 }
 
 #[mlua::lua_module]
-fn chrome_cookie_lib(lua: &Lua) -> LuaResult<mlua::Table> {
+fn chrome_cookie(lua: &Lua) -> LuaResult<mlua::Table> {
   let exports = lua.create_table()?;
 
   // decrypt_chrome_cookie(encrypted_value: Vec<u8>, password: String) -> Option<String>

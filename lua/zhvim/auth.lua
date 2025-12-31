@@ -1,5 +1,6 @@
 ---get cookies.
 ---all modules under auth must provide a function `get_cookies()`.
+local Cookies = require 'zhvim.auth.auth'.Cookies
 local M = {
   auths = {
     require 'zhvim.auth.firefox',
@@ -15,7 +16,7 @@ function M.get_cookies(...)
       return cookies
     end
   end
-  return {}
+  return Cookies {}
 end
 
 ---if you want to customize it, set `M.cookies` by yourself

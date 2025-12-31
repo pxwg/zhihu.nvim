@@ -5,7 +5,6 @@ local M = {
 
 ---@param cookies table?
 ---@return table cookies
----@see ime.new
 function M.Cookies:new(cookies)
   cookies = cookies or {}
   setmetatable(cookies, {

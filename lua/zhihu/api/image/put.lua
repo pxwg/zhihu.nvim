@@ -1,6 +1,6 @@
 --- upload a zhihu image
 local requests = require "requests"
-local md5 = require 'zhvim.api.image.post'.md5
+local md5 = require 'zhihu.api.image.post'.md5
 local M = {
   mime_types = {
     jpg = "image/jpeg",

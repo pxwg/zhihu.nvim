@@ -1,6 +1,6 @@
 local md_to_html = require("markdown_to_html").md_to_html
-local Image = require 'zhvim.image'.Image
-local util = require("zhvim.util")
+local Image = require 'zhihu.image'.Image
+local util = require("zhihu.util")
 local fn = require 'vim.fn'
 local M = {}
 

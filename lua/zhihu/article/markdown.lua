@@ -1,9 +1,9 @@
 --- a class to get/post/patch zhihu article in markdown
-local Article = require "zhvim.article.html".Article
+local Article = require "zhihu.article.html".Article
 local md_to_html = require("markdown_to_html").md_to_html
 local fs = require 'vim.fs'
 local fn = require 'vim.fn'
-local get_python_executable = require'zhvim.auth.pychrome'.get_python_executable
+local get_python_executable = require'zhihu.auth.pychrome'.get_python_executable
 local M = {
   Article = {
   }

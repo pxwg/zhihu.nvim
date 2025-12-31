@@ -1,7 +1,7 @@
 --- init a zhihu image
 local requests = require "requests"
 local json = require 'vim.json'
-local auth = require 'zhvim.auth'
+local auth = require 'zhihu.auth'
 local M = {
   API = {
     url = "https://api.zhihu.com/images",

@@ -1,11 +1,11 @@
 --- a class to get/post/patch zhihu article in HTML
-local Get = require 'zhvim.api.article.get'.API
-local Post = require 'zhvim.api.article.post'.API
-local Patch = require 'zhvim.api.article.patch'.API
+local Get = require 'zhihu.api.article.get'.API
+local Post = require 'zhihu.api.article.post'.API
+local Patch = require 'zhihu.api.article.patch'.API
 local json = require 'vim.json'
 local fs = require 'vim.fs'
 local fn = require 'vim.fn'
-local get_python_executable = require'zhvim.auth.pychrome'.get_python_executable
+local get_python_executable = require'zhihu.auth.pychrome'.get_python_executable
 local M = {
   Article = {
   }

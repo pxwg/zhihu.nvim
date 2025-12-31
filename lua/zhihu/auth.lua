@@ -1,11 +1,11 @@
 ---get cookies.
 ---all modules under auth must provide a function `get_cookies()`.
-local Cookies = require 'zhvim.auth.auth'.Cookies
+local Cookies = require 'zhihu.auth.auth'.Cookies
 local M = {
   auths = {
-    require 'zhvim.auth.firefox',
-    require 'zhvim.auth.chrome',
-    require 'zhvim.auth.pychrome',
+    require 'zhihu.auth.firefox',
+    require 'zhihu.auth.chrome',
+    require 'zhihu.auth.pychrome',
   }
 }
 

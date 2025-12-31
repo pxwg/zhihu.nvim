@@ -1,9 +1,9 @@
 --- a class to get/post/patch zhihu image in HTML
-local Post = require 'zhvim.api.image.post'.API
-local Put = require 'zhvim.api.image.put'.API
+local Post = require 'zhihu.api.image.post'.API
+local Put = require 'zhihu.api.image.put'.API
 local fs = require 'vim.fs'
-local md5 = require 'zhvim.api.image.post'.md5
-local infer_mime_type = require 'zhvim.api.image.put'.infer_mime_type
+local md5 = require 'zhihu.api.image.post'.md5
+local infer_mime_type = require 'zhihu.api.image.put'.infer_mime_type
 local M = {
   Image = {
     mime = Put.headers["Content-Type"],

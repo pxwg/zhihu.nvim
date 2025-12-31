@@ -2,8 +2,8 @@ local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local json = require 'vim.json'
 local requests = require "requests"
-local auth = require 'zhvim.auth'
-local util = require("zhvim.util")
+local auth = require 'zhihu.auth'
+local util = require("zhihu.util")
 local M = {}
 
 ---TODO: Reads a file as binary and calculates its SHA256 hash.

@@ -1,4 +1,4 @@
-local util = require("zhvim.util")
+local util = require("zhihu.util")
 local M = {}
 
 ---Execute a user-defined script and return the result, where the output is in CommonMark format.

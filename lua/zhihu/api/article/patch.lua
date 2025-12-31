@@ -1,13 +1,13 @@
---- init a zhihu article
+--- update a zhihu article
 local requests = require "requests"
 local json = require 'vim.json'
-local auth = require 'zhvim.auth'
+local auth = require 'zhihu.auth'
 local M = {
   API = {
-    url = "https://zhuanlan.zhihu.com/api/articles/drafts",
+    url = "https://zhuanlan.zhihu.com/api/articles/%s/draft",
     headers = {
       ["User-Agent"] =
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
       ["Content-Type"] = "application/json",
       ["x-requested-with"] = "fetch",
     }
@@ -30,19 +30,22 @@ setmetatable(M.API, {
 })
 
 ---factory method.
+---@param id string
 ---@param title string?
 ---@param content string?
 ---@return table
-function M.API.from_html(title, content)
+function M.API.from_id(id, title, content)
   title = title or "未命名"
   content = content or ""
   local body = {
     title = title,
     content = content,
-    delta_time = 0,
+    table_of_contents = false,
+    delta_time = 30,
     can_reward = false,
   }
   local api = {
+    url = M.API.url:format(id),
     data = json.encode(body),
   }
   return M.API(api)
@@ -51,7 +54,7 @@ end
 ---request
 ---@return table
 function M.API:request()
-  return requests.post(self)
+  return requests.patch(self)
 end
 
 return M

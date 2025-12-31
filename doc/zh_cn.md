@@ -12,7 +12,7 @@ return {
   "pxwg/zhihu_neovim",
   build = "bash deploy.sh",
   dependencies = { "nvim-lua/plenary.nvim" },
-  main = "zhvim",
+  main = "zhihu",
   ---@type ZhnvimConfigs
   opts = {
     default_browser = "chrome",

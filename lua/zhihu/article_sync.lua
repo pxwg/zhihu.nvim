@@ -1,5 +1,5 @@
 local requests = require "requests"
-local auth = require 'zhvim.auth'
+local auth = require 'zhihu.auth'
 local M = {
   headers = {
     ["User-Agent"] =

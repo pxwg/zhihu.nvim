@@ -1,4 +1,4 @@
-local util = require("zhvim.util")
+local util = require("zhihu.util")
 
 ---@class input_content
 ---@field content string The content of the input file.

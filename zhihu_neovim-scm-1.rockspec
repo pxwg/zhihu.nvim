@@ -63,6 +63,7 @@ build = {
       ["zhvim.article.scripts.parse_html"] = "lua/zhvim/article/scripts/parse_html.py",
       ["zhvim.article.html"] = "lua/zhvim/article/html.lua",
       ["zhvim.article.markdown"] = "lua/zhvim/article/markdown.lua",
+      ["zhvim.image"] = "lua/zhvim/image.lua",
       ["zhvim.article_sync"] = "lua/zhvim/article_sync.lua",
       ["zhvim.article_upload"] = "lua/zhvim/article_upload.lua",
       ["zhvim.buf_id"] = "lua/zhvim/buf_id.lua",

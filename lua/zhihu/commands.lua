@@ -1,14 +1,14 @@
 local uv = require 'luv'
 local M = {}
-local auth = require("zhvim.auth")
-local buf_id = require("zhvim.buf_id")
-local html = require("zhvim.md_html")
-local parse_zhihu_article = require("zhvim.article.html").parse_zhihu_article
-local convert_html_to_md = require("zhvim.article.markdown").convert_html_to_md
-local script = require("zhvim.script")
-local sync = require("zhvim.article_sync")
-local upl = require("zhvim.article_upload")
-local util = require("zhvim.util")
+local auth = require("zhihu.auth")
+local buf_id = require("zhihu.buf_id")
+local html = require("zhihu.md_html")
+local parse_zhihu_article = require("zhihu.article.html").parse_zhihu_article
+local convert_html_to_md = require("zhihu.article.markdown").convert_html_to_md
+local script = require("zhihu.script")
+local sync = require("zhihu.article_sync")
+local upl = require("zhihu.article_upload")
+local util = require("zhihu.util")
 
 ---@param cmd_opts table? Options for the command
 ---@param opts ZhnvimConfigs User configs

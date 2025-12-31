@@ -1,6 +1,6 @@
 --- download a zhihu article
 local requests = require "requests"
-local auth = require 'zhvim.auth'
+local auth = require 'zhihu.auth'
 local M = {
   API = {
     url = "https://zhuanlan.zhihu.com/p/%s",

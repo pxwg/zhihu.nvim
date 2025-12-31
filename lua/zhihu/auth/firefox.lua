@@ -3,7 +3,7 @@ local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local lsqlite3 = require "lsqlite3"
 local PlatformDirs = require 'platformdirs'.PlatformDirs
-local Cookies = require 'zhvim.auth.auth'.Cookies
+local Cookies = require 'zhihu.auth.auth'.Cookies
 local M = {}
 
 ---Get the Firefox cookies.sqlite path for the current user

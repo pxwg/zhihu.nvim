@@ -1,4 +1,4 @@
-local default_config = require("zhvim.config")
+local default_config = require("zhihu.config")
 local M = {}
 ---@param opts? ZhnvimConfigs
 M.setup = function(opts)
@@ -45,7 +45,7 @@ M.setup = function(opts)
     firefox = err_browser_firefox,
   }
 
-  require("zhvim.commands").setup_commands(config, err_browser)
-  require("zhvim.commands").setup_autocmd(config)
+  require("zhihu.commands").setup_commands(config, err_browser)
+  require("zhihu.commands").setup_autocmd(config)
 end
 return M

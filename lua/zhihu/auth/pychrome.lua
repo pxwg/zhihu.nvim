@@ -2,7 +2,7 @@
 local json = require 'vim.json'
 local fn = require 'vim.fn'
 local fs = require 'vim.fs'
-local Cookies = require 'zhvim.auth.auth'.Cookies
+local Cookies = require 'zhihu.auth.auth'.Cookies
 local M = {}
 
 ---get python executable from vim

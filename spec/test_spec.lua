@@ -1,7 +1,7 @@
 package.path = package.path .. ';lua/?.lua'
 
-local auth = require "zhvim.auth"
-local Article = require "zhvim.article.html".Article
+local auth = require "zhihu.auth"
+local Article = require "zhihu.article.html".Article
 
 -- luacheck: ignore 113
 ---@diagnostic disable: undefined-global

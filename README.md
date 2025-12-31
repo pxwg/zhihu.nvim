@@ -42,7 +42,7 @@ $ luarocks --lua-version 5.1 --local --tree ~/.local/share/nvim/rocks install zh
 ```lua
 return {
   "pxwg/zhihu_neovim",
-  main = "zhvim",
+  main = "zhihu",
   ---@type ZhnvimConfigs
   opts = {
     default_browser = "chrome",

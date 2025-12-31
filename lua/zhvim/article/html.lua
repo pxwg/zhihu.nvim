@@ -5,6 +5,7 @@ local Patch = require 'zhvim.api.article.patch'.API
 local json = require 'vim.json'
 local fs = require 'vim.fs'
 local fn = require 'vim.fn'
+local get_python_executable = require'zhvim.auth.pychrome'.get_python_executable
 local M = {
   Article = {
   }
@@ -16,8 +17,8 @@ local M = {
 ---@return table parsed_data Parsed data containing title, content, and writer
 function M.parse_zhihu_article(html_content)
   local plugin_root = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
-  local python_script = fs.joinpath(plugin_root, "util/parse_html.py")
-  local python_executable = fs.joinpath(plugin_root, ".venv/bin/python")
+  local python_script = fs.joinpath(plugin_root, "scripts", "parse_html.py")
+  local python_executable = get_python_executable()
 
   local temp_file = "/tmp/nvim_zhihu_html_content.html"
   local file = io.open(temp_file, "w")

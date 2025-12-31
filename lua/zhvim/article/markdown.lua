@@ -3,6 +3,7 @@ local Article = require "zhvim.article.html".Article
 local md_to_html = require("markdown_to_html").md_to_html
 local fs = require 'vim.fs'
 local fn = require 'vim.fn'
+local get_python_executable = require'zhvim.auth.pychrome'.get_python_executable
 local M = {
   Article = {
   }
@@ -13,8 +14,8 @@ local M = {
 ---@return string md_content Converted Markdown content or an error message
 function M.convert_html_to_md(html_content)
   local plugin_root = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
-  local python_script = fs.joinpath(plugin_root, "util/html_md.py")
-  local python_executable = fs.joinpath(plugin_root, ".venv/bin/python")
+  local python_script = fs.joinpath(plugin_root, "scripts", "html_md.py")
+  local python_executable = get_python_executable()
 
   local temp_file = "/tmp/nvim_html_to_md_content.html"
   local file = io.open(temp_file, "w")

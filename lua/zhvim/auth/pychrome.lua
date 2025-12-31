@@ -5,6 +5,17 @@ local fs = require 'vim.fs'
 local Cookies = require 'zhvim.auth.auth'.Cookies
 local M = {}
 
+---get python executable from vim
+---@return string
+function M.get_python_executable()
+  vim.cmd [[
+    redir => g:py
+    pyx print(sys.executable)
+    redir END
+  ]]
+  return fn.trim(vim.g.py)
+end
+
 ---Extract Zhihu cookies from Chrome database
 ---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
 function M.get_cookies(chrome_path, port, timeout, url)
@@ -12,12 +23,7 @@ function M.get_cookies(chrome_path, port, timeout, url)
   port = port or 9222
   timeout = timeout or 10
   url = url or "https://www.zhihu.com/"
-  vim.cmd [[
-    redir => g:py
-    pyx print(sys.executable)
-    redir END
-  ]]
-  local python_executable = fn.trim(vim.g.py)
+  local python_executable = M.get_python_executable()
   local python_script_chrome = fs.joinpath(
     fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
     "scripts", "auth_chrome.py"

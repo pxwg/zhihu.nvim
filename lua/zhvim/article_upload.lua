@@ -6,26 +6,6 @@ local auth = require 'zhvim.auth'
 local util = require("zhvim.util")
 local M = {}
 
----@class upload_token
----@field access_id string
----@field access_key string
----@field access_token string
----@field access_timestamp number
-
----@class upload_file
----@field image_id string
----@field object_key string
----@field state number
-
----@class upload_response
----@field upload_vendor string
----@field upload_token upload_token
----@field upload_file upload_file
-
----@class html_content
----@field title string
----@field content string
-
 ---TODO: Reads a file as binary and calculates its SHA256 hash.
 ---@param file_path string The absolute path to the file
 ---@return string? The SHA256 hash of the file content, or nil if an error occurs

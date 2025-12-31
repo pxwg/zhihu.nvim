@@ -3,7 +3,8 @@ local M = {}
 local auth = require("zhvim.auth")
 local buf_id = require("zhvim.buf_id")
 local html = require("zhvim.md_html")
-local md = require("zhvim.html_md")
+local parse_zhihu_article = require("zhvim.article.html").parse_zhihu_article
+local convert_html_to_md = require("zhvim.article.markdown").convert_html_to_md
 local script = require("zhvim.script")
 local sync = require("zhvim.article_sync")
 local upl = require("zhvim.article_upload")
@@ -145,8 +146,8 @@ local function sync_article()
     )
     return
   end
-  local html_content = md.parse_zhihu_article(output)
-  html_content.content = md.convert_html_to_md(html_content.content)
+  local html_content = parse_zhihu_article(output)
+  html_content.content = convert_html_to_md(html_content.content)
   html_content.title = html_content.title:gsub(" -- 知乎$", "") or "Untitled"
   local zhihu_content = "# " .. html_content.title .. "\n\n" .. html_content.content
 

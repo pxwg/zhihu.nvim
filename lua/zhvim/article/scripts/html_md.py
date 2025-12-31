@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import re
 from bs4 import BeautifulSoup

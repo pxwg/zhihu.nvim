@@ -12,7 +12,7 @@ if modrev:sub(1, 1) == '$' then
   repo_url = "https://github.com/pxwg/zhihu_neovim"
   package = repo_url:match("/([^/]+)/?$")
 end
-version = modrev ..'-'.. specrev
+version = modrev .. '-' .. specrev
 
 description = {
   summary = '$summary',
@@ -22,7 +22,7 @@ description = {
   license = 'MIT',
 }
 
-build_dependencies = {  }
+build_dependencies = {}
 
 dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp" }
 
@@ -41,7 +41,6 @@ end
 
 build = {
   type = 'rust-mlua',
-  copy_directories = { 'util' },
   modules = {
     "chrome_cookie",
     "markdown_to_html",
@@ -50,17 +49,25 @@ build = {
     lua = {
       ["zhvim.auth.scripts.firefox"] = "lua/zhvim/auth/scripts/firefox.sql",
       ["zhvim.auth.scripts.auth_chrome"] = "lua/zhvim/auth/scripts/auth_chrome.py",
+      ["zhvim.auth.auth"] = "lua/zhvim/auth/auth.lua",
       ["zhvim.auth.chrome"] = "lua/zhvim/auth/chrome.lua",
       ["zhvim.auth.firefox"] = "lua/zhvim/auth/firefox.lua",
       ["zhvim.auth.pychrome"] = "lua/zhvim/auth/pychrome.lua",
-      ["zhvim.auth.auth"] = "lua/zhvim/auth/auth.lua",
       ["zhvim.auth"] = "lua/zhvim/auth.lua",
+      ["zhvim.api.article.get"] = "lua/zhvim/api/article/get.lua",
+      ["zhvim.api.article.post"] = "lua/zhvim/api/article/post.lua",
+      ["zhvim.api.article.patch"] = "lua/zhvim/api/article/patch.lua",
+      ["zhvim.api.image.post"] = "lua/zhvim/api/image/post.lua",
+      ["zhvim.api.image.put"] = "lua/zhvim/api/image/put.lua",
+      ["zhvim.article.scripts.html_md"] = "lua/zhvim/article/scripts/html_md.py",
+      ["zhvim.article.scripts.parse_html"] = "lua/zhvim/article/scripts/parse_html.py",
+      ["zhvim.article.html"] = "lua/zhvim/article/html.lua",
+      ["zhvim.article.markdown"] = "lua/zhvim/article/markdown.lua",
       ["zhvim.article_sync"] = "lua/zhvim/article_sync.lua",
       ["zhvim.article_upload"] = "lua/zhvim/article_upload.lua",
       ["zhvim.buf_id"] = "lua/zhvim/buf_id.lua",
       ["zhvim.commands"] = "lua/zhvim/commands.lua",
       ["zhvim.config"] = "lua/zhvim/config.lua",
-      ["zhvim.html_md"] = "lua/zhvim/html_md.lua",
       ["zhvim.init"] = "lua/zhvim/init.lua",
       ["zhvim.md_html"] = "lua/zhvim/md_html.lua",
       ["zhvim.script"] = "lua/zhvim/script.lua",

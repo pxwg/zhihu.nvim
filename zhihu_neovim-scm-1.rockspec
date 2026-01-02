@@ -24,7 +24,7 @@ description = {
 
 build_dependencies = {}
 
-dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp" }
+dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp", "htmlparser" }
 
 test_dependencies = {}
 
@@ -60,7 +60,6 @@ build = {
       ["zhihu.api.image.post"] = "lua/zhihu/api/image/post.lua",
       ["zhihu.api.image.put"] = "lua/zhihu/api/image/put.lua",
       ["zhihu.article.scripts.html_md"] = "lua/zhihu/article/scripts/html_md.py",
-      ["zhihu.article.scripts.parse_html"] = "lua/zhihu/article/scripts/parse_html.py",
       ["zhihu.article.html"] = "lua/zhihu/article/html.lua",
       ["zhihu.article.markdown"] = "lua/zhihu/article/markdown.lua",
       ["zhihu.image"] = "lua/zhihu/image.lua",

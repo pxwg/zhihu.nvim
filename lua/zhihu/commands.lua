@@ -3,7 +3,7 @@ local M = {}
 local auth = require("zhihu.auth")
 local buf_id = require("zhihu.buf_id")
 local html = require("zhihu.md_html")
-local parse_zhihu_article = require("zhihu.article.html").parse_zhihu_article
+local parse_zhihu_article = require("zhihu.article.html").parse
 local convert_html_to_md = require("zhihu.article.markdown").convert_html_to_md
 local script = require("zhihu.script")
 local sync = require("zhihu.article_sync")
@@ -146,10 +146,10 @@ local function sync_article()
     )
     return
   end
-  local html_content = parse_zhihu_article(output)
-  html_content.content = convert_html_to_md(html_content.content)
-  html_content.title = html_content.title:gsub(" -- 知乎$", "") or "Untitled"
-  local zhihu_content = "# " .. html_content.title .. "\n\n" .. html_content.content
+  local article = {}
+  article.title, article.writer, article.content = parse_zhihu_article(output)
+  article.content = convert_html_to_md(article.content:gettext())
+  local zhihu_content = "# " .. article.title .. "\n\n" .. article.content
 
   local buf = vim.api.nvim_create_buf(true, true)
   vim.cmd("split")

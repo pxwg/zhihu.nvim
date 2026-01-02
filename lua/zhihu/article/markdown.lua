@@ -1,49 +1,20 @@
 --- a class to get/post/patch zhihu article in markdown
 local Article = require "zhihu.article.html".Article
 local md_to_html = require("markdown_to_html").md_to_html
-local fs = require 'vim.fs'
-local fn = require 'vim.fn'
-local get_python_executable = require 'zhihu.auth.pychrome'.get_python_executable
+local Generator = require "zhihu.article.html.markdown".Generator
 local M = {
   Article = {
   }
 }
-
----Convert HTML content to Markdown using a Python script.
----@param html_content string HTML content to be converted
----@return string md_content Converted Markdown content or an error message
-function M.html_to_md(html_content)
-  local plugin_root = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
-  local python_script = fs.joinpath(plugin_root, "scripts", "html_md.py")
-  local python_executable = get_python_executable()
-
-  local temp_file = "/tmp/nvim_html_to_md_content.html"
-  local file = io.open(temp_file, "w")
-  if not file then
-    vim.notify("Failed to open temporary file for writing.", vim.log.levels.ERROR)
-    return ""
-  end
-  file:write(html_content)
-  file:close()
-
-  local output = fn.system({ python_executable, python_script, temp_file })
-
-  os.remove(temp_file)
-
-  if vim.v.shell_error ~= 0 then
-    vim.notify("Python script failed with error code: " .. output, vim.log.levels.ERROR)
-    return ""
-  end
-
-  return output
-end
 
 ---@param article table?
 ---@return table article
 function M.Article:new(article)
   article = article or {}
   article = Article(article)
+  article.generator = article.generator or Generator()
   setmetatable(article, {
+    __tostring = self.tostring,
     __index = self
   })
   return article
@@ -52,15 +23,14 @@ end
 ---Convert a table<string, string> to string
 ---@return string
 function M.Article:tostring()
-  return self.content and M.html_to_md(self.content:gettext()) or self.status
+  return self.generator:generate(self.root)
 end
 
 ---factory method.
----@param title string
----@param content string
+---@param markdown string?
 ---@return table
-function M.Article.from_content(title, content)
-  return Article.from_content(title, md_to_html(content))
+function M.Article.from_markdown(markdown)
+  return Article.from_html(markdown and md_to_html(markdown))
 end
 
 setmetatable(M.Article, {

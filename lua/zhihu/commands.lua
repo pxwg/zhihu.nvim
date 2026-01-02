@@ -3,8 +3,8 @@ local M = {}
 local auth = require("zhihu.auth")
 local buf_id = require("zhihu.buf_id")
 local html = require("zhihu.md_html")
-local parse_zhihu_article = require("zhihu.article.html").parse
-local convert_html_to_md = require("zhihu.article.markdown").html_to_md
+local parse_zhihu_article = require("zhihu.article.html").Article.from_html
+local generator = require "zhihu.article.html.markdown".Generator()
 local script = require("zhihu.script")
 local sync = require("zhihu.article_sync")
 local upl = require("zhihu.article_upload")
@@ -146,10 +146,8 @@ local function sync_article()
     )
     return
   end
-  local article = {}
-  article.title, article.writer, article.content = parse_zhihu_article(output)
-  article.content = convert_html_to_md(article.content:gettext())
-  local zhihu_content = "# " .. article.title .. "\n\n" .. article.content
+  local article = parse_zhihu_article(output)
+  local zhihu_content = "# " .. article.title .. "\n\n" .. generator:generate(article.root)
 
   local buf = vim.api.nvim_create_buf(true, true)
   vim.cmd("split")

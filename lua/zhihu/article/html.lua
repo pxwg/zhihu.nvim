@@ -3,34 +3,30 @@ local Get = require 'zhihu.api.article.get'.API
 local Post = require 'zhihu.api.article.post'.API
 local Patch = require 'zhihu.api.article.patch'.API
 local parse = require 'htmlparser'.parse
+local md_to_html = require("markdown_to_html").md_to_html
+local fs = require 'vim.fs'
+local json = require 'vim.json'
 local M = {
+  selector = ".RichText.ztext",
+  attribute = "data-zop",
+  template_path = fs.joinpath(
+    fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
+    "templates", "untitle.md"
+  ),
   url = Get.url .. '/edit',
-  selectors = {
-    title = "title[data-rh='true']",
-    writer = ".AuthorInfo-name .UserLink-link",
-    content = ".RichText.ztext",
-  },
-  Article = {
-  }
 }
-
----Parse HTML content to extract user, article, and title information using a Python script.
----Writing to a temporary file and executing a Python script to parse the HTML.
----@param html string HTML content to be parsed
----@return string?
----@return string?
----@return table?
-function M.parse(html)
-  local root = parse(html)
-  local elements = {}
-  elements.title = root:select(M.selectors.title)[1] or {}
-  elements.writer = root:select(M.selectors.writer)[1] or {}
-  elements.content = root:select(M.selectors.content)[1] or {}
-  local title = elements.title:getcontent()
-  local writer = elements.writer:getcontent()
-  title = title:match("(.*) -- 知乎$") or title
-  return title, writer, elements.content
+local text = ""
+local f = io.open(M.template_path)
+if f then
+  text = f:read "*a"
+  f:close()
 end
+M.Article = {
+  itemId = "",
+  title = "untitle",
+  -- similar as https://github.com/niudai/VSCode-Zhihu
+  root = parse(md_to_html(text)),
+}
 
 ---@param article table?
 ---@return table article
@@ -40,13 +36,16 @@ function M.Article:new(article)
     __tostring = self.tostring,
     __index = self
   })
+  local meta = getmetatable(article.root)
+  meta.__tostring = article.root.gettext
+  setmetatable(article.root, meta)
   return article
 end
 
 ---Convert a table<string, string> to string
 ---@return string
 function M.Article:tostring()
-  return self.content and self.content:gettext() or self.status
+  return tostring(self.root)
 end
 
 setmetatable(M.Article, {
@@ -59,49 +58,49 @@ setmetatable(M.Article, {
 function M.Article.from_id(id)
   local api = Get.from_id(id)
   local resp = api:request()
-  local article = { id = id }
   if resp.status_code == 200 then
-    article.title, article.writer, article.content = M.parse(resp.text)
-  else
-    article.status = resp.status
+    return M.Article.from_html(resp.text)
   end
-  return M.Article(article)
+  return M.Article { itemId = resp.status }
 end
 
 ---factory method.
----@param title string
----@param content string
+---@param html string?
 ---@return table
-function M.Article.from_content(title, content)
-  title = title or "未命名"
-  content = content or ""
-  local api = Post.from_html(title, content)
-  local resp = api:request()
-  local article = { title = title, content = parse(content) }
-  if resp.status_code == 200 then
-    article.id = resp.json().id
-  else
-    article.status = resp.status
-  end
+function M.Article.from_html(html)
+  local html = html or ""
+  local root = parse(html)
+  local tag = root:select(("[%s]"):format(M.attribute))[1]
+  local article = json.decode(tag and tag.attributes[M.attribute]:gsub("&quot;", '"') or "{}")
+  article.root = root:select(M.selector)[1] or root
   return M.Article(article)
 end
 
 ---update article
----@return boolean
+---@return string? error
 function M.Article:update()
-  local api = Patch.from_id(self.id, self.title, tostring(self))
-  local resp = api:request()
-  if resp.status_code ~= 200 then
-    self.status = resp.status
-    return false
+  if tonumber(self.itemId) == nil then
+    local api = Post.from_html(self.title, tostring(self.root))
+    local resp = api:request()
+    self.itemId = resp.status_code == 200 and resp.json().id or resp.status
   end
-  return true
+  if tonumber(self.itemId) == nil then
+    return self.itemId
+  end
+  local api = Patch.from_id(self.itemId, self.title, tostring(self.root))
+  local resp = api:request()
+  if resp.status_code == 200 then
+    return
+  end
+  return resp.status
 end
 
 ---call `vim.ui.open()`
----@return string
+---@return string?
 function M.Article:get_url()
-  return M.url:format(self.id)
+  if tonumber(self.itemId) then
+    return M.url:format(self.itemId)
+  end
 end
 
 return M

@@ -5,6 +5,7 @@ crate-type = ["cdylib", "rlib"]
 
 [package]
 name = "markdown_to_html"
+description = "Better support for zhihu HTML than <https://github.com/jgm/lunamark>"
 version = "0.1.0"
 edition = "2021"
 

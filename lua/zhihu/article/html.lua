@@ -9,24 +9,24 @@ local json = require 'vim.json'
 local M = {
   selector = ".RichText.ztext",
   attribute = "data-zop",
-  template_path = fs.joinpath(
-    fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
-    "templates", "untitle.md"
-  ),
   url = Get.url .. '/edit',
+  Article = {
+    itemId = "",
+    title = "Untitled",
+  },
 }
+M.template_path = fs.joinpath(
+  fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
+  "templates", ("%s.md"):format(M.Article.title)
+)
 local text = ""
 local f = io.open(M.template_path)
 if f then
   text = f:read "*a"
   f:close()
 end
-M.Article = {
-  itemId = "",
-  title = "untitle",
-  -- similar as https://github.com/niudai/VSCode-Zhihu
-  root = parse(md_to_html(text)),
-}
+-- similar as https://github.com/niudai/VSCode-Zhihu
+M.Article.root = parse(md_to_html(text))
 
 ---@param article table?
 ---@return table article

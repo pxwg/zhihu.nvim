@@ -4,6 +4,7 @@ local Post = require 'zhihu.api.article.post'.API
 local Patch = require 'zhihu.api.article.patch'.API
 local parse = require 'htmlparser'.parse
 local M = {
+  url = Get.url .. '/edit',
   selectors = {
     title = "title[data-rh='true']",
     writer = ".AuthorInfo-name .UserLink-link",
@@ -88,13 +89,19 @@ end
 ---update article
 ---@return boolean
 function M.Article:update()
-  local api = Patch.from_id(self.id, self.title, self.content)
+  local api = Patch.from_id(self.id, self.title, tostring(self))
   local resp = api:request()
   if resp.status_code ~= 200 then
     self.status = resp.status
     return false
   end
   return true
+end
+
+---call `vim.ui.open()`
+---@return string
+function M.Article:get_url()
+  return M.url:format(self.id)
 end
 
 return M

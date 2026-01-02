@@ -3,7 +3,7 @@ local Article = require "zhihu.article.html".Article
 local md_to_html = require("markdown_to_html").md_to_html
 local fs = require 'vim.fs'
 local fn = require 'vim.fn'
-local get_python_executable = require'zhihu.auth.pychrome'.get_python_executable
+local get_python_executable = require 'zhihu.auth.pychrome'.get_python_executable
 local M = {
   Article = {
   }
@@ -12,7 +12,7 @@ local M = {
 ---Convert HTML content to Markdown using a Python script.
 ---@param html_content string HTML content to be converted
 ---@return string md_content Converted Markdown content or an error message
-function M.convert_html_to_md(html_content)
+function M.html_to_md(html_content)
   local plugin_root = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
   local python_script = fs.joinpath(plugin_root, "scripts", "html_md.py")
   local python_executable = get_python_executable()
@@ -49,13 +49,10 @@ function M.Article:new(article)
   return article
 end
 
----factory method.
----@param id string
----@return table
-function M.Article.from_id(id)
-  local article = Article.from_id(id)
-  article.markdown = M.convert_html_to_md(article.content)
-  return article
+---Convert a table<string, string> to string
+---@return string
+function M.Article:tostring()
+  return self.content and M.html_to_md(self.content:gettext()) or self.status
 end
 
 ---factory method.
@@ -63,9 +60,7 @@ end
 ---@param content string
 ---@return table
 function M.Article.from_content(title, content)
-  local article = Article.from_content(title, md_to_html(content))
-  article.markdown = content
-  return article
+  return Article.from_content(title, md_to_html(content))
 end
 
 setmetatable(M.Article, {

@@ -33,6 +33,7 @@ function M.Generator:generate(root)
   return new_root:gettext() .. "\n" .. code
 end
 
+---emit HTML tag to other language's AST node purely
 ---@see emit_
 ---@param root table
 ---@return table root
@@ -42,7 +43,7 @@ function M.Generator:emit(root)
   return root, self:emit_(root)
 end
 
----emit code from root
+---emit HTML tag to other language's AST node
 ---@param root table HTML content to be converted
 ---@return string? code footnote code
 function M.Generator:emit_(root)
@@ -64,6 +65,7 @@ setmetatable(M.ChainedGenerator, {
   __call = M.ChainedGenerator.new
 })
 
+---emit HTML tag to other language's AST node in clain
 ---@param root table HTML content to be converted
 ---@return string code
 function M.ChainedGenerator:emit_(root)
@@ -90,6 +92,7 @@ setmetatable(M.SelectorGenerator, {
   __call = M.SelectorGenerator.new
 })
 
+---convert all selected HTML tags in batch
 ---@param root table HTML content to be converted
 ---@return string? code
 function M.SelectorGenerator:emit_(root)
@@ -100,10 +103,12 @@ function M.SelectorGenerator:emit_(root)
   return text
 end
 
+---convert a HTML tag to other language's AST node
+---TODO: https://github.com/msva/lua-htmlparser/issues/38#issuecomment-3707155560
 ---@param root table HTML content to be converted
 ---@return string? code
 function M.SelectorGenerator:convert_(root)
-  root._text = self.template:format(fn.trim(root:getcontent()))
+  root:settext(self.template:format(fn.trim(root:getcontent())))
 end
 
 return M

@@ -27,6 +27,9 @@ if f then
 end
 -- similar as https://github.com/niudai/VSCode-Zhihu
 M.Article.root = parse(md_to_html(text))
+local meta = getmetatable(M.Article.root)
+meta.__tostring = M.Article.root.gettext
+setmetatable(M.Article.root, meta)
 
 ---@param article table?
 ---@return table article

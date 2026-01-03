@@ -3,27 +3,13 @@ local fn = require 'vim.fn'
 local fs = require 'vim.fs'
 local get_python_executable = require 'zhihu.auth.pychrome'.get_python_executable
 local M = {
-  Generator = {}
+  generator = {}
 }
-
----@param generator table?
----@return table generator
-function M.Generator:new(generator)
-  generator = generator or {}
-  setmetatable(generator, {
-    __index = self
-  })
-  return generator
-end
-
-setmetatable(M.Generator, {
-  __call = M.Generator.new
-})
 
 ---Convert HTML content from a file to Markdown with specific rules.
 ---@param root table HTML content to be converted
 ---@return string markdown Converted Markdown content or an error message
-function M.Generator:generate(root)
+function M.generator:generate(root)
   local plugin_root = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
   local python_script = fs.joinpath(plugin_root, "scripts", "html_md.py")
   local python_executable = get_python_executable()

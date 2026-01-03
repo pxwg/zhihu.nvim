@@ -17,8 +17,8 @@ fn assert_md_html(input: &str, expected_output: &str) {
 
 #[test]
 fn test_markdown_to_html_link() {
-  let input = "这个文章纯粹为了测试正在快速更新的插件[Zhihu on Neovim](https://github.com/pxwg/zhihu_neovim)的基本功能是否被正确实现。";
-  let expected_output = r#"<html><head></head><body><p>这个文章纯粹为了测试正在快速更新的插件<a href="https://github.com/pxwg/zhihu_neovim">Zhihu on Neovim</a>的基本功能是否被正确实现。</p></body></html>"#;
+  let input = "这个文章纯粹为了测试正在快速更新的插件[Zhihu on Neovim](https://github.com/pxwg/zhihu.nvim)的基本功能是否被正确实现。";
+  let expected_output = r#"<html><head></head><body><p>这个文章纯粹为了测试正在快速更新的插件<a href="https://github.com/pxwg/zhihu.nvim">Zhihu on Neovim</a>的基本功能是否被正确实现。</p></body></html>"#;
   assert_md_html(input, expected_output);
 }
 

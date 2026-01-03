@@ -11,7 +11,7 @@ Using [neovim](https://github.com/neovim/neovim) to level up your [zhihu](https:
 #### Command style
 
 ```vim
-:Rocks install zhihu_neovim
+:Rocks install zhihu.nvim
 ```
 
 #### Declare style
@@ -20,7 +20,7 @@ Using [neovim](https://github.com/neovim/neovim) to level up your [zhihu](https:
 
 ```toml
 [plugins]
-"zhihu_neovim" = "scm"
+"zhihu.nvim" = "scm"
 ```
 
 Then
@@ -32,7 +32,7 @@ Then
 or:
 
 ```sh
-$ luarocks --lua-version 5.1 --local --tree ~/.local/share/nvim/rocks install zhihu_neovim
+$ luarocks --lua-version 5.1 --local --tree ~/.local/share/nvim/rocks install zhihu.nvim
 # ~/.local/share/nvim/rocks is the default rocks tree path
 # you can change it according to your vim.g.rocks_nvim.rocks_path
 ```
@@ -41,7 +41,7 @@ $ luarocks --lua-version 5.1 --local --tree ~/.local/share/nvim/rocks install zh
 
 ```lua
 return {
-  "pxwg/zhihu_neovim",
+  "pxwg/zhihu.nvim",
   main = "zhihu",
   ---@type ZhnvimConfigs
   opts = {

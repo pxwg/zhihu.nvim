@@ -1,1 +1,1 @@
-> 本文使用 [Zhihu on NeoVim](https://github.com/pxwg/zhihu_neovim) 创作并发布
+> 本文使用 [Zhihu on NeoVim](https://github.com/pxwg/zhihu.nvim) 创作并发布

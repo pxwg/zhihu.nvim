@@ -9,7 +9,7 @@
 > 使用`lazy.nvim` 安装：
 ```lua
 return {
-  "pxwg/zhihu_neovim",
+  "pxwg/zhihu.nvim",
   build = "bash deploy.sh",
   dependencies = { "nvim-lua/plenary.nvim" },
   main = "zhihu",

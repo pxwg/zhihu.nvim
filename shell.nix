@@ -4,7 +4,7 @@
 
 with pkgs;
 mkShell {
-  name = "zhihu_neovim";
+  name = "zhihu.nvim";
   buildInputs = [
     pkg-config
     sqlite

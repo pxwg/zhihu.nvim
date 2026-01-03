@@ -64,6 +64,7 @@ build = {
       ["zhihu.article.html.markdown"] = "lua/zhihu/article/html/markdown.lua",
       ["zhihu.article.html"] = "lua/zhihu/article/html.lua",
       ["zhihu.article.markdown"] = "lua/zhihu/article/markdown.lua",
+      ["zhihu.article"] = "lua/zhihu/article.lua",
       ["zhihu.image"] = "lua/zhihu/image.lua",
       ["zhihu.article_sync"] = "lua/zhihu/article_sync.lua",
       ["zhihu.article_upload"] = "lua/zhihu/article_upload.lua",

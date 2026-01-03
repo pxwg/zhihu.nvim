@@ -1,4 +1,5 @@
 ---Convert HTML content to Markdown
+---TODO: Replace python's beautifulsoup4 by lua's htmlparser
 local fn = require 'vim.fn'
 local fs = require 'vim.fs'
 local get_python_executable = require 'zhihu.auth.pychrome'.get_python_executable

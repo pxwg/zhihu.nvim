@@ -1,6 +1,7 @@
 --- upload a zhihu image
 local requests = require "requests"
 local md5 = require 'zhihu.api.image.post'.md5
+local sha1 = require'sha1'
 local M = {
   mime_types = {
     jpg = "image/jpeg",
@@ -39,25 +40,6 @@ function M.infer_mime_type(file)
   return M.mime_types[ext]
 end
 
----Calculate the HMAC-SHA1 signature and return it as a base64-encoded string.
----@param access_key_secret string The secret key used for signing
----@param string_to_sign string The string to be signed
----@return string signature
-function M.calculate_signature(access_key_secret, string_to_sign)
-  local cmd = string.format(
-    "printf '%s' | openssl dgst -sha1 -hmac '%s' -binary",
-    vim.fn.shellescape(string_to_sign),
-    vim.fn.shellescape(access_key_secret)
-  )
-  local p = io.popen(cmd)
-  local hash = ""
-  if p then
-    hash = p:read "*a":match("%S+") or ""
-    p:close()
-  end
-  return vim.base64.encode(hash)
-end
-
 ---@param api table?
 ---@return table api
 function M.API:new(api)
@@ -91,7 +73,7 @@ function M.API.from_file(file, access_id, access_token, access_key)
   api.headers["x-oss-security-token"] = access_token
   local string_to_sign = M.string_to_sign:format(api.headers["Content-Type"], api.headers["x-oss-date"],
     api.headers["x-oss-date"], access_token, api.headers["User-Agent"], md5(file))
-  local signature = M.calculate_signature(access_key, string_to_sign)
+  local signature = sha1.hmac_binary(access_key, string_to_sign)
   api.headers["Authorization"] = api.headers["Authorization"]:format(access_id, signature)
   return api
 end

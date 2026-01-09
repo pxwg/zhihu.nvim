@@ -1,4 +1,5 @@
 --- init a zhihu image
+local md5 = require "md5"
 local requests = require "requests"
 local json = require 'vim.json'
 local auth = require 'zhihu.auth'
@@ -16,14 +17,13 @@ local M = {
 ---@param file string The absolute path to the file
 ---@return string hash of the file content
 function M.md5(file)
-  local cmd = "openssl dgst -md5 " .. vim.fn.shellescape(file) .. " | awk '{print $2}'"
-  local p = io.popen(cmd)
-  local hash = ""
-  if p then
-    hash = p:read "*a":match("%S+") or ""
-    p:close()
+  local f = io.open(file)
+  local text = ""
+  if f then
+    text = f:read"*a"
+    f:close()
   end
-  return hash
+  return md5.sumhexa(text)
 end
 
 ---@param api table?

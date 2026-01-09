@@ -2,6 +2,7 @@
 local requests = require "requests"
 local md5 = require 'zhihu.api.image.post'.md5
 local sha1 = require'sha1'
+local base64 = require'vim.base64'
 local M = {
   mime_types = {
     jpg = "image/jpeg",
@@ -73,7 +74,7 @@ function M.API.from_file(file, access_id, access_token, access_key)
   api.headers["x-oss-security-token"] = access_token
   local string_to_sign = M.string_to_sign:format(api.headers["Content-Type"], api.headers["x-oss-date"],
     api.headers["x-oss-date"], access_token, api.headers["User-Agent"], md5(file))
-  local signature = vim.base64.encode(sha1.hmac_binary(access_key, string_to_sign))
+  local signature = base64.encode(sha1.hmac_binary(access_key, string_to_sign))
   api.headers["Authorization"] = api.headers["Authorization"]:format(access_id, signature)
   return api
 end

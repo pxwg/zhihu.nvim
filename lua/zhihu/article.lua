@@ -24,15 +24,20 @@ end
 
 ---open article's URL.
 ---for example:
----nnoremap <buffer> <localleader>lv :call v:lua.require'zhihu.article'.open()<CR>
+---nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
 ---@param id integer?
 function M.open(id)
-  id = id or vim.b.article.itemId
-  if not tonumber(id) then
-    vim.notify("run :w firstly!", vim.log.levels.WARN)
-    return
+  id = id or vim.b.article and vim.b.article.itemId
+  local url
+  if tonumber(id) then
+    url = M.url:format(id)
+  else
+    url = vim.api.nvim_buf_get_name(0)
+    if url:match "zhihu://" then
+      vim.notify("run :w firstly!", vim.log.levels.WARN)
+      return
+    end
   end
-  local url = M.url:format(id)
   vim.ui.open(url)
 end
 

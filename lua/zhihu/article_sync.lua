@@ -21,7 +21,7 @@ local M = {
 ---@return string? error Error message if the download fails
 function M.download_zhihu_article(url, cookies)
   headers = M.headers
-  headers["Cookie"] = cookies or auth.load_cookies()
+  headers["Cookie"] = cookies or auth.dumps_cookies()
   local isok, response = pcall(requests.get, {
     url = url,
     headers = headers,

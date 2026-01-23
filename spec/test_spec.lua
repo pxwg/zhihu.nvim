@@ -8,7 +8,7 @@ local generator = require "zhihu.article.html.markdown".generator
 -- luacheck: ignore 113
 ---@diagnostic disable: undefined-global
 describe("test", function()
-    local cookies = auth.load_cookies()
+    local cookies = auth.dumps_cookies()
     it("tests get cookies", function()
         assert.are.equal(#cookies > 0, true)
     end)

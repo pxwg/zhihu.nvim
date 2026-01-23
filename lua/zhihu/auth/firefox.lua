@@ -25,14 +25,14 @@ function M.get_cookies_path()
 end
 
 ---Extract Zhihu cookies from Firefox database
----@param cookie_path string?
+---@param cookies_path string?
 ---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
-function M.get_cookies(cookie_path)
-  cookie_path = cookie_path or M.get_cookies_path()
-  if cookie_path:match "%%" then
+function M.get_cookies(cookies_path)
+  cookies_path = cookies_path or M.get_cookies_path()
+  if cookies_path:match "%%" then
     return {}
   end
-  local db = lsqlite3.open(cookie_path)
+  local db = lsqlite3.open(cookies_path)
 
   local sql_file = fs.joinpath(
     fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
@@ -50,7 +50,7 @@ function M.get_cookies(cookie_path)
     f:close()
   end
   if db:exec(sql) ~= 0 then
-    return {}
+    return Cookies()
   end
   local cookies = {}
   for k, v in db:urows(sql) do

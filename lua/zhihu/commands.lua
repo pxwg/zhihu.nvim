@@ -233,7 +233,7 @@ function M.setup_commands(opts, err_browser)
     return
   else
     vim.api.nvim_create_user_command("ZhihuAuth", function(cmd_opts)
-      vim.g.zhvim_cookies = auth.load_cookies()
+      vim.g.zhvim_cookies = auth.dumps_cookies()
     end, {
       nargs = "*",
       complete = function(arg_lead, cmd_line, cursor_pos)

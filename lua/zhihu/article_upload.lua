@@ -53,7 +53,7 @@ end
 ---@return string?
 ---@return string?
 function M.init_draft(html_content, cookies)
-  cookies = cookies or auth.load_cookies()
+  cookies = cookies or auth.dumps_cookies()
   local draft_url = "https://zhuanlan.zhihu.com/api/articles/drafts"
 
   local draft_body = {
@@ -98,7 +98,7 @@ end
 ---@param html_content html_content
 ---@param cookies string? Cookies for authentication
 function M.update_draft(draft_id, html_content, cookies)
-  cookies = cookies or auth.load_cookies()
+  cookies = cookies or auth.dumps_cookies()
   local patch_url = string.format("https://zhuanlan.zhihu.com/api/articles/%s/draft", draft_id)
 
   local patch_body = {
@@ -139,7 +139,7 @@ end
 ---@param cookies string? Authentication cookie for Zhihu API
 ---@return upload_response?
 function M.get_image_id_from_hash(img_hash, cookies)
-  cookies = cookies or auth.load_cookies()
+  cookies = cookies or auth.dumps_cookies()
   local url = "https://api.zhihu.com/images"
 
   local headers = {

@@ -26,7 +26,7 @@ function M.API:new(api)
   setmetatable(api, {
     __index = self
   })
-  api.headers.Cookie = auth.load_cookies()
+  api.headers.Cookie = auth.dumps_cookies()
   return api
 end
 

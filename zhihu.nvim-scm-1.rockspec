@@ -24,7 +24,8 @@ description = {
 
 build_dependencies = {}
 
-dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp", "htmlparser", "lua-cjson", "md5", "sha1", "base64" }
+dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp", "htmlparser", "lua-cjson", "md5", "sha1",
+  "base64" }
 
 test_dependencies = {}
 
@@ -41,6 +42,7 @@ end
 
 build = {
   type = 'rust-mlua',
+  copy_directories = { 'plugin' } ,
   modules = {
     "chrome_cookie",
     "markdown_to_html",
@@ -50,6 +52,7 @@ build = {
       ["zhihu.auth.scripts.firefox"] = "lua/zhihu/auth/scripts/firefox.sql",
       ["zhihu.auth.scripts.auth_chrome"] = "lua/zhihu/auth/scripts/auth_chrome.py",
       ["zhihu.auth.auth"] = "lua/zhihu/auth/auth.lua",
+      ["zhihu.auth.cache"] = "lua/zhihu/auth/cache.lua",
       ["zhihu.auth.chrome"] = "lua/zhihu/auth/chrome.lua",
       ["zhihu.auth.firefox"] = "lua/zhihu/auth/firefox.lua",
       ["zhihu.auth.pychrome"] = "lua/zhihu/auth/pychrome.lua",
@@ -61,7 +64,8 @@ build = {
       ["zhihu.api.image.put"] = "lua/zhihu/api/image/put.lua",
       ["zhihu.article.scripts.html_md"] = "lua/zhihu/article/scripts/html_md.py",
       ["zhihu.article.templates.Untitled"] = "lua/zhihu/article/templates/Untitled.md",
-      ["zhihu.article.html.markdown"] = "lua/zhihu/article/html/markdown.lua",
+      ["zhihu.article.generator.generator"] = "lua/zhihu/article/generator/generator.lua",
+      ["zhihu.article.generator.markdown"] = "lua/zhihu/article/generator/markdown.lua",
       ["zhihu.article.html"] = "lua/zhihu/article/html.lua",
       ["zhihu.article.markdown"] = "lua/zhihu/article/markdown.lua",
       ["zhihu.article"] = "lua/zhihu/article.lua",

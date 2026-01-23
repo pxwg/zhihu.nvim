@@ -1,7 +1,7 @@
 --- a class to get/post/patch zhihu article in markdown
 local Article = require "zhihu.article.html".Article
 local md_to_html = require("markdown_to_html").md_to_html
-local generator = require "zhihu.article.html.markdown".generator
+local generator = require "zhihu.article.generator.markdown".generator
 local M = {
   Article = {
   }
@@ -26,16 +26,15 @@ function M.Article:tostring()
   return self.generator:generate(self.root)
 end
 
----factory method.
----@param markdown string?
----@return table
-function M.Article.from_markdown(markdown)
-  return Article.from_html(markdown and md_to_html(markdown))
-end
-
 setmetatable(M.Article, {
   __index = Article,
   __call = M.Article.new
 })
+
+---set content
+---@param content string
+function M.Article:set_content(content)
+  self:set_html(md_to_html(content))
+end
 
 return M

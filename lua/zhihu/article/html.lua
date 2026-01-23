@@ -8,8 +8,8 @@ local fs = require 'vim.fs'
 local json = require 'vim.json'
 local M = {
   selector = ".RichText.ztext",
+  error_selector = ".ErrorPage-text",
   attribute = "data-zop",
-  url = Get.url .. '/edit',
   Article = {
     itemId = "",
     title = "Untitled",
@@ -19,14 +19,14 @@ M.template_path = fs.joinpath(
   fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
   "templates", ("%s.md"):format(M.Article.title)
 )
-local text = ""
-local f = io.open(M.template_path)
-if f then
-  text = f:read "*a"
-  f:close()
+local _text = ""
+local _f = io.open(M.template_path)
+if _f then
+  _text = _f:read "*a"
+  _f:close()
 end
 -- similar as https://github.com/niudai/VSCode-Zhihu
-M.Article.root = parse(md_to_html(text))
+M.Article.root = parse(md_to_html(_text))
 local meta = getmetatable(M.Article.root)
 meta.__tostring = M.Article.root.gettext
 setmetatable(M.Article.root, meta)
@@ -55,27 +55,29 @@ setmetatable(M.Article, {
   __call = M.Article.new
 })
 
----factory method.
+---factory method. wrap `from_html`
 ---@param id string
 ---@return table
 function M.Article.from_id(id)
   local api = Get.from_id(id)
   local resp = api:request()
-  if resp.status_code == 200 then
-    return M.Article.from_html(resp.text)
+  local text = resp.status_code == 200 and resp.text or resp.status
+  local article = M.Article.from_html(text)
+  if article.itemId == "" then
+    article.itemId = id
   end
-  return M.Article { itemId = resp.status }
+  return article
 end
 
 ---factory method.
 ---@param html string?
 ---@return table
 function M.Article.from_html(html)
-  local html = html or ""
+  html = html or ""
   local root = parse(html)
   local tag = root:select(("[%s]"):format(M.attribute))[1]
   local article = json.decode(tag and tag.attributes[M.attribute]:gsub("&quot;", '"') or "{}")
-  article.root = root:select(M.selector)[1] or root
+  article.root = root:select(M.selector)[1] or root:select(M.error_selector)[1] or parse ""
   return M.Article(article)
 end
 
@@ -98,12 +100,30 @@ function M.Article:update()
   return resp.status
 end
 
----call `vim.ui.open()`
----@return string?
-function M.Article:get_url()
-  if tonumber(self.itemId) then
-    return M.url:format(self.itemId)
+---split article to lines
+---@return string[]
+function M.Article:get_lines()
+  local lines = {}
+  for line in tostring(self):gmatch("[^\r\n]+") do
+    table.insert(lines, line)
   end
+  return lines
+end
+
+---set HTML content
+---@param html string
+function M.Article:set_html(html)
+  local root = parse(html)
+  self.root = root:select(M.selector)[1] or root
+end
+
+M.Article.set_content = M.Article.set_html
+
+---set lines
+---@param lines string[]
+function M.Article:set_lines(lines)
+  local text = table.concat(lines, "\n")
+  self:set_content(text)
 end
 
 return M

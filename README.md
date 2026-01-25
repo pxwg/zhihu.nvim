@@ -99,6 +99,8 @@ If you want to create an article from a default template, try:
 
 ```vim
 :edit zhihu://new.md
+:let b:article.title = "Title"
+:write
 ```
 
 ```markdown

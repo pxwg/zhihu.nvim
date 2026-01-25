@@ -1,5 +1,6 @@
 ---Code generators for article
 local parse = require 'htmlparser'.parse
+local htmlEntities = require 'htmlEntities'
 local deepcopy = require 'vim.shared'.deepcopy
 local fn = require 'vim.fn'
 local M = {
@@ -40,7 +41,7 @@ end
 ---@return string code
 function M.Generator:generate(node)
   local new_node, code = self:emit(node)
-  local text = new_node:gettext()
+  local text = htmlEntities.decode(new_node:gettext())
   text = text:gsub("\n\n\n+", "\n\n")
   return fn.trim(text .. "\n\n" .. code)
 end

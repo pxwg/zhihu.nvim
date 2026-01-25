@@ -1,8 +1,16 @@
 # Zhihu on Neovim
 
-[中文版](./doc/zh_cn.md)
+[Zhihu](https://www.zhihu.com/) extension built on [NeoVim](https://github.com/neovim/neovim).
 
-Using [neovim](https://github.com/neovim/neovim) to level up your [zhihu](https://www.zhihu.com/) writing, inspired by [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian).
+## Features
+
+- [x] Convert local markdown files into Zhihu articles and send them to the draft box;
+- [x] Using user-defined scripts to convert other file types into Zhihu articles, then upload them to the draft box.
+- [x] Synchronizing Zhihu articles to local markdown files;
+- [ ] Support editing Zhihu answers;
+- [ ] Support direct publishing of Zhihu articles and answers (bypassing the draft box);
+- [ ] Add [blink-cmp](https://github.com/Saghen/blink.cmp) to auto complete @(user name list) and # tags (c.f.: [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)).
+- [ ] Develop and test a more robust conversion library to achieve 100% compatibility with Zhihu-flavored HTML.
 
 ## Installation
 
@@ -45,22 +53,6 @@ return {
   main = "zhihu",
   ---@type ZhnvimConfigs
   opts = {
-    default_browser = "chrome",
-    browser = {
-      firefox = {
-        interface = false,
-        init_url = "https://www.zhihu.com/",
-        path = util.get_browser_path("firefox") or "Unknown Firefox path",
-        db_path = util.get_firefox_cookies_path() or "Unknown Firefox DB path",
-      },
-      chrome = {
-        interface = true,
-        timeout = 10,
-        init_url = "https://www.zhihu.com/",
-        path = util.get_browser_path("chrome") or "Unknown Chrome path",
-        port = 9222,
-      },
-    },
     script = {
       typst = {
         pattern = "*.typ",
@@ -150,6 +142,26 @@ if f then
 end
 ```
 
+### Zhihu Auth
+
+In order to log in zhihu, this library search
+
+- firefox cookies database
+- chrome cookies database
+- pychrome: a python module to communicate with chrome browser.
+  open <https://www.zhihu.com/> to let user to log in
+
+A cookies will be cached. If you meet `403 Forbidden`, try:
+
+1. quit browser: avoid browser lock cookies database
+2. restart neovim: fetch latest cookies from browser cookies database
+
+If it doesn't work, try:
+
+1. log in zhihu again: update cookies of browser cookies database
+2. quit browser
+3. restart neovim
+
 ### Conversion Script
 
 `zhihu_on_neovim` offers a conversion API (implemented in Rust, compiled as a Lua dynamic library) to convert local CommonMark files to Zhihu-flavored HTML and upload them as drafts.
@@ -206,19 +218,10 @@ local function typst_script(content)
 end
 ```
 
-## Value
-- Convert local markdown files into Zhihu articles and send them to the draft box;
-- Using user-defined scripts to convert other file types into Zhihu articles, then upload them to the draft box.
-- Synchronizing Zhihu articles to local markdown files.
+## Similar Projects
 
-## To-do
-- [ ] Support editing Zhihu answers;
-- [ ] Support direct publishing of Zhihu articles and answers (bypassing the draft box);
-- [ ] Add [blink-cmp](https://github.com/Saghen/blink.cmp) to auto complete @(user name list) and # tags (c.f.: [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)).
-- [ ] Develop and test a more robust conversion library to achieve 100% compatibility with Zhihu-flavored HTML.
-
-## No-Value
-- Reading Zhihu articles in neovim.
+- [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)
+- [VSCode-Zhihu](https://github.com/niudai/VSCode-Zhihu)
 
 ## Related Projects
 

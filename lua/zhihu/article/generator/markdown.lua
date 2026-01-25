@@ -1,4 +1,5 @@
 ---Convert HTML content to Markdown
+local htmlEntities = require 'htmlEntities'
 local ChainedGenerator = require 'zhihu.article.generator.generator'.ChainedGenerator
 local SelectorGenerator = require 'zhihu.article.generator.generator'.SelectorGenerator
 local fn = require 'vim.fn'
@@ -33,7 +34,7 @@ local M = {
     template = "[%s](%s)",
   },
   code_block = SelectorGenerator {
-    selector = "div.highlight > pre > code",
+    selector = "div.highlight",
     template = [[
 
 ```%s
@@ -130,7 +131,15 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.code_block:convert_(node)
-  local c = self.template:format(fn.trim(node:getcontent()), (node.classes[1] or ""):gsub("^language--", ""))
+  local pre = node:select"pre"[1]
+  if not pre then
+    return
+  end
+  local code = pre:select"code"[1]
+  if not code then
+    return
+  end
+  local c = self.template:format((code.classes[1] or ""):gsub("^language--", ""), fn.trim(code:getcontent()))
   node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
 end
 
@@ -140,7 +149,8 @@ end
 function M.sup:convert_(node)
   local c = self.template:format(node.attributes["data-numero"] or "")
   node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
-  return ("%s: %s %s\n"):format(c, node.attributes["data-text"] or "", node.attributes["data-url"] or "")
+  local text = ("%s: %s %s\n"):format(c, node.attributes["data-text"] or "", node.attributes["data-url"] or "")
+  return htmlEntities.decode(text)
 end
 
 ---convert a HTML tag to other language's AST node

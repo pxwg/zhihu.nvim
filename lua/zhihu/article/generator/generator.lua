@@ -14,6 +14,13 @@ local M = {
   },
 }
 
+---TODO: https://github.com/msva/lua-htmlparser/issues/38#issuecomment-3707155560
+---@param node table
+---@param c string
+function M.settext(node, c)
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
 ---@param generator table?
 ---@return table generator
 function M.Generator:new(generator)
@@ -123,12 +130,11 @@ function M.SelectorGenerator:emit_(node)
 end
 
 ---convert a HTML tag to other language's AST node
----TODO: https://github.com/msva/lua-htmlparser/issues/38#issuecomment-3707155560
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.SelectorGenerator:convert_(node)
   local c = self.template:format(fn.trim(node:getcontent()))
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  M.settext(node, c)
 end
 
 return M

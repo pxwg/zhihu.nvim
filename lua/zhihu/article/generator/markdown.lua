@@ -1,9 +1,11 @@
 ---Convert HTML content to Markdown
 local htmlEntities = require 'htmlEntities'
+local url = require'socket.url'
+local fn = require 'vim.fn'
+
+local settext = require 'zhihu.article.generator.generator'.settext
 local ChainedGenerator = require 'zhihu.article.generator.generator'.ChainedGenerator
 local SelectorGenerator = require 'zhihu.article.generator.generator'.SelectorGenerator
-local fn = require 'vim.fn'
-local url = require'socket.url'
 
 local M = {
   head = SelectorGenerator {
@@ -104,7 +106,7 @@ function M.a:convert_(node)
     href = url.unescape((result.query or ""):match("target=([^;]+)") or "")
   end
   local c = self.template:format(fn.trim(node:getcontent()), href)
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 ---convert a HTML tag to other language's AST node
@@ -124,7 +126,7 @@ $$
 ]]
   end
   local c = template:format(latex)
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 ---convert a HTML tag to other language's AST node
@@ -140,7 +142,7 @@ function M.code_block:convert_(node)
     return
   end
   local c = self.template:format((code.classes[1] or ""):gsub("^language--", ""), fn.trim(code:getcontent()))
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 ---convert a HTML tag to other language's AST node
@@ -148,7 +150,7 @@ end
 ---@return string? code
 function M.sup:convert_(node)
   local c = self.template:format(node.attributes["data-numero"] or "")
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
   local text = ("%s: %s %s\n"):format(c, node.attributes["data-text"] or "", node.attributes["data-url"] or "")
   return htmlEntities.decode(text)
 end
@@ -160,7 +162,7 @@ function M.figure:convert_(node)
   local img = node:select "img"[1] or { attributes = {} }
   local figcaption = node:select "figcaption"[1]
   local c = self.template:format(figcaption and figcaption:getcontent() or "", img.attributes.src or "")
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 ---convert a HTML tag to other language's AST node
@@ -172,7 +174,7 @@ function M.ol:convert_(node)
     c = c .. self.template:format(i, li:getcontent())
   end
   c = c .. "\n"
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 ---convert a HTML tag to other language's AST node
@@ -184,7 +186,7 @@ function M.ul:convert_(node)
     c = c .. self.template:format(li:getcontent())
   end
   c = c .. "\n"
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 ---convert a HTML tag to other language's AST node
@@ -206,7 +208,7 @@ function M.table:convert_(node)
     end
   end
   c = c .. "\n"
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 ---convert a HTML tag to other language's AST node
@@ -218,7 +220,7 @@ function M.blockquote:convert_(node)
     c = c .. self.template:format(line)
   end
   c = c .. "\n"
-  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  settext(node, c)
 end
 
 M.generator = ChainedGenerator {

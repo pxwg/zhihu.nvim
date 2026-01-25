@@ -72,27 +72,83 @@ return {
 }
 ```
 
-## Dependency
-
-<!-- TODO: Add dependency management. -->
-- Rust tool chain, curl, python.
-- Support for *nix systems only, Windows support is under development (progress may be slow as I don't have a Windows machine).
-
 ## Usage
 
-- Open a local file in neovim;
-- Saving your cookie:
-  - With `:ZhihuAuth` command, this plugin will (`browser_name` is `firefox` or `chrome` for now):
-    - If `:ZhihuAuth browser_name interface` is typed, it will open the browser and ask you to login (support for Chrome only), then save the cookie in `vim.g.zhvim_cookies`;
-    - If `:ZhihuAuth browser_name interface` is not typed, it will try to read the cookie from the browser's cookie database (support for Chromium and Firefox) and save it in `vim.g.zhvim_cookies`;
-  - By editing global variable `$ZHIVIM_COOKIES` or `vim.g.zhvim_cookies `, this plugin will use it to authenticate your zhihu account.
-  - This plugin will **NEVER** save your cookie automatically in the file system or share it with others, so you can safely use it in your private environment.
-- Run `:ZhihuDraft` to int/update the draft;
-    - If the file type is `markdown`, this plugin will automatically detect it and convert it into a Zhihu-flavored HTML, then using the Zhihu API with your cookie to upload it to your draft box;
-  - If the file type matches the `script[filetype]` in the configuration, you need to using some scripts (`pandoc` may be useful) to convert it into [CommonMark](https://spec.commonmark.org/), then this plugin will convert it into Zhihu-flavored HTML and upload it to your draft box;
-- Run `:ZhihuOpen` to open the draft box in your browser;
-- Run `:ZhihuSync` to enter the diff page, compare the differences between the Zhihu web version and the local Markdown file, and use Neovim's built-in `diff` feature to edit the differences.
-- Run `:ZhihuLink attach` or `:ZhihuLink detach` to attach or detach the current file with the Zhihu article, allowing you to edit the file and synchronize it with the Zhihu article.
+### Zhihu Article
+
+```sh
+vi zhihu://XXX.md
+# or
+vi zhihu://XXX.html
+```
+
+or in neovim:
+
+```vim
+:edit zhihu://XXX.md
+```
+
+The article whose id is XXX will be opened.
+After editing,
+
+```vim
+:write
+```
+
+will save and upload the article.
+
+```vim
+:nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
+```
+
+Press `<localleader>lv` to open the article in your browser.
+
+If you want to create an article from a default template, try:
+
+```vim
+:edit zhihu://new.md
+```
+
+```markdown
+> 本文使用 [Zhihu on NeoVim](https://github.com/pxwg/zhihu.nvim) 创作并发布
+```
+
+If you try to open a non-existent article, you will see:
+
+```vim
+:edit zhihu://0.md
+```
+
+```markdown
+# 404
+
+你似乎来到了没有知识存在的荒原
+
+[去往首页](https://www.zhihu.com)
+```
+
+You can update zhihu article by:
+
+```lua
+local Article = require 'zhihu.article.markdown'.Article
+-- or if your prefer using HTML to write article
+-- local Article = require 'zhihu.article.html'.Article
+local id = "your_article_id"
+local article
+if id then
+  article = Article:from_id(id)
+  -- or create an article
+else
+  article = Article { title = "title" }
+end
+local f = io.open "/the/path/of/your/article.md"
+if f then
+  local markdown = f:read "*a"
+  f:close()
+  article:set_content(markdown)
+  article:update()
+end
+```
 
 ### Conversion Script
 
@@ -156,11 +212,10 @@ end
 - Synchronizing Zhihu articles to local markdown files.
 
 ## To-do
-- Support for Windows;
-- Support editing Zhihu answers;
-- Support direct publishing of Zhihu articles and answers (bypassing the draft box);
-- Add [blink-cmp](https://github.com/Saghen/blink.cmp) to auto complete @(user name list) and # tags (c.f.: [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)).
-- Develop and test a more robust conversion library to achieve 100% compatibility with Zhihu-flavored HTML.
+- [ ] Support editing Zhihu answers;
+- [ ] Support direct publishing of Zhihu articles and answers (bypassing the draft box);
+- [ ] Add [blink-cmp](https://github.com/Saghen/blink.cmp) to auto complete @(user name list) and # tags (c.f.: [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)).
+- [ ] Develop and test a more robust conversion library to achieve 100% compatibility with Zhihu-flavored HTML.
 
 ## No-Value
 - Reading Zhihu articles in neovim.

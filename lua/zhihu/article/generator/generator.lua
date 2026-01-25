@@ -1,4 +1,5 @@
 ---Code generators for article
+local parse = require 'htmlparser'.parse
 local deepcopy = require 'vim.shared'.deepcopy
 local fn = require 'vim.fn'
 local M = {
@@ -8,7 +9,7 @@ local M = {
   },
   SelectorGenerator = {
     selector = "*",
-    template = "",
+    template = "%s",
   },
 }
 
@@ -26,27 +27,38 @@ setmetatable(M.Generator, {
   __call = M.Generator.new
 })
 
----@param root table
+---translate HTML to other markup language
+---@param html string
 ---@return string code
-function M.Generator:generate(root)
-  local new_root, code = self:emit(root)
-  return new_root:gettext() .. "\n" .. code
+function M.Generator:translate(html)
+  local node = parse(html)
+  return self:generate(node)
+end
+
+---generate other markup language from HTML node
+---@param node table
+---@return string code
+function M.Generator:generate(node)
+  local new_node, code = self:emit(node)
+  local text = new_node:gettext()
+  text = text:gsub("\n\n\n+", "\n\n")
+  return fn.trim(text .. "\n\n" .. code)
 end
 
 ---emit HTML tag to other language's AST node purely
 ---@see emit_
----@param root table
----@return table root
+---@param node table
+---@return table node
 ---@return string? code
-function M.Generator:emit(root)
-  root = deepcopy(root)
-  return root, self:emit_(root)
+function M.Generator:emit(node)
+  node = deepcopy(node)
+  return node, self:emit_(node)
 end
 
 ---emit HTML tag to other language's AST node
----@param root table HTML content to be converted
+---@param node table HTML content to be converted
 ---@return string? code footnote code
-function M.Generator:emit_(root)
+function M.Generator:emit_(node)
 end
 
 ---@param generator table?
@@ -66,12 +78,12 @@ setmetatable(M.ChainedGenerator, {
 })
 
 ---emit HTML tag to other language's AST node in clain
----@param root table HTML content to be converted
+---@param node table HTML content to be converted
 ---@return string code
-function M.ChainedGenerator:emit_(root)
+function M.ChainedGenerator:emit_(node)
   local text = ""
   for _, generator in ipairs(self) do
-    text = text .. (generator:emit_(root) or "")
+    text = text .. (generator:emit_(node) or "")
   end
   return text
 end
@@ -93,22 +105,29 @@ setmetatable(M.SelectorGenerator, {
 })
 
 ---convert all selected HTML tags in batch
----@param root table HTML content to be converted
+---@param node table HTML content to be converted
 ---@return string? code
-function M.SelectorGenerator:emit_(root)
+function M.SelectorGenerator:emit_(node)
   local text = ""
-  for _, tag in ipairs(root:select(self.selector)) do
+  local tag = node:select(self.selector)[1]
+  while tag do
     text = text .. (self:convert_(tag) or "")
+    local new_node = parse(node:gettext())
+    for k, v in pairs(new_node) do
+      node[k] = v
+    end
+    tag = node:select(self.selector)[1]
   end
   return text
 end
 
 ---convert a HTML tag to other language's AST node
 ---TODO: https://github.com/msva/lua-htmlparser/issues/38#issuecomment-3707155560
----@param root table HTML content to be converted
+---@param node table HTML content to be converted
 ---@return string? code
-function M.SelectorGenerator:convert_(root)
-  root:settext(self.template:format(fn.trim(root:getcontent())))
+function M.SelectorGenerator:convert_(node)
+  local c = self.template:format(fn.trim(node:getcontent()))
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
 end
 
 return M

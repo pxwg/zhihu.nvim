@@ -5,6 +5,7 @@ local Patch = require 'zhihu.api.article.patch'.API
 local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
 local fs = require 'vim.fs'
+local split = require 'vim.shared'.split
 local json = require 'vim.json'
 local M = {
   selector = ".RichText.ztext",
@@ -58,11 +59,11 @@ setmetatable(M.Article, {
 ---factory method. wrap `from_html`
 ---@param id string
 ---@return table
-function M.Article.from_id(id)
+function M.Article:from_id(id)
   local api = Get.from_id(id)
   local resp = api:request()
   local text = resp.status_code == 200 and resp.text or resp.status
-  local article = M.Article.from_html(text)
+  local article = self:from_html(text)
   if article.itemId == "" then
     article.itemId = id
   end
@@ -72,13 +73,16 @@ end
 ---factory method.
 ---@param html string?
 ---@return table
-function M.Article.from_html(html)
+function M.Article:from_html(html)
   html = html or ""
   local root = parse(html)
   local tag = root:select(("[%s]"):format(M.attribute))[1]
   local article = json.decode(tag and tag.attributes[M.attribute]:gsub("&quot;", '"') or "{}")
-  article.root = root:select(M.selector)[1] or root:select(M.error_selector)[1] or parse ""
-  return M.Article(article)
+  article.root = root:select(M.selector)[1] or root:select(M.error_selector)[1] or root
+  if article.root.root ~= article.root then
+    article.root = parse(article.root:gettext())
+  end
+  return self(article)
 end
 
 ---update article
@@ -103,11 +107,8 @@ end
 ---split article to lines
 ---@return string[]
 function M.Article:get_lines()
-  local lines = {}
-  for line in tostring(self):gmatch("[^\r\n]+") do
-    table.insert(lines, line)
-  end
-  return lines
+  local text = tostring(self)
+  return split(text, "\n\r?")
 end
 
 ---set HTML content

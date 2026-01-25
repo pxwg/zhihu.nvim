@@ -1,9 +1,23 @@
+---will be refactored to lua/zhihu/api/image
+---@class upload_token
+---@field access_id string
+---@field access_key string
+---@field access_token string
+---@field access_timestamp number
+
+---@class upload_file
+---@field image_id string
+---@field object_key string
+---@field state number
+
+---@class upload_response
+---@field upload_vendor string
+---@field upload_token upload_token
+---@field upload_file upload_file
 local uv = require 'vim.uv'
-local fs = require 'vim.fs'
 local json = require 'vim.json'
 local requests = require "requests"
 local auth = require 'zhihu.auth'
-local util = require("zhihu.util")
 local M = {}
 
 ---TODO: Reads a file as binary and calculates its SHA256 hash.
@@ -45,93 +59,6 @@ local function calculate_signature(access_key_secret, string_to_sign)
   local signature = handle:read("*a"):gsub("%s+", "") -- Remove trailing whitespace/newlines
   handle:close()
   return vim.base64.encode(signature)
-end
-
----Function to initialize a draft on Zhihu
----@param html_content html_content HTML content of the article
----@param cookies string? Cookies for authentication
----@return string?
----@return string?
-function M.init_draft(html_content, cookies)
-  cookies = cookies or auth.dumps_cookies()
-  local draft_url = "https://zhuanlan.zhihu.com/api/articles/drafts"
-
-  local draft_body = {
-    title = html_content.title,
-    content = html_content.content,
-    delta_time = 0,
-    can_reward = false,
-  }
-
-  local headers = {
-    ["User-Agent"] =
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-    ["Content-Type"] = "application/json",
-    ["Cookie"] = cookies,
-    ["x-requested-with"] = "fetch",
-  }
-
-  local isok, response = pcall(requests.post, {
-    url = draft_url,
-    headers = headers,
-    data = json.encode(draft_body),
-  })
-  if not isok then
-    return nil, response
-  end
-  if response.status_code ~= 200 then
-    return nil, response.status
-  end
-
-  local draft_response = response.json()
-
-  if draft_response and draft_response.id then
-    return draft_response.id, html_content.content
-  else
-    vim.notify("Error generating draft.", vim.log.levels.ERROR)
-    return nil, nil
-  end
-end
-
----Function to update a draft on Zhihu
----@param draft_id string ID of the draft to update
----@param html_content html_content
----@param cookies string? Cookies for authentication
-function M.update_draft(draft_id, html_content, cookies)
-  cookies = cookies or auth.dumps_cookies()
-  local patch_url = string.format("https://zhuanlan.zhihu.com/api/articles/%s/draft", draft_id)
-
-  local patch_body = {
-    title = html_content.title,
-    content = html_content.content,
-    table_of_contents = false,
-    delta_time = 30,
-    can_reward = false,
-  }
-
-  local headers = {
-    ["User-Agent"] =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-    ["Content-Type"] = "application/json",
-    ["Cookie"] = cookies,
-    ["x-requested-with"] = "fetch",
-  }
-
-  local isok, response = pcall(requests.patch, {
-    url = patch_url,
-    headers = headers,
-    data = json.encode(patch_body),
-  })
-  if not isok then
-    vim.notify("Error updating draft.", vim.log.levels.ERROR)
-    return
-  end
-  if response.status_code ~= 200 then
-    vim.notify("Error updating draft.", vim.log.levels.ERROR)
-    return
-  end
-
-  vim.notify("Updated draft successfully.", vim.log.levels.INFO)
 end
 
 ---Get image ID from hash using Zhihu API.
@@ -200,8 +127,7 @@ end
 --   return
 -- end
 -- print(hash)
--- local cookie = vim.env.ZHIVIM_COOKIES or vim.g.zhvim_cookies
--- print(vim.inspect(M.get_image_id_from_hash(hash, cookie)))
+-- print(vim.inspect(M.get_image_id_from_hash(hash)))
 
 ---Upload an image to Zhihu and return the response
 ---@param image_path string Absolute path to the image
@@ -272,8 +198,6 @@ end
 ---@param upload_file upload_file File information for the image
 ---@return string? New image URL or nil if upload failed
 function M.get_image_link(image_path, upload_token, upload_file)
-  local base_dir = fs.dirname(vim.api.nvim_buf_get_name(0))
-  image_path = util.get_absolute_path(image_path, base_dir)
 
   local img_hash = M.read_file_and_hash(image_path)
   if not img_hash then

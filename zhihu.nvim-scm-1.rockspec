@@ -62,7 +62,6 @@ build = {
       ["zhihu.api.article.patch"] = "lua/zhihu/api/article/patch.lua",
       ["zhihu.api.image.post"] = "lua/zhihu/api/image/post.lua",
       ["zhihu.api.image.put"] = "lua/zhihu/api/image/put.lua",
-      ["zhihu.article.scripts.html_md"] = "lua/zhihu/article/scripts/html_md.py",
       ["zhihu.article.templates.Untitled"] = "lua/zhihu/article/templates/Untitled.md",
       ["zhihu.article.generator.generator"] = "lua/zhihu/article/generator/generator.lua",
       ["zhihu.article.generator.markdown"] = "lua/zhihu/article/generator/markdown.lua",
@@ -70,15 +69,6 @@ build = {
       ["zhihu.article.markdown"] = "lua/zhihu/article/markdown.lua",
       ["zhihu.article"] = "lua/zhihu/article.lua",
       ["zhihu.image"] = "lua/zhihu/image.lua",
-      ["zhihu.article_sync"] = "lua/zhihu/article_sync.lua",
-      ["zhihu.article_upload"] = "lua/zhihu/article_upload.lua",
-      ["zhihu.buf_id"] = "lua/zhihu/buf_id.lua",
-      ["zhihu.commands"] = "lua/zhihu/commands.lua",
-      ["zhihu.config"] = "lua/zhihu/config.lua",
-      ["zhihu.init"] = "lua/zhihu/init.lua",
-      ["zhihu.md_html"] = "lua/zhihu/md_html.lua",
-      ["zhihu.script"] = "lua/zhihu/script.lua",
-      ["zhihu.util"] = "lua/zhihu/util.lua",
     }
   },
 }

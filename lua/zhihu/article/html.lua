@@ -1,12 +1,15 @@
 --- a class to get/post/patch zhihu article in HTML
+local htmlEntities = require 'htmlEntities'
+local fs = require 'vim.fs'
+local split = require 'vim.shared'.split
+local json = require 'vim.json'
+
 local Get = require 'zhihu.api.article.get'.API
 local Post = require 'zhihu.api.article.post'.API
 local Patch = require 'zhihu.api.article.patch'.API
 local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
-local fs = require 'vim.fs'
-local split = require 'vim.shared'.split
-local json = require 'vim.json'
+
 local M = {
   selector = ".RichText.ztext",
   error_selector = ".ErrorPage-text",
@@ -77,7 +80,7 @@ function M.Article:from_html(html)
   html = html or ""
   local root = parse(html)
   local tag = root:select(("[%s]"):format(M.attribute))[1]
-  local article = json.decode(tag and tag.attributes[M.attribute]:gsub("&quot;", '"') or "{}")
+  local article = json.decode(tag and htmlEntities.decode(tag.attributes[M.attribute]) or "{}")
   article.root = root:select(M.selector)[1] or root:select(M.error_selector)[1] or root
   if article.root.root ~= article.root then
     article.root = parse(article.root:gettext())

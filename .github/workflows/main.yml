@@ -15,6 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Rust toolchain
+        uses: moonrepo/setup-rust@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Run tests
+        run: cargo test --features=lua51
       - uses: nvim-neorocks/luarocks-tag-release@v7
         env:
           LUAROCKS_API_KEY: ${{secrets.LUAROCKS_API_KEY}}

@@ -1,39 +1,237 @@
 ---Convert HTML content to Markdown
----TODO: Replace python's beautifulsoup4 by lua's htmlparser
+local ChainedGenerator = require 'zhihu.article.generator.generator'.ChainedGenerator
+local SelectorGenerator = require 'zhihu.article.generator.generator'.SelectorGenerator
 local fn = require 'vim.fn'
-local fs = require 'vim.fs'
-local get_python_executable = require 'zhihu.auth.pychrome'.get_python_executable
+local url = require'socket.url'
+
 local M = {
-  generator = {}
+  head = SelectorGenerator {
+    selector = "head",
+    template = "",
+  },
+  br = SelectorGenerator {
+    selector = "br",
+    template = "\n",
+  },
+  i = SelectorGenerator {
+    selector = "i",
+    template = "*%s*",
+  },
+  b = SelectorGenerator {
+    selector = "b",
+    template = "**%s**",
+  },
+  tex = SelectorGenerator {
+    selector = ".ztext-math",
+    template = "$%s$",
+  },
+  span = SelectorGenerator {
+    selector = "span",
+  },
+  a = SelectorGenerator {
+    selector = "a",
+    template = "[%s](%s)",
+  },
+  code_block = SelectorGenerator {
+    selector = "div.highlight > pre > code",
+    template = [[
+
+```%s
+%s
+```
+
+]],
+  },
+  code = SelectorGenerator {
+    selector = "code",
+    template = "`%s`",
+  },
+  sup = SelectorGenerator {
+    selector = "sup[data-numero]",
+    template = "[^%s]",
+  },
+  figure = SelectorGenerator {
+    selector = "figure",
+    template = "\n\n![%s](%s)\n\n",
+  },
+  h = {},
+  ol = SelectorGenerator {
+    selector = "ol",
+    template = "%d. %s\n",
+  },
+  ul = SelectorGenerator {
+    selector = "ul",
+    template = "- %s\n",
+  },
+  table = SelectorGenerator {
+    selector = "table",
+    template = "| %s |\n",
+  },
+  p = SelectorGenerator {
+    selector = "p",
+    template = "%s\n\n",
+  },
+  blockquote = SelectorGenerator {
+    selector = "blockquote",
+    template = "> %s\n",
+  },
+  div = SelectorGenerator {
+    selector = "div",
+  },
+  body = SelectorGenerator {
+    selector = "body",
+  },
+  html = SelectorGenerator {
+    selector = "html",
+  },
 }
 
----Convert HTML content from a file to Markdown with specific rules.
----@param root table HTML content to be converted
----@return string markdown Converted Markdown content or an error message
-function M.generator:generate(root)
-  local plugin_root = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
-  local python_script = fs.joinpath(plugin_root, "scripts", "html_md.py")
-  local python_executable = get_python_executable()
-
-  local temp_file = "/tmp/nvim_html_to_md_content.html"
-  local file = io.open(temp_file, "w")
-  if not file then
-    vim.notify("Failed to open temporary file for writing.", vim.log.levels.ERROR)
-    return ""
-  end
-  file:write(root:gettext())
-  file:close()
-
-  local output = fn.system({ python_executable, python_script, temp_file })
-
-  os.remove(temp_file)
-
-  if vim.v.shell_error ~= 0 then
-    vim.notify("Python script failed with error code: " .. output, vim.log.levels.ERROR)
-    return ""
-  end
-
-  return output
+for i = 1, 6 do
+  M.h[i] = SelectorGenerator {
+    selector = ("h%d"):format(i),
+    template = "\n\n" .. string.rep("#", i) .. " %s\n\n",
+  }
 end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.a:convert_(node)
+  local href = node.attributes.href or ""
+  local result = url.parse(href)
+  if result.host == "link.zhihu.com" then
+    href = url.unescape((result.query or ""):match("target=([^;]+)") or "")
+  end
+  local c = self.template:format(fn.trim(node:getcontent()), href)
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.tex:convert_(node)
+  local template = self.template
+  local latex = node.attributes["data-tex"] or ""
+  if latex:sub(-2) == "\\\\" then
+    latex = latex:sub(1, -2)
+    template = [[
+
+$$
+%s
+$$
+
+]]
+  end
+  local c = template:format(latex)
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.code_block:convert_(node)
+  local c = self.template:format(fn.trim(node:getcontent()), (node.classes[1] or ""):gsub("^language--", ""))
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.sup:convert_(node)
+  local c = self.template:format(node.attributes["data-numero"] or "")
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+  return ("%s: %s %s\n"):format(c, node.attributes["data-text"] or "", node.attributes["data-url"] or "")
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.figure:convert_(node)
+  local img = node:select "img"[1] or { attributes = {} }
+  local figcaption = node:select "figcaption"[1]
+  local c = self.template:format(figcaption and figcaption:getcontent() or "", img.attributes.src or "")
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.ol:convert_(node)
+  local c = "\n\n"
+  for i, li in ipairs(node:select "li") do
+    c = c .. self.template:format(i, li:getcontent())
+  end
+  c = c .. "\n"
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.ul:convert_(node)
+  local c = "\n\n"
+  for _, li in ipairs(node:select "li") do
+    c = c .. self.template:format(li:getcontent())
+  end
+  c = c .. "\n"
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.table:convert_(node)
+  local c = "\n\n"
+  for i, tr in ipairs(node:select "tr") do
+    local tds = {}
+    for _, tr in ipairs(tr:select "tr") do
+      table.insert(tds, tr:getcontent())
+    end
+    for _, td in ipairs(tr:select "td") do
+      table.insert(tds, td:getcontent())
+    end
+    c = c .. self.template:format(table.concat(tds, " | "))
+    if i == 1 then
+      c = c .. self.template:format(table.concat(fn.strwidth(tds), " | "))
+    end
+  end
+  c = c .. "\n"
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+---convert a HTML tag to other language's AST node
+---@param node table HTML content to be converted
+---@return string? code
+function M.blockquote:convert_(node)
+  local c = "\n\n"
+  for line in fn.trim(node:getcontent()):gmatch "[^\n\r]+" do
+    c = c .. self.template:format(line)
+  end
+  c = c .. "\n"
+  node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
+end
+
+M.generator = ChainedGenerator {
+  M.head,
+  M.br,
+  M.i,
+  M.b,
+  M.tex,
+  M.span,
+  M.a,
+  M.code_block,
+  M.code,
+  M.sup,
+  M.figure,
+  M.h[1], M.h[2], M.h[3], M.h[4], M.h[5], M.h[6],
+  M.ol,
+  M.ul,
+  M.table,
+  M.p,
+  M.blockquote,
+  M.div,
+  M.body,
+  M.html
+}
 
 return M

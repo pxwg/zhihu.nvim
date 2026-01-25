@@ -50,7 +50,7 @@ function M.read_cb()
   local id = M.filename_to_id()
   local article
   if tonumber(id) then
-    article = Article.from_id(id)
+    article = Article:from_id(id)
   else
     article = Article()
   end

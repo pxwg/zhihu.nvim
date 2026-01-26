@@ -13,7 +13,7 @@ local M = {
   }
 }
 
----TODO: Reads a file as binary and calculates its SHA256 hash.
+---Reads a file as binary and calculates its SHA256 hash.
 ---@param file string The absolute path to the file
 ---@return string hash of the file content
 function M.md5(file)

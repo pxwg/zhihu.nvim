@@ -14,33 +14,22 @@
 ---@field upload_vendor string
 ---@field upload_token upload_token
 ---@field upload_file upload_file
-local uv = require 'vim.uv'
-local json = require 'vim.json'
+local md5 = require "md5"
+local guess = require 'mimetypes'.guess
 local requests = require "requests"
-local auth = require 'zhihu.auth'
 local M = {}
 
 ---TODO: Reads a file as binary and calculates its SHA256 hash.
 ---@param file_path string The absolute path to the file
 ---@return string? The SHA256 hash of the file content, or nil if an error occurs
 function M.read_file_and_hash(file_path)
-  local sha256_cmd = "openssl dgst -md5 " .. vim.fn.shellescape(file_path) .. " | awk '{print $2}'"
-  local hash = vim.fn.system(sha256_cmd):gsub("%s+", "")
-  return hash
-end
-
--- Function to infer MIME type from file extension
-local function infer_mime_type(file_path)
-  local ext = file_path:match("^.+(%..+)$"):lower()
-  local mime_types = {
-    [".jpg"] = "image/jpeg",
-    [".jpeg"] = "image/jpeg",
-    [".png"] = "image/png",
-    [".gif"] = "image/gif",
-    [".bmp"] = "image/bmp",
-    [".webp"] = "image/webp",
-  }
-  return mime_types[ext] or "application/octet-stream" -- Default to binary stream
+  local f = io.open(file_path, "rb")
+  local data = ""
+  if f then
+    data = f:read "*a"
+    f:close()
+  end
+  return md5.sumhexa(data)
 end
 
 ---Calculate the HMAC-SHA1 signature and return it as a base64-encoded string.
@@ -61,80 +50,12 @@ local function calculate_signature(access_key_secret, string_to_sign)
   return vim.base64.encode(signature)
 end
 
----Get image ID from hash using Zhihu API.
----@param img_hash string Image hash to retrieve ID for
----@param cookies string? Authentication cookie for Zhihu API
----@return upload_response?
-function M.get_image_id_from_hash(img_hash, cookies)
-  cookies = cookies or auth.dumps_cookies()
-  local url = "https://api.zhihu.com/images"
-
-  local headers = {
-    ["Content-Type"] = "application/json",
-    ["Accept-Language"] = "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-    ["Cookie"] = cookies,
-  }
-  local body = {
-    image_hash = img_hash,
-    source = "article",
-  }
-
-  local isok, response = pcall(requests.post, {
-    url = url,
-    headers = headers,
-    data = json.encode(body),
-  })
-  if not isok then
-    vim.notify("Failed to retrieve image ID.", vim.log.levels.ERROR)
-    return
-  end
-  if response.status_code ~= 200 then
-    vim.notify("Failed to parse response from Zhihu API", vim.log.levels.ERROR)
-    return
-  end
-
-  local parsed_response = response.json()
-  vim.notify("Image ID retrieved successfully.", vim.log.levels.INFO)
-  return parsed_response
-end
-
----Generate a random hash using the system's time and a random number.
----@return string
-function M.generate_random_hash()
-  local os_name = uv.os_uname().sysname:lower()
-
-  local md5_command = "md5" -- Default for macOS
-  if os_name == "linux" then
-    md5_command = "md5sum"
-  end
-  local random_seed = tostring(os.time()) .. tostring(math.random())
-  local handle = io.popen(string.format("echo -n '%s' | %s", random_seed, md5_command))
-  if not handle then
-    vim.notify("Failed to execute command: " .. md5_command, vim.log.levels.ERROR)
-    return ""
-  end
-  local result = handle:read("*a")
-  handle:close()
-
-  return result:match("%w+")
-end
-
--- local filepath = vim.fn.expand("~/tests/test.png")
--- local hash = M.read_file_and_hash(filepath)
--- -- local hash = M.generate_random_hash()
--- if not hash then
---   vim.notify("Failed to read or hash the file: " .. filepath, vim.log.levels.ERROR)
---   return
--- end
--- print(hash)
--- print(vim.inspect(M.get_image_id_from_hash(hash)))
-
 ---Upload an image to Zhihu and return the response
 ---@param image_path string Absolute path to the image
 ---@param upload_token upload_token Authentication token for Zhihu API
 ---@return boolean? response
 function M.upload_image(image_path, upload_token)
-  local mime_type = infer_mime_type(image_path)
+  local mime_type = guess(image_path) or "application/octet-stream"
   if not mime_type then
     vim.notify("Failed to infer MIME type for file: " .. image_path, vim.log.levels.ERROR)
     return nil
@@ -190,41 +111,6 @@ function M.upload_image(image_path, upload_token)
   end
 
   return response.text
-end
-
----Get the image link from Zhihu API or upload it if it is not uploaded.
----@param image_path string Absolute path to the image
----@param upload_token upload_token Authentication token for Zhihu API
----@param upload_file upload_file File information for the image
----@return string? New image URL or nil if upload failed
-function M.get_image_link(image_path, upload_token, upload_file)
-
-  local img_hash = M.read_file_and_hash(image_path)
-  if not img_hash then
-    vim.notify("Failed to read or hash the file: " .. image_path, vim.log.levels.ERROR)
-    return nil
-  end
-  local mime_type = infer_mime_type(image_path)
-  local image_status = upload_file.state
-  local url = "https://picx.zhimg.com/v2-" .. img_hash .. "." .. mime_type:match("image/(%w+)")
-  if image_status == 1 then
-    return url
-  elseif image_status == 2 then
-    local response = M.upload_image(image_path, upload_token)
-    if response then
-      vim.notify("Image uploaded successfully.", vim.log.levels.INFO)
-      return url
-    else
-      vim.notify("Failed to upload image.", vim.log.levels.ERROR)
-      return nil
-    end
-  else
-    vim.notify(
-      "Image upload status is unknown: " .. image_status .. ", returning the default url",
-      vim.log.levels.ERROR
-    )
-    return url
-  end
 end
 
 return M

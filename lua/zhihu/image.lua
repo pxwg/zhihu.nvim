@@ -1,13 +1,10 @@
 --- a class to get/post/patch zhihu image in HTML
 local Post = require 'zhihu.api.image.post'.API
 local Put = require 'zhihu.api.image.put'.API
-local fs = require 'vim.fs'
-local md5 = require 'zhihu.api.image.post'.md5
-local infer_mime_type = require 'zhihu.api.image.put'.infer_mime_type
 local M = {
+  url = "https://picx.zhimg.com/%s",
   Image = {
-    mime = Put.headers["Content-Type"],
-    url = "https://picx.zhimg.com/v2-%s.%s",
+    upload_file = {}
   }
 }
 
@@ -15,11 +12,8 @@ local M = {
 ---@return table image
 function M.Image:new(image)
   image = image or {}
-  image.file = fs.normalize(fs.abspath(image.file))
-  image.hash = md5(image.file)
-  image.mime = infer_mime_type(image.file)
-  image.url = M.Image.url:format(image.hash, image.mime:match("[^/]+$") or "")
   setmetatable(image, {
+    __tostring = self.tostring,
     __index = self
   })
   return image
@@ -29,29 +23,34 @@ setmetatable(M.Image, {
   __call = M.Image.new
 })
 
----update image
----@return boolean
-function M.Image:update()
-  local api = Post.from_file(self.file)
+---Convert a table<string, string> to string
+---@return string
+function M.Image:tostring()
+  return M.url:format(self.upload_file.object_key or "")
+end
+
+---create from a file path
+---@param file string
+---@return table image
+function M.Image.from_file(file)
+  local api = Post.from_file(file)
   local resp = api:request()
   if resp.status_code ~= 200 then
-    self.status = resp.status
-    return false
+    return M.Image { upload_file = { image_id = resp.status } }
   end
-  local upload_result = resp.json()
+  local image = M.Image(resp.json())
   -- image exists
-  if upload_result.upload_file.state == 1 then
-    return true
+  if image.upload_file.state == 1 then
+    return image
   end
-  -- upload_result.upload_file.state == 2
-  local upload_token = upload_result.upload_token
-  api = Put.from_file(self.file, upload_token.access_id, upload_token.access_token, upload_token.access_key)
+  assert(image.upload_file.state == 2)
+
+  api = Put.from_image(file, image)
   resp = api:request()
   if resp.status_code ~= 200 then
-    self.status = resp.status
-    return false
+    image.upload_file.image_id = resp.status
   end
-  return true
+  return image
 end
 
 return M

@@ -1,17 +1,9 @@
 --- upload a zhihu image
 local requests = require "requests"
-local md5 = require 'zhihu.api.image.post'.md5
-local sha1 = require'sha1'
-local base64 = require'vim.base64'
+local guess = require 'mimetypes'.guess
+local sha1 = require 'sha1'
+local base64 = require 'vim.base64'
 local M = {
-  mime_types = {
-    jpg = "image/jpeg",
-    jpeg = "image/jpeg",
-    png = "image/png",
-    gif = "image/gif",
-    bmp = "image/bmp",
-    webp = "image/webp",
-  },
   string_to_sign = [[PUT
 
 %s
@@ -19,9 +11,9 @@ local M = {
 x-oss-date:%s
 x-oss-security-token:%s
 x-oss-user-agent:%s
-/zhihu-pics/v2-%s]],
+/zhihu-pics/%s]],
   API = {
-    url = "https://zhihu-pics-upload.zhimg.com/v2-%s",
+    url = "https://zhihu-pics-upload.zhimg.com/%s",
     headers = {
       ["User-Agent"] = "aliyun-sdk-js/6.8.0 Firefox 137.0 on OS X 10.15",
       ["Accept-Encoding"] = "gzip, deflate, br, zstd",
@@ -32,14 +24,6 @@ x-oss-user-agent:%s
     }
   }
 }
-
----infer MIME type from file extension
----@param file string
----@return string? mime
-function M.infer_mime_type(file)
-  local ext = file:match("[^.]+$"):lower()
-  return M.mime_types[ext]
-end
 
 ---@param api table?
 ---@return table api
@@ -57,11 +41,29 @@ setmetatable(M.API, {
 
 ---factory method.
 ---@param file string
+---@param image table
+---@return table
+function M.API.from_image(file, image)
+  return M.API.from_upload_token(file, image.upload_file.object_key, image.upload_token)
+end
+
+---factory method.
+---@param file string
+---@param object_key string
+---@param upload_token table<string, string>
+---@return table
+function M.API.from_upload_token(file, object_key, upload_token)
+  return M.API.from_access_token(file, object_key, upload_token.access_id, upload_token.access_token, upload_token.access_key)
+end
+
+---factory method.
+---@param file string
+---@param object_key string
 ---@param access_id string
 ---@param access_token string
 ---@param access_key string
 ---@return table
-function M.API.from_file(file, access_id, access_token, access_key)
+function M.API.from_access_token(file, object_key, access_id, access_token, access_key)
   local api = {}
   local f = io.open(file, "rb")
   if f then
@@ -69,11 +71,12 @@ function M.API.from_file(file, access_id, access_token, access_key)
     f:close()
   end
   api = M.API(api)
-  api.headers["Content-Type"] = M.infer_mime_type(file) or api.headers["Content-Type"]
+  api.url = api.url:format(object_key)
+  api.headers["Content-Type"] = guess(file) or api.headers["Content-Type"]
   api.headers["x-oss-date"] = os.date("!%a, %d %b %Y %H:%M:%S GMT")
   api.headers["x-oss-security-token"] = access_token
   local string_to_sign = M.string_to_sign:format(api.headers["Content-Type"], api.headers["x-oss-date"],
-    api.headers["x-oss-date"], access_token, api.headers["User-Agent"], md5(file))
+    api.headers["x-oss-date"], access_token, api.headers["User-Agent"], object_key)
   local signature = base64.encode(sha1.hmac_binary(access_key, string_to_sign))
   api.headers["Authorization"] = api.headers["Authorization"]:format(access_id, signature)
   return api

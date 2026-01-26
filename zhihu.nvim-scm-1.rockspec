@@ -25,7 +25,7 @@ description = {
 build_dependencies = {}
 
 dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp", "htmlparser", "lua-cjson", "md5", "sha1",
-  "base64", "html-entities" }
+  "base64", "html-entities", "mimetypes" }
 
 test_dependencies = {}
 

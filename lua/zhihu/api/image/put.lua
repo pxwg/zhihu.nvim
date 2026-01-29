@@ -19,7 +19,7 @@ x-oss-user-agent:%s
       ["Accept-Encoding"] = "gzip, deflate, br, zstd",
       ["Content-Type"] = "application/octet-stream",
       ["Accept-Language"] = "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-      ["x-oss-user-agent: "] = "aliyun-sdk-js/6.8.0 Firefox 137.0 on OS X 10.15",
+      ["x-oss-user-agent"] = "aliyun-sdk-js/6.8.0 Firefox 137.0 on OS X 10.15",
       ["Authorization"] = "OSS %s:%s",
     }
   }

@@ -25,6 +25,22 @@ x-oss-user-agent:%s
   }
 }
 
+---@class upload_token
+---@field access_id string
+---@field access_key string
+---@field access_token string
+---@field access_timestamp number
+
+---@class upload_file
+---@field image_id string
+---@field object_key string
+---@field state number
+
+---@class upload_response
+---@field upload_vendor string
+---@field upload_token upload_token
+---@field upload_file upload_file
+
 ---@param api table?
 ---@return table api
 function M.API:new(api)
@@ -41,7 +57,7 @@ setmetatable(M.API, {
 
 ---factory method.
 ---@param file string
----@param image table
+---@param image upload_response
 ---@return table
 function M.API.from_image(file, image)
   return M.API.from_upload_token(file, image.upload_file.object_key, image.upload_token)
@@ -50,7 +66,7 @@ end
 ---factory method.
 ---@param file string
 ---@param object_key string
----@param upload_token table<string, string>
+---@param upload_token upload_token
 ---@return table
 function M.API.from_upload_token(file, object_key, upload_token)
   return M.API.from_access_token(file, object_key, upload_token.access_id, upload_token.access_token, upload_token.access_key)

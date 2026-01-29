@@ -1,19 +1,4 @@
 ---will be refactored to lua/zhihu/api/image
----@class upload_token
----@field access_id string
----@field access_key string
----@field access_token string
----@field access_timestamp number
-
----@class upload_file
----@field image_id string
----@field object_key string
----@field state number
-
----@class upload_response
----@field upload_vendor string
----@field upload_token upload_token
----@field upload_file upload_file
 local md5 = require "md5"
 local guess = require 'mimetypes'.guess
 local requests = require "requests"

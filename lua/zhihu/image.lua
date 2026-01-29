@@ -1,4 +1,5 @@
 --- a class to get/post/patch zhihu image in HTML
+local json = require 'vim.json'
 local Post = require 'zhihu.api.image.post'.API
 local Put = require 'zhihu.api.image.put'.API
 local M = {
@@ -41,6 +42,7 @@ function M.Image.from_file(file)
   local image = M.Image(resp.json())
   -- image exists
   if image.upload_file.state == 1 then
+    image.upload_file.object_key = ("v2-%s"):format(json.decode(api.data).image_hash)
     return image
   end
   assert(image.upload_file.state == 2)

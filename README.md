@@ -2,6 +2,8 @@
 
 [Zhihu](https://www.zhihu.com/) extension built on [NeoVim](https://github.com/neovim/neovim).
 
+[中文文档](https://zhuanlan.zhihu.com/p/1998903214075027613)
+
 ## Features
 
 - [x] Convert local markdown files into Zhihu articles and send them to the draft box;
@@ -51,16 +53,6 @@ $ luarocks --lua-version 5.1 --local --tree ~/.local/share/nvim/rocks install zh
 return {
   "pxwg/zhihu.nvim",
   main = "zhihu",
-  ---@type ZhnvimConfigs
-  opts = {
-    script = {
-      typst = {
-        pattern = "*.typ",
-        extension = { typ = "typst" },
-        script = your_script, -- your custom script function
-      },
-    },
-  },
 }
 ```
 
@@ -88,6 +80,12 @@ After editing,
 ```
 
 will save and upload the article.
+
+```vim
+:write!
+```
+
+will save the article without uploading.
 
 ```vim
 :nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
@@ -121,6 +119,30 @@ If you try to open a non-existent article, you will see:
 [去往首页](https://www.zhihu.com)
 ```
 
+### Zhihu Auth
+
+In order to log in zhihu, this library search
+
+- firefox cookies database
+- chrome cookies database
+- pychrome: a python module to communicate with chrome browser.
+  open <https://www.zhihu.com/> to let user to log in
+
+A cookies will be cached. If you meet `403 Forbidden`, try:
+
+1. quit browser: avoid browser lock cookies database
+2. restart neovim: fetch latest cookies from browser cookies database
+
+If it doesn't work, try:
+
+1. log in zhihu again: update cookies of browser cookies database
+2. quit browser
+3. restart neovim
+
+## API
+
+### Update zhihu article
+
 You can update zhihu article by:
 
 ```lua
@@ -144,80 +166,15 @@ if f then
 end
 ```
 
-### Zhihu Auth
+### Convert markdown and HTML
 
-In order to log in zhihu, this library search
-
-- firefox cookies database
-- chrome cookies database
-- pychrome: a python module to communicate with chrome browser.
-  open <https://www.zhihu.com/> to let user to log in
-
-A cookies will be cached. If you meet `403 Forbidden`, try:
-
-1. quit browser: avoid browser lock cookies database
-2. restart neovim: fetch latest cookies from browser cookies database
-
-If it doesn't work, try:
-
-1. log in zhihu again: update cookies of browser cookies database
-2. quit browser
-3. restart neovim
-
-### Conversion Script
-
-`zhihu_on_neovim` offers a conversion API (implemented in Rust, compiled as a Lua dynamic library) to convert local CommonMark files to Zhihu-flavored HTML and upload them as drafts.
-
-By default, only `.md` files are directly supported. If your input is not Markdown, you can define a custom Lua script to convert it to CommonMark first, then use the API for further conversion and upload.
-
-```mermaid
-graph LR
-    A[Input File] -->|is .md| B[zhnvim]
-    B --> C[md_html]
-    C --> D[upload]
-
-    A -->|not .md & configured| E[user_script]
-    E --> F[md_file]
-    F --> B
-```
-
-Custom scripts should be Lua functions with this signature:
 ```lua
----@param input input_content
----@return output md_content
-local your_script = function(input)
-  -- your logic here
-  return output
+local md_to_html = require 'markdown_to_html'.md_to_html
+local html_to_md = function(html)
+    return require 'zhihu.article.generator.markdown'.generator:translate(html)
 end
-```
-Where `input_content` contains:
-```lua
----@field content string  -- file content
----@field title string    -- file title
----@field path string     -- file path
-```
-And `md_content` should return:
-```lua
----@field content_md string  -- Markdown content
----@field title_md string    -- Markdown title
-```
-
-Example: using `pandoc` to convert a Typst file to Markdown with a user defined Lua filter:
-```lua
-local function typst_script(content)
-  local cmd = {
-    "pandoc",
-    content.path,
-    "-t",
-    "markdown",
-    "--lua-filter=" .. vim.fn.stdpath("config") .. "/typ_md.lua",
-  }
-  local result = vim.fn.system(cmd)
-  if vim.v.shell_error ~= 0 then
-    return { title = content.title, content = "Error: " .. result }
-  end
-  return { title = content.title, content = result }
-end
+local markdown = "# Title"
+assert(markdown == html_to_md(md_to_html(markdown)))
 ```
 
 ## Similar Projects

@@ -79,19 +79,19 @@ After editing,
 :write
 ```
 
-will save and upload the article.
+will save the article to draft.
 
 ```vim
-:write!
+:write
 ```
 
-will save the article without uploading.
+again will upload draft.
 
 ```vim
 :nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
 ```
 
-Press `<localleader>lv` to open the article in your browser.
+Press `<localleader>lv` to view the article in your browser.
 
 If you want to create an article from a default template, try:
 
@@ -139,6 +139,15 @@ If it doesn't work, try:
 2. quit browser
 3. restart neovim
 
+### Zhihu Image
+
+Every image must be on zhihu like
+<https://picx.zhimg.com/v2-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX>.
+
+```vim
+:let b:article.titleImage = "https://picx.zhimg.com/v2-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+```
+
 ## API
 
 ### Update zhihu article
@@ -164,6 +173,15 @@ if f then
   article:set_content(markdown)
   article:update()
 end
+```
+
+### Upload image to zhihu
+
+```lua
+local Image = require 'zhihu.image'.Image
+local image = Image.from_file "/the/path/of/image.png"
+print(image)
+-- https://picx.zhimg.com/v2-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 ### Convert markdown and HTML

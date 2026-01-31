@@ -63,15 +63,18 @@ end
 
 ---callback for BufWriteCmd
 function M.write_cb()
-  vim.o.modified = false
-
   local Article = M.Articles[vim.o.filetype] or M.Articles[0]
   local article = Article(vim.b.article)
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-  article:set_lines(lines)
-  local error = article:update()
-  if error then
-    vim.notify(error, vim.log.levels.ERROR)
+  if vim.o.modified then
+    vim.o.modified = false
+    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
+    article:set_lines(lines)
+    local error = article:update()
+    if error then
+      vim.notify(error, vim.log.levels.ERROR)
+    end
+  else
+    -- article:publish()
   end
 
   article.root = nil

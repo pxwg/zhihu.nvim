@@ -17,6 +17,10 @@ local M = {
   Article = {
     itemId = "",
     title = "Untitled",
+    table_of_contents = false,
+    delta_time = 30,
+    can_reward = false,
+    isTitleImageFullScreen = false,
   },
 }
 M.template_path = fs.joinpath(
@@ -91,6 +95,10 @@ end
 ---update article
 ---@return string? error
 function M.Article:update()
+  -- nothing need to be updated
+  if self.root == nil or self.titleImage == nil then
+    return
+  end
   if tonumber(self.itemId) == nil then
     local api = Post.from_html(self.title, tostring(self.root))
     local resp = api:request()
@@ -99,7 +107,7 @@ function M.Article:update()
   if tonumber(self.itemId) == nil then
     return self.itemId
   end
-  local api = Patch.from_id(self.itemId, self.title, tostring(self.root))
+  local api = Patch.from_article(self)
   local resp = api:request()
   if resp.status_code == 200 then
     return

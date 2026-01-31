@@ -30,20 +30,30 @@ setmetatable(M.API, {
 })
 
 ---factory method.
----@param id string
----@param title string?
----@param content string?
+---@param article table
 ---@return table
-function M.API.from_id(id, title, content)
-  title = title or "未命名"
-  content = content or ""
+function M.API.from_article(article)
   local body = {
-    title = title,
-    content = content,
-    table_of_contents = false,
-    delta_time = 30,
-    can_reward = false,
+    delta_time = article.delta_time,
   }
+  if article.titleImage then
+    body.titleImage = tostring(article.titleImage)
+    body.isTitleImageFullScreen = article.isTitleImageFullScreen
+  end
+  if article.root then
+    body.content = tostring(article.root)
+    body.title = article.title
+    body.table_of_contents = article.table_of_contents
+    body.can_reward = article.can_reward
+  end
+  return M.API.from_id(article.itemId, body)
+end
+
+---factory method.
+---@param id string
+---@param body table
+---@return table
+function M.API.from_id(id, body)
   local api = {
     url = M.API.url:format(id),
     data = json.encode(body),

@@ -59,10 +59,16 @@ function M.read_cb()
 
   article.root = nil
   vim.b.article = article
+  if Article.authorName and article.authorName ~= Article.authorName then
+    vim.o.modifiable = false
+  end
 end
 
 ---callback for BufWriteCmd
 function M.write_cb()
+  if vim.o.modifiable == false then
+    return
+  end
   local Article = M.Articles[vim.o.filetype] or M.Articles[0]
   local article = Article(vim.b.article)
   if vim.o.modified then

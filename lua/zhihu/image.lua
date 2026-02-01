@@ -49,10 +49,26 @@ function M.Image.from_file(file)
 
   api = Put.from_image(file, image)
   resp = api:request()
-  if resp.status_code ~= 200 then
+  if resp.status_code == 200 then
+    image.upload_file.state = 1
+  else
     image.upload_file.image_id = resp.status
   end
   return image
+end
+
+---create from a file path
+---@param hash string
+---@return table image
+function M.Image.from_hash(hash)
+  local api = Post:from_hash(hash)
+  local resp = api:request()
+  local image
+  if resp.status_code ~= 200 then
+    image = { upload_file = { image_id = resp.status } }
+  end
+    image = resp.json()
+  return M.Image(image)
 end
 
 return M

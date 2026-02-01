@@ -35,9 +35,9 @@ if _f then
 end
 -- similar as https://github.com/niudai/VSCode-Zhihu
 M.Article.root = parse(md_to_html(_text))
-local meta = getmetatable(M.Article.root)
-meta.__tostring = M.Article.root.gettext
-setmetatable(M.Article.root, meta)
+local _meta = getmetatable(M.Article.root)
+_meta.__tostring = M.Article.root.gettext
+setmetatable(M.Article.root, _meta)
 
 ---@param article table?
 ---@return table article

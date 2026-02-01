@@ -26,13 +26,13 @@ function M.get_cookies(...)
   return Cookies {}
 end
 
----if you want to customize it, set `M.cookies_string` by yourself
+---if you want to customize it, set `M.cookies` by yourself
 ---@return string
 function M.dumps_cookies(...)
-  if M.cookies_string == nil then
-    M.cookies_string = tostring(M.get_cookies(...))
+  if M.cookies == nil then
+    M.cookies = (M.get_cookies(...))
   end
-  return M.cookies_string
+  return tostring(M.cookies)
 end
 
 return M

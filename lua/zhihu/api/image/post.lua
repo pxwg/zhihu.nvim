@@ -1,15 +1,10 @@
 --- init a zhihu image
 local md5 = require "md5"
 local requests = require "requests"
-local json = require 'vim.json'
-local auth = require 'zhihu.auth'
+local API = require 'zhihu.api'.API
 local M = {
   API = {
     url = "https://api.zhihu.com/images",
-    headers = {
-      ["Content-Type"] = "application/json",
-      ["Accept-Language"] = "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-    }
   }
 }
 
@@ -30,6 +25,7 @@ end
 ---@return table api
 function M.API:new(api)
   api = api or {}
+  api = API(api)
   setmetatable(api, {
     __index = self
   })
@@ -38,29 +34,27 @@ function M.API:new(api)
 end
 
 setmetatable(M.API, {
+  __index = API,
   __call = M.API.new
 })
 
 ---factory method.
 ---@param hash string
 ---@return table
-function M.API.from_hash(hash)
+function M.API:from_hash(hash)
   local body = {
     image_hash = hash,
     source = "article",
   }
-  local api = {
-    data = json.encode(body),
-  }
-  return M.API(api)
+  return self:from_body(body)
 end
 
 ---factory method.
 ---@param file string
 ---@return table
-function M.API.from_file(file)
+function M.API:from_file(file)
   local hash = M.md5(file)
-  return M.API.from_hash(hash)
+  return self:from_hash(hash)
 end
 
 ---request

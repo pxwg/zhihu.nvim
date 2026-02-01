@@ -100,14 +100,14 @@ function M.Article:update()
     return
   end
   if tonumber(self.itemId) == nil then
-    local api = Post.from_html(self.title, tostring(self.root))
+    local api = Post:from_html(self.title, tostring(self.root))
     local resp = api:request()
     self.itemId = resp.status_code == 200 and resp.json().id or resp.status
   end
   if tonumber(self.itemId) == nil then
     return self.itemId
   end
-  local api = Patch.from_article(self)
+  local api = Patch:from_article(self)
   local resp = api:request()
   if resp.status_code == 200 then
     return

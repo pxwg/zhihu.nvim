@@ -4,6 +4,7 @@ local fs = require 'vim.fs'
 
 local auth = require "zhihu.auth"
 local Article = require "zhihu.article.html".Article
+local Image = require "zhihu.image".Image
 local template_path = require "zhihu.article.html".template_path
 local generator = require "zhihu.article.generator.markdown".generator
 
@@ -18,6 +19,10 @@ describe("test zhihu", function()
     local article = Article:from_id "581677880"
     it("tests get article", function()
         assert.are.equal(article.title, "深度学习并行训练算法一锅炖: DDP, TP, PP, ZeRO")
+    end)
+    local image = Image.from_hash "36828cdbb31942c394c5d2ea92aef201"
+    it("tests get image", function()
+        assert.are.equal(image.upload_file.state, 1)
     end)
 end)
 

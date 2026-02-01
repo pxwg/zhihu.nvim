@@ -1,5 +1,4 @@
 --- init a zhihu article
-local requests = require "requests"
 local API = require 'zhihu.api'.API
 local M = {
   API = {
@@ -38,12 +37,6 @@ function M.API:from_html(title, content)
     can_reward = false,
   }
   return self:from_body(body)
-end
-
----request
----@return table
-function M.API:request()
-  return requests.post(self)
 end
 
 return M

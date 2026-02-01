@@ -1,6 +1,5 @@
 --- init a zhihu image
 local md5 = require "md5"
-local requests = require "requests"
 local API = require 'zhihu.api'.API
 local M = {
   API = {
@@ -55,12 +54,6 @@ end
 function M.API:from_file(file)
   local hash = M.md5(file)
   return self:from_hash(hash)
-end
-
----request
----@return table
-function M.API:request()
-  return requests.post(self)
 end
 
 return M

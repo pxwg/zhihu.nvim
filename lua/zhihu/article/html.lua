@@ -96,7 +96,7 @@ end
 ---@return string? error
 function M.Article:update()
   -- nothing need to be updated
-  if self.root == nil or self.titleImage == nil then
+  if self.root == nil and self.titleImage == nil then
     return
   end
   if tonumber(self.itemId) == nil then

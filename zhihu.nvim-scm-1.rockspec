@@ -25,7 +25,7 @@ description = {
 build_dependencies = {}
 
 dependencies = { "lua >= 5.1", "platformdirs", "lsqlite3", "lua-requests-temp", "htmlparser", "lua-cjson", "md5", "sha1",
-  "base64", "html-entities", "mimetypes" }
+  "base64", "html-entities", "mimetypes", "uuid" }
 
 test_dependencies = {}
 
@@ -62,6 +62,7 @@ build = {
       ["zhihu.api.article.patch"] = "lua/zhihu/api/article/patch.lua",
       ["zhihu.api.image.post"] = "lua/zhihu/api/image/post.lua",
       ["zhihu.api.image.put"] = "lua/zhihu/api/image/put.lua",
+      ["zhihu.api"] = "lua/zhihu/api.lua",
       ["zhihu.article.templates.Untitled"] = "lua/zhihu/article/templates/Untitled.md",
       ["zhihu.article.generator.generator"] = "lua/zhihu/article/generator/generator.lua",
       ["zhihu.article.generator.markdown"] = "lua/zhihu/article/generator/markdown.lua",

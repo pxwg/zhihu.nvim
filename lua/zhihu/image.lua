@@ -34,7 +34,7 @@ end
 ---@param file string
 ---@return table image
 function M.Image.from_file(file)
-  local api = Post.from_file(file)
+  local api = Post:from_file(file)
   local resp = api:request()
   if resp.status_code ~= 200 then
     return M.Image { upload_file = { image_id = resp.status } }

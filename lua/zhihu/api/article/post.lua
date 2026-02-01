@@ -1,16 +1,9 @@
 --- init a zhihu article
 local requests = require "requests"
-local json = require 'vim.json'
-local auth = require 'zhihu.auth'
+local API = require 'zhihu.api'.API
 local M = {
   API = {
     url = "https://zhuanlan.zhihu.com/api/articles/drafts",
-    headers = {
-      ["User-Agent"] =
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-      ["Content-Type"] = "application/json",
-      ["x-requested-with"] = "fetch",
-    }
   }
 }
 
@@ -18,6 +11,7 @@ local M = {
 ---@return table api
 function M.API:new(api)
   api = api or {}
+  api = API(api)
   setmetatable(api, {
     __index = self
   })
@@ -26,6 +20,7 @@ function M.API:new(api)
 end
 
 setmetatable(M.API, {
+  __index = API,
   __call = M.API.new
 })
 
@@ -33,7 +28,7 @@ setmetatable(M.API, {
 ---@param title string?
 ---@param content string?
 ---@return table
-function M.API.from_html(title, content)
+function M.API:from_html(title, content)
   title = title or "未命名"
   content = content or ""
   local body = {
@@ -42,10 +37,7 @@ function M.API.from_html(title, content)
     delta_time = 0,
     can_reward = false,
   }
-  local api = {
-    data = json.encode(body),
-  }
-  return M.API(api)
+  return self:from_body(body)
 end
 
 ---request

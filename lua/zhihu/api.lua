@@ -1,4 +1,5 @@
 ---a common class for json API
+local requests = require "requests"
 local json = require 'vim.json'
 local auth = require 'zhihu.auth'
 local M = {
@@ -41,6 +42,12 @@ function M.API:from_body(body, id)
     data = json.encode(body),
   }
   return self(api)
+end
+
+---request
+---@return table
+function M.API:request()
+  return requests.post(self)
 end
 
 return M

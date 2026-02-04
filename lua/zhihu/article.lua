@@ -53,7 +53,7 @@ function M._create_article_wrapper(filetype, config)
     return M._create_markdown_to_html_article(ArticleBase, config.converter)
   elseif config.type == "html" then
     local ArticleBase = config.Article or html_article
-    return M._create_direct_html_article(ArticleBase, config.direct_converter)
+    return M._create_direct_html_article(ArticleBase, config.converter)
   else
     error(("Invalid converter type for filetype '%s': %s"):format(filetype, config.type))
   end
@@ -113,11 +113,11 @@ end
 
 ---Create article class for direct html conversion
 ---@param ArticleBase table base Article class
----@param direct_converter table<string, function> {in = fn, out = fn}
+---@param converter table<string, function> {in = fn, out = fn}
 ---@return table Article class
-function M._create_direct_html_article(ArticleBase, direct_converter)
-  local converter_in, converter_out = direct_converter["in"], direct_converter["out"]
-  if not direct_converter then
+function M._create_direct_html_article(ArticleBase, converter)
+  local converter_in, converter_out = converter["in"], converter["out"]
+  if not converter then
     error("direct_html converter requires a 'direct_converter' function")
   end
   

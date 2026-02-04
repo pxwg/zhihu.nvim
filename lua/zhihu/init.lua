@@ -4,8 +4,7 @@ local default_opts = {}
 ---@class ZhihuFiletypeConfig
 ---@field type '"markdown"' | '"html"' Middle conversion strategy
 ---@field Article? table Optional, required if not using defaults
----@field converter? fun(content: string): string Required for 'markdown' type
----@field direct_converter? fun(content: string): string Required for 'html' type
+---@field converter? fun(content: string): string Converter function from content to intermediate format, e.g., typst -> markdown or org -> html
 ---@field title? fun(content: string): string Optional function to generate title from content
 
 ---@class ZhihuOpts

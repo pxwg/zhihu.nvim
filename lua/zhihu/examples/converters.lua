@@ -36,4 +36,30 @@ function M.typst_to_markdown(typst_content)
   return markdown
 end
 
+function M.markdown_to_typst(content)
+  local temp_md_file = os.tmpname() .. ".md"
+  local temp_typ_file = os.tmpname() .. ".typ"
+  local f = io.open(temp_md_file, "w")
+  if not f then
+    error("Cannot create temp markdown file")
+  end
+  f:write(content)
+  f:close()
+  local cmd = string.format("pandoc '%s' -t typst -o '%s' 2>/dev/null", temp_md_file, temp_typ_file)
+  local exit_code = os.execute(cmd)
+  local typst = ""
+  if exit_code == 0 then
+    local out = io.open(temp_typ_file, "r")
+    if out then
+      typst = out:read("*a")
+      out:close()
+    end
+  else
+    typst = "Error: Pandoc conversion failed"
+  end
+  os.remove(temp_md_file)
+  os.remove(temp_typ_file)
+  return typst
+end
+
 return M

@@ -9,6 +9,7 @@ local M = {
   url = Get.url .. '/edit',
   Articles = {},
   _custom_articles = {}, -- custom article configs from opts
+  _templates = {}, -- template prefix for each filetype
 }
 
 -- Initialize with default articles
@@ -28,6 +29,10 @@ function M.register_filetypes(opts)
   
   for filetype, config in pairs(opts.filetypes) do
     M._custom_articles[filetype] = config
+    -- Store template prefix if provided
+    if config.template_prefix then
+      M._templates[filetype] = config.template_prefix
+    end
     M.Articles[filetype] = M._create_article_wrapper(filetype, config)
   end
 end
@@ -86,6 +91,26 @@ function M._create_markdown_to_html_article(ArticleBase, converter)
     self:set_html(md_to_html(md))
   end
   
+  function CustomArticle:get_lines()
+    -- Override to prepend template prefix if it exists
+    local lines = ArticleBase.get_lines(self)
+    local filetype = vim.bo.filetype
+    local template = M._templates[filetype]
+    if template and #lines > 0 then
+      -- Prepend template at the beginning
+      local template_lines = vim.split(template, "\n", { plain = true })
+      local result = {}
+      for _, line in ipairs(template_lines) do
+        table.insert(result, line)
+      end
+      for _, line in ipairs(lines) do
+        table.insert(result, line)
+      end
+      return result
+    end
+    return lines
+  end
+  
   return CustomArticle
 end
 
@@ -124,6 +149,26 @@ function M._create_direct_html_article(ArticleBase, direct_converter)
   function CustomArticle:set_content(content)
     local html = direct_converter(content)
     self:set_html(html)
+  end
+  
+  function CustomArticle:get_lines()
+    -- Override to prepend template prefix if it exists
+    local lines = ArticleBase.get_lines(self)
+    local filetype = vim.bo.filetype
+    local template = M._templates[filetype]
+    if template and #lines > 0 then
+      -- Prepend template at the beginning
+      local template_lines = vim.split(template, "\n", { plain = true })
+      local result = {}
+      for _, line in ipairs(template_lines) do
+        table.insert(result, line)
+      end
+      for _, line in ipairs(lines) do
+        table.insert(result, line)
+      end
+      return result
+    end
+    return lines
   end
   
   return CustomArticle

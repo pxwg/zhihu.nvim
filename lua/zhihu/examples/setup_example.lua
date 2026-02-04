@@ -15,10 +15,13 @@ require("zhihu").setup({
     typst = {
       -- Type indicates the conversion strategy
       type = "markdown_to_html",
-      
       -- Optional: provide a custom Article base class
       -- If not provided, uses the default html Article class
       -- Article = require 'zhihu.article.html'.Article,
+      
+      -- Optional: template prefix to prepend to each article
+      -- This is added at the beginning when reading/saving the article
+      template_prefix = [[#quote(block: true, [本文使用 #link("https://github.com/pxwg/zhihu.nvim")[Zhihu on NeoVim] 创作并发布])]],
       
       -- Required: converter function that converts content to markdown
       -- This function receives the raw file content and should return markdown string
@@ -38,6 +41,10 @@ require("zhihu").setup({
     rst = {
       type = "direct_html",
       
+      -- Optional: template prefix to prepend to each article
+      -- For direct_html, it's prepended as-is
+      template_prefix = "<blockquote><p>This article was created with Zhihu on NeoVim</p></blockquote>",
+      
       -- Required: direct_converter function that converts content directly to HTML
       -- This function receives the raw file content and should return HTML string
       direct_converter = function(rst_content)
@@ -53,6 +60,9 @@ require("zhihu").setup({
       
       -- Custom Article class that inherits from html Article
       Article = require('zhihu.article.custom.custom_article').CustomArticle,
+      
+      -- Optional: template prefix for this specific filetype
+      template_prefix = "Custom prefix for this format",
       
       converter = function(content)
         -- Custom conversion logic

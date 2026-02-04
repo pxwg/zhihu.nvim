@@ -14,7 +14,6 @@ function M.API:new(api)
   setmetatable(api, {
     __index = self
   })
-  api.headers.Cookie = auth.dumps_cookies()
   return api
 end
 
@@ -24,12 +23,10 @@ setmetatable(M.API, {
 })
 
 ---factory method.
----@param title string?
----@param content string?
+---@param title string
+---@param content string
 ---@return table
 function M.API:from_html(title, content)
-  title = title or "未命名"
-  content = content or ""
   local body = {
     title = title,
     content = content,

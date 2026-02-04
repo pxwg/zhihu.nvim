@@ -23,7 +23,6 @@ function M.API:new(api)
     __index = self
   })
   api.headers.Cookie = auth.dumps_cookies()
-  api.headers["x-xsrftoken"] = auth.cookies._xsrf
   return api
 end
 

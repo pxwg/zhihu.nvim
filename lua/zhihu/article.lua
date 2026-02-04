@@ -4,6 +4,7 @@ local Get = require 'zhihu.api.article.get'.API
 local html_article = require 'zhihu.article.html'.Article
 local markdown_article = require 'zhihu.article.markdown'.Article
 local md_to_html = require("markdown_to_html").md_to_html
+local markdown = require("zhihu.article.markdown")
 
 local M = {
   url = Get.url .. '/edit',
@@ -47,11 +48,11 @@ end
 ---@param config table {type, Article, converter, direct_converter}
 ---@return table Article class wrapper
 function M._create_article_wrapper(filetype, config)
-  local ArticleBase = config.Article or html_article
-  
   if config.type == "markdown_to_html" then
+    local ArticleBase = config.Article or markdown_article
     return M._create_markdown_to_html_article(ArticleBase, config.converter)
   elseif config.type == "direct_html" then
+    local ArticleBase = config.Article or html_article
     return M._create_direct_html_article(ArticleBase, config.direct_converter)
   else
     error(("Invalid converter type for filetype '%s': %s"):format(filetype, config.type))
@@ -100,25 +101,15 @@ function M._create_markdown_to_html_article(ArticleBase, converter)
     local filetype = vim.bo.filetype
     local template = M._templates[filetype]
     
-    -- For new articles (no itemId), use only template_prefix if it exists
     if template and not tonumber(self.itemId) then
       return vim.split(template, "\n", { plain = true })
     end
     
     -- For existing articles, prepend template prefix if it exists
     local lines = ArticleBase.get_lines(self)
-    if template and #lines > 0 then
-      local template_lines = vim.split(template, "\n", { plain = true })
-      local result = {}
-      for _, line in ipairs(template_lines) do
-        table.insert(result, line)
-      end
-      for _, line in ipairs(lines) do
-        table.insert(result, line)
-      end
-      return result
+    if #lines > 0 then
+      return lines
     end
-    return lines
   end
   
   return CustomArticle

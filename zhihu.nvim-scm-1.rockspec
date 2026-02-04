@@ -42,7 +42,6 @@ end
 
 build = {
   type = 'rust-mlua',
-  copy_directories = { 'plugin' } ,
   modules = {
     "chrome_cookie",
     "markdown_to_html",
@@ -73,3 +72,4 @@ build = {
     }
   },
 }
+

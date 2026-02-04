@@ -33,6 +33,18 @@ require("zhihu").setup({
         -- Alternative: Call an external command
         -- local handle = io.popen('typst-md-convert /dev/stdin', 'r')
         -- ... read and return result
+      end,
+      
+      -- Optional: title function that generates title from content
+      -- This function receives the raw file content (before conversion) and returns a title string
+      -- The generated title will be used when uploading/updating the article
+      title = function(typst_content)
+        -- Extract title from content, e.g., first heading or metadata
+        return require("my_converters").extract_title_from_typst(typst_content)
+        
+        -- Example: Extract first line as title
+        -- local first_line = typst_content:match("^[^\n]+")
+        -- return first_line or "Untitled"
       end
     },
     
@@ -50,6 +62,14 @@ require("zhihu").setup({
       direct_converter = function(rst_content)
         -- Example: use a rst-to-html converter
         return require("my_converters").rst_to_html(rst_content)
+      end,
+      
+      -- Optional: title function that generates title from content
+      -- This function receives the raw file content (before conversion) and returns a title string
+      -- The generated title will be used when uploading/updating the article
+      title = function(rst_content)
+        -- Extract title from content
+        return require("my_converters").extract_title_from_rst(rst_content)
       end
     },
     
@@ -67,6 +87,14 @@ require("zhihu").setup({
       converter = function(content)
         -- Custom conversion logic
         return require("my_converters").custom_format_to_markdown(content)
+      end,
+      
+      -- Optional: title function that generates title from content
+      -- This function receives the raw file content (before conversion) and returns a title string
+      -- The generated title will be used when uploading/updating the article
+      title = function(content)
+        -- Extract title from content for custom format
+        return require("my_converters").extract_title_from_custom(content)
       end
     }
   }

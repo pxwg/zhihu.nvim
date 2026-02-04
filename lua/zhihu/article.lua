@@ -10,6 +10,7 @@ local M = {
   Articles = {},
   _custom_articles = {}, -- custom article configs from opts
   _templates = {}, -- template prefix for each filetype
+  _title_functions = {}, -- title generator functions for each filetype
 }
 
 -- Initialize with default articles
@@ -32,6 +33,10 @@ function M.register_filetypes(opts)
     -- Store template prefix if provided
     if config.template_prefix then
       M._templates[filetype] = config.template_prefix
+    end
+    -- Store title function if provided
+    if config.title then
+      M._title_functions[filetype] = config.title
     end
     M.Articles[filetype] = M._create_article_wrapper(filetype, config)
   end
@@ -92,12 +97,17 @@ function M._create_markdown_to_html_article(ArticleBase, converter)
   end
   
   function CustomArticle:get_lines()
-    -- Override to prepend template prefix if it exists
-    local lines = ArticleBase.get_lines(self)
     local filetype = vim.bo.filetype
     local template = M._templates[filetype]
+    
+    -- For new articles (no itemId), use only template_prefix if it exists
+    if template and not tonumber(self.itemId) then
+      return vim.split(template, "\n", { plain = true })
+    end
+    
+    -- For existing articles, prepend template prefix if it exists
+    local lines = ArticleBase.get_lines(self)
     if template and #lines > 0 then
-      -- Prepend template at the beginning
       local template_lines = vim.split(template, "\n", { plain = true })
       local result = {}
       for _, line in ipairs(template_lines) do
@@ -152,12 +162,17 @@ function M._create_direct_html_article(ArticleBase, direct_converter)
   end
   
   function CustomArticle:get_lines()
-    -- Override to prepend template prefix if it exists
-    local lines = ArticleBase.get_lines(self)
     local filetype = vim.bo.filetype
     local template = M._templates[filetype]
+    
+    -- For new articles (no itemId), use only template_prefix if it exists
+    if template and not tonumber(self.itemId) then
+      return vim.split(template, "\n", { plain = true })
+    end
+    
+    -- For existing articles, prepend template prefix if it exists
+    local lines = ArticleBase.get_lines(self)
     if template and #lines > 0 then
-      -- Prepend template at the beginning
       local template_lines = vim.split(template, "\n", { plain = true })
       local result = {}
       for _, line in ipairs(template_lines) do
@@ -238,6 +253,18 @@ function M.write_cb()
     vim.o.modified = false
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
     article:set_lines(lines)
+    
+    -- Generate title if title function is provided
+    local filetype = vim.o.filetype
+    local title_fn = M._title_functions[filetype]
+    if title_fn then
+      local content = table.concat(lines, "\n")
+      local generated_title = title_fn(content)
+      if generated_title and generated_title ~= "" then
+        article.title = generated_title
+      end
+    end
+    
     local error = article:update()
     if error then
       vim.notify(error, vim.log.levels.ERROR)

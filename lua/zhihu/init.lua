@@ -10,6 +10,7 @@ local default_opts = {}
 ---@field converter? fun(content: string): string Required for 'markdown_to_html' type
 ---@field direct_converter? fun(content: string): string Required for 'direct_html' type
 ---@field template_prefix? string Optional prefix to prepend to the article (e.g., disclaimer, signature)
+---@field title? fun(content: string): string Optional function to generate title from content
 
 ---Setup zhihu.nvim with optional configuration.
 ---

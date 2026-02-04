@@ -48,10 +48,10 @@ end
 ---@param config table {type, Article, converter, direct_converter}
 ---@return table Article class wrapper
 function M._create_article_wrapper(filetype, config)
-  if config.type == "markdown_to_html" then
+  if config.type == "markdown" then
     local ArticleBase = config.Article or markdown_article
     return M._create_markdown_to_html_article(ArticleBase, config.converter)
-  elseif config.type == "direct_html" then
+  elseif config.type == "html" then
     local ArticleBase = config.Article or html_article
     return M._create_direct_html_article(ArticleBase, config.direct_converter)
   else
@@ -61,9 +61,10 @@ end
 
 ---Create article class for markdown_to_html conversion
 ---@param ArticleBase table base Article class
----@param converter function(content: string) -> string (markdown to html)
+---@param converter table<string, function> {in = fn, out = fn}
 ---@return table Article class
 function M._create_markdown_to_html_article(ArticleBase, converter)
+  local converter_in, converter_out = converter["in"], converter["out"]
   if not converter then
     error("markdown_to_html converter requires a 'converter' function")
   end
@@ -93,22 +94,17 @@ function M._create_markdown_to_html_article(ArticleBase, converter)
   })
   
   function CustomArticle:set_content(content)
-    local md = converter(content)
+    local md = converter_in(content)
     self:set_html(md_to_html(md))
   end
   
   function CustomArticle:get_lines()
-    local filetype = vim.bo.filetype
-    local template = M._templates[filetype]
-    
-    if template and not tonumber(self.itemId) then
-      return vim.split(template, "\n", { plain = true })
-    end
-    
-    -- For existing articles, prepend template prefix if it exists
     local lines = ArticleBase.get_lines(self)
     if #lines > 0 then
-      return lines
+      local md_content = table.concat(lines, "\n")
+      local lang_content = converter_out and converter_out(md_content) or md_content
+      local result_lines = vim.split(lang_content, "\n", { plain = true })
+      return result_lines
     end
   end
   

@@ -113,9 +113,10 @@ end
 
 ---Create article class for direct html conversion
 ---@param ArticleBase table base Article class
----@param direct_converter function(content: string) -> string (direct to html)
+---@param direct_converter table<string, function> {in = fn, out = fn}
 ---@return table Article class
 function M._create_direct_html_article(ArticleBase, direct_converter)
+  local converter_in, converter_out = direct_converter["in"], direct_converter["out"]
   if not direct_converter then
     error("direct_html converter requires a 'direct_converter' function")
   end
@@ -144,33 +145,18 @@ function M._create_direct_html_article(ArticleBase, direct_converter)
   })
   
   function CustomArticle:set_content(content)
-    local html = direct_converter(content)
+    local html = converter_in(content)
     self:set_html(html)
   end
   
   function CustomArticle:get_lines()
-    local filetype = vim.bo.filetype
-    local template = M._templates[filetype]
-    
-    -- For new articles (no itemId), use only template_prefix if it exists
-    if template and not tonumber(self.itemId) then
-      return vim.split(template, "\n", { plain = true })
-    end
-    
-    -- For existing articles, prepend template prefix if it exists
     local lines = ArticleBase.get_lines(self)
-    if template and #lines > 0 then
-      local template_lines = vim.split(template, "\n", { plain = true })
-      local result = {}
-      for _, line in ipairs(template_lines) do
-        table.insert(result, line)
-      end
-      for _, line in ipairs(lines) do
-        table.insert(result, line)
-      end
-      return result
+    if #lines > 0 then
+      local html_content = table.concat(lines, "\n")
+      local lang_content = converter_out and converter_out(html_content) or html_content
+      local result_lines = vim.split(lang_content, "\n", { plain = true })
+      return result_lines
     end
-    return lines
   end
   
   return CustomArticle

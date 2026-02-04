@@ -53,10 +53,47 @@ $ luarocks --lua-version 5.1 --local --tree ~/.local/share/nvim/rocks install zh
 return {
   "pxwg/zhihu.nvim",
   main = "zhihu",
+  config = function()
+    require("zhihu").setup({
+      -- Optional: configure custom filetypes
+      filetypes = {
+        typst = {
+          type = "markdown_to_html",
+          converter = function(content) return content end
+        }
+      }
+    })
+  end
 }
 ```
 
 ## Usage
+
+### Setup (Optional)
+
+You can provide custom file type handlers in the setup function:
+
+```lua
+require("zhihu").setup({
+  ---@type ZhihuOpts
+  filetypes = {
+    ---@type ZhihuFiletypeConfig
+    typst = {
+      type = "markdown",
+      -- Required: converter function that converts content to markdown
+      -- This function receives the raw file content and should return markdown string
+      converter = {
+        -- ["in"] function is called to convert from Typst to Markdown
+        ["in"] = require("my_converters").typst_to_markdown,
+        -- ["out"] function is called for reverse conversion (Markdown to Typst)
+        ["out"] = require("my_converters").markdown_to_typst,
+      },
+    },
+  }
+})
+```
+
+See [`setup_example.lua`](./lua/zhihu/examples/setup_example.lua) for a full example.
 
 ### Zhihu Article
 

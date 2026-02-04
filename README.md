@@ -101,7 +101,7 @@ require("zhihu").setup({
 })
 ```
 
-See `lua/zhihu/examples/setup_example.lua` for a full example.
+See [`setup_example.lua`](./lua/zhihu/examples/setup_example.lua) for a full example.
 
 ### Zhihu Article
 

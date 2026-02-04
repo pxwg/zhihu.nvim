@@ -16,7 +16,7 @@ require("zhihu").setup({
       -- Type indicates the conversion strategy
       type = "markdown",
       -- Optional: provide a custom Article base class
-      -- If not provided, uses the default html Article class
+      -- If not provided, uses the default markdown/html Article class
       -- Article = require 'zhihu.article.html'.Article,
       
       -- Required: converter function that converts content to markdown

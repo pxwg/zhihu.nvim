@@ -75,28 +75,20 @@ You can provide custom file type handlers in the setup function:
 
 ```lua
 require("zhihu").setup({
+  ---@type ZhihuOpts
   filetypes = {
+    ---@type ZhihuFiletypeConfig
     typst = {
-      -- Two conversion strategies:
-      -- 1. "markdown_to_html": Convert to markdown first, then to HTML
-      type = "markdown_to_html",
-      ---Required: function to convert your format to markdown
-      ---@param content string Your file content from buffer
-      ---@return string markdown content output, used to generate HTML
-      converter = function(content)
-        return require("my_converters").typst_to_markdown(content)
-      end
+      type = "markdown",
+      -- Required: converter function that converts content to markdown
+      -- This function receives the raw file content and should return markdown string
+      converter = {
+        -- ["in"] function is called to convert from Typst to Markdown
+        ["in"] = require("my_converters").typst_to_markdown,
+        -- ["out"] function is called for reverse conversion (Markdown to Typst)
+        ["out"] = require("my_converters").markdown_to_typst,
+      },
     },
-    rst = {
-      -- 2. "direct_html": Convert directly to HTML
-      -- This way is NOT recommended unless you have a robust converter which can generate Zhihu-compatible HTML content, which is VERY hard to implement and nearly NO existing libraries can do this well.
-      type = "direct_html",
-      ---Required: function to convert your format directly to HTML
-      ---@param content string Your file content from buffer
-      direct_converter = function(content)
-        return require("my_converters").rst_to_html(content)
-      end
-    }
   }
 })
 ```

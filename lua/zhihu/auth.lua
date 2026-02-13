@@ -4,17 +4,18 @@ local set_cookies = require 'zhihu.auth.cache'.set_cookies
 local Cookies = require 'zhihu.auth.auth'.Cookies
 local M = {
   auths = {
-    require 'zhihu.auth.firefox',
-    require 'zhihu.auth.cache',
-    require 'zhihu.auth.chrome',
-    require 'zhihu.auth.pychrome',
+    'zhihu.auth.firefox',
+    'zhihu.auth.cache',
+    'zhihu.auth.chrome',
+    'zhihu.auth.pychrome',
   }
 }
 
 ---Extract Zhihu cookies from cache
 ---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
 function M.get_cookies(...)
-  for _, auth in ipairs(M.auths) do
+  for _, name in ipairs(M.auths) do
+    local auth = require(name)
     local cookies = auth.get_cookies(...)
     if #tostring(cookies) > 0 then
       if auth ~= require 'zhihu.auth.cache' then

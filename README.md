@@ -82,10 +82,10 @@ After editing,
 will save the article to draft.
 
 ```vim
-:write
+:quit
 ```
 
-again will upload draft.
+will publish draft.
 
 ```vim
 :nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>

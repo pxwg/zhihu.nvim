@@ -75,32 +75,25 @@ function M.write_cb()
     vim.o.modified = false
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
     article:set_lines(lines)
-    local error = article:update()
-    if error then
-      vim.notify(error, vim.log.levels.ERROR)
-    end
-  else
-    -- article:publish()
+    article.modified = true
+  end
+  local error = article:update()
+  if error then
+    vim.notify(error, vim.log.levels.ERROR)
   end
 
   article.root = nil
   vim.b.article = article
 end
 
----create autocmds
----@param augroup_id integer?
-function M.create_autocmds(augroup_id)
-  augroup_id = augroup_id or vim.api.nvim_create_augroup("zhihu", {})
-  vim.api.nvim_create_autocmd({ "BufReadCmd", "SessionLoadPost" }, {
-    pattern = "zhihu://*",
-    group = augroup_id,
-    callback = M.read_cb
-  })
-  vim.api.nvim_create_autocmd("BufWriteCmd", {
-    pattern = "zhihu://*",
-    group = augroup_id,
-    callback = M.write_cb
-  })
+---callback for ExitPre
+---TODO: publish
+function M.exit_cb()
+  local Article = M.Articles[vim.o.filetype] or M.Articles[0]
+  local article = Article(vim.b.article)
+  if article.modified then
+    article:publish()
+  end
 end
 
 return M

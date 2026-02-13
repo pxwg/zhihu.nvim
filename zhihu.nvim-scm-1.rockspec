@@ -70,6 +70,7 @@ build = {
       ["zhihu.article.markdown"] = "lua/zhihu/article/markdown.lua",
       ["zhihu.article"] = "lua/zhihu/article.lua",
       ["zhihu.image"] = "lua/zhihu/image.lua",
+      ["zhihu.init"] = "lua/zhihu/init.lua",
     }
   },
 }

@@ -70,7 +70,9 @@ function M.Article:from_id(id, question_id)
   local resp = api:request()
   local text = resp.status_code == 200 and resp.text or resp.status
   local article = self:from_html(text)
-  if article.itemId == "" then
+  if article.itemId then
+    assert(article.itemId == id)
+  else
     article.itemId = id
   end
   article.question_id = question_id
@@ -99,19 +101,16 @@ function M.Article:update()
   if self.root == nil and self.titleImage == nil then
     return
   end
-  if tonumber(self.itemId) == nil then
-    local Post
-    if self.question_id then
-      Post = require 'zhihu.api.answer.post'.API
-    else
-      Post = require 'zhihu.api.article.post'.API
+  if self.question_id == nil then
+    if tonumber(self.itemId) == nil then
+      local Post = require 'zhihu.api.article.post'.API
+      local api = Post:from_html(self.title, tostring(self.root))
+      local resp = api:request()
+      self.itemId = resp.status_code == 200 and resp.json().id or resp.status
     end
-    local api = Post:from_html(self.question_id or self.title, tostring(self.root))
-    local resp = api:request()
-    self.itemId = resp.status_code == 200 and resp.json().id or resp.status
-  end
-  if tonumber(self.itemId) == nil then
-    return self.itemId
+    if tonumber(self.itemId) == nil then
+      return self.itemId
+    end
   end
   local api
   if self.question_id then

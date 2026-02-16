@@ -27,24 +27,27 @@ end
 ---nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
 ---@param id integer?
 ---@param question_id integer?
-function M.open(id, question_id)
-  id = id or vim.b.article and vim.b.article.itemId
-  question_id = question_id or vim.b.article and vim.b.article.question_id
+---@param modifiable boolean?
+function M.open(id, question_id, modifiable)
+  id = id or vim.b.article.itemId
+  question_id = question_id or vim.b.article.question_id
+  if modifiable == nil then
+    modifiable = vim.bo.modifiable
+  end
   local url
-  if not tonumber(id) then
+  if tonumber(id) or tonumber(question_id) then
+    local API = require'zhihu.api.article.get'.API
+    local api = API.from_id(id, question_id)
+    url = api.url
+    if modifiable and tonumber(id) then
+      url = url .. '/edit'
+    end
+  else
     url = vim.api.nvim_buf_get_name(0)
     if url:match "zhihu://" then
       vim.notify("run :w firstly!", vim.log.levels.WARN)
       return
     end
-  else
-    local mod = require'zhihu.api.article.get'
-    if question_id then
-      url = mod.url:format(question_id, id)
-    else
-      url = mod.API.url:format(id)
-    end
-    url = url .. '/edit'
   end
   vim.ui.open(url)
 end

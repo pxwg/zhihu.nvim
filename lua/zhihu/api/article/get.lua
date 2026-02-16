@@ -2,7 +2,8 @@
 local requests = require "requests"
 local auth = require 'zhihu.auth'
 local M = {
-  url = "https://www.zhihu.com/question/%s/answer/%s",
+  url = "https://www.zhihu.com/question/%s",
+  field = "/answer/%s",
   API = {
     url = "https://zhuanlan.zhihu.com/p/%s",
     headers = {
@@ -43,7 +44,11 @@ setmetatable(M.API, {
 function M.API.from_id(id, question_id)
   local api = {}
   if question_id then
-    api.url = M.url:format(question_id, id)
+    local field = ""
+    if tonumber(id) then
+      field = M.field:format(id)
+    end
+    api.url = M.url:format(question_id) .. field
   else
     api.url = M.API.url:format(id)
   end

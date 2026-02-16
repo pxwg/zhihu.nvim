@@ -2,6 +2,7 @@
 local requests = require "requests"
 local auth = require 'zhihu.auth'
 local M = {
+  url = "https://www.zhihu.com/question/%s/answer/%s",
   API = {
     url = "https://zhuanlan.zhihu.com/p/%s",
     headers = {
@@ -37,11 +38,15 @@ setmetatable(M.API, {
 ---factory method.
 ---lua < 5.3 use double as number, which result in overflow
 ---@param id string
+---@param question_id string?
 ---@return table
-function M.API.from_id(id)
-  local api = {
-    url = M.API.url:format(id)
-  }
+function M.API.from_id(id, question_id)
+  local api = {}
+  if question_id then
+    api.url = M.url:format(question_id, id)
+  else
+    api.url = M.API.url:format(id)
+  end
   return M.API(api)
 end
 

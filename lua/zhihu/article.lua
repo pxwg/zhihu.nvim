@@ -1,8 +1,6 @@
 ---get article according to filetype
 local fs = require 'vim.fs'
-local Get = require 'zhihu.api.article.get'.API
 local M = {
-  url = Get.url .. '/edit',
   Articles = {
     html = require 'zhihu.article.html'.Article,
     markdown = require 'zhihu.article.markdown'.Article,
@@ -14,29 +12,39 @@ M.Articles[0] = M.Articles.markdown
 ---convert filename to id
 ---@param filename string?
 ---@return string id
+---@return string? question_id
 function M.filename_to_id(filename)
   -- luacheck: ignore 111 113
   ---@diagnostic disable: undefined-global
   filename = filename or vim.api.nvim_buf_get_name(0)
-  local basename = fs.basename(vim.api.nvim_buf_get_name(0))
-  return basename:match "^[^.]+" or ""
+  local id = fs.basename(filename):match "^[^.]+" or ""
+  local question_id = fs.dirname(filename):match "%d+"
+  return id, question_id
 end
 
 ---open article's URL.
 ---for example:
 ---nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
 ---@param id integer?
-function M.open(id)
+---@param question_id integer?
+function M.open(id, question_id)
   id = id or vim.b.article and vim.b.article.itemId
+  question_id = question_id or vim.b.article and vim.b.article.question_id
   local url
-  if tonumber(id) then
-    url = M.url:format(id)
-  else
+  if not tonumber(id) then
     url = vim.api.nvim_buf_get_name(0)
     if url:match "zhihu://" then
       vim.notify("run :w firstly!", vim.log.levels.WARN)
       return
     end
+  else
+    local mod = require'zhihu.api.article.get'
+    if question_id then
+      url = mod.url:format(question_id, id)
+    else
+      url = mod.API.url:format(id)
+    end
+    url = url .. '/edit'
   end
   vim.ui.open(url)
 end
@@ -47,12 +55,12 @@ function M.read_cb()
   vim.cmd "filetype detect"
 
   local Article = M.Articles[vim.o.filetype] or M.Articles[0]
-  local id = M.filename_to_id()
+  local id, question_id = M.filename_to_id()
   local article
   if tonumber(id) then
-    article = Article:from_id(id)
+    article = Article:from_id(id, question_id)
   else
-    article = Article()
+    article = Article { question_id = question_id }
   end
   local lines = article:get_lines()
   vim.api.nvim_buf_set_lines(0, 0, -1, true, lines)

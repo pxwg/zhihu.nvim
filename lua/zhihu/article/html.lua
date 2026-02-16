@@ -5,8 +5,6 @@ local split = require 'vim.shared'.split
 local json = require 'vim.json'
 
 local Get = require 'zhihu.api.article.get'.API
-local Post = require 'zhihu.api.article.post'.API
-local Patch = require 'zhihu.api.article.patch'.API
 local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
 
@@ -65,15 +63,17 @@ setmetatable(M.Article, {
 
 ---factory method. wrap `from_html`
 ---@param id string
+---@param question_id string?
 ---@return table
-function M.Article:from_id(id)
-  local api = Get.from_id(id)
+function M.Article:from_id(id, question_id)
+  local api = Get.from_id(id, question_id)
   local resp = api:request()
   local text = resp.status_code == 200 and resp.text or resp.status
   local article = self:from_html(text)
   if article.itemId == "" then
     article.itemId = id
   end
+  article.question_id = question_id
   return article
 end
 
@@ -100,14 +100,27 @@ function M.Article:update()
     return
   end
   if tonumber(self.itemId) == nil then
-    local api = Post:from_html(self.title, tostring(self.root))
+    local Post
+    if self.question_id then
+      Post = require 'zhihu.api.answer.post'.API
+    else
+      Post = require 'zhihu.api.article.post'.API
+    end
+    local api = Post:from_html(self.question_id or self.title, tostring(self.root))
     local resp = api:request()
     self.itemId = resp.status_code == 200 and resp.json().id or resp.status
   end
   if tonumber(self.itemId) == nil then
     return self.itemId
   end
-  local api = Patch:from_article(self)
+  local api
+  if self.question_id then
+    local Post = require 'zhihu.api.answer.post'.API
+    api = Post:from_html(self.question_id, tostring(self.root))
+  else
+    local Patch = require 'zhihu.api.article.patch'.API
+    api = Patch:from_article(self)
+  end
   local resp = api:request()
   if resp.status_code == 200 then
     return

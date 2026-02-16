@@ -1,6 +1,5 @@
 --- init a zhihu article
 local API = require 'zhihu.api'.API
-local auth = require 'zhihu.auth'
 local M = {
   API = {
     url = "https://zhuanlan.zhihu.com/api/articles/drafts",

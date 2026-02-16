@@ -23,10 +23,10 @@ setmetatable(M.API, {
 })
 
 ---factory method.
+---@param question_id string
 ---@param content string
----@param id string
 ---@return table
-function M.API:from_html(content, id)
+function M.API:from_html(question_id, content)
   local body = {
     content = content,
     draft_type = "normal",
@@ -47,7 +47,7 @@ function M.API:from_html(content, id)
       thank_inviter = "",
     }
   }
-  return self:from_body(body, id)
+  return self:from_body(body, question_id)
 end
 
 return M

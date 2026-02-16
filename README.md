@@ -9,7 +9,7 @@
 - [x] Convert local markdown files into Zhihu articles and send them to the draft box;
 - [x] Using user-defined scripts to convert other file types into Zhihu articles, then upload them to the draft box.
 - [x] Synchronizing Zhihu articles to local markdown files;
-- [ ] Support editing Zhihu answers;
+- [x] Support editing Zhihu answers;
 - [ ] Support direct publishing of Zhihu articles and answers (bypassing the draft box);
 - [ ] Add [blink-cmp](https://github.com/Saghen/blink.cmp) to auto complete @(user name list) and # tags (c.f.: [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)).
 - [ ] Develop and test a more robust conversion library to achieve 100% compatibility with Zhihu-flavored HTML.
@@ -119,6 +119,14 @@ If you try to open a non-existent article, you will see:
 [去往首页](https://www.zhihu.com)
 ```
 
+### Zhihu Answer
+
+Similar with article.
+
+```sh
+vi zhihu://question_id/new.md
+```
+
 ### Zhihu Auth
 
 In order to log in zhihu, this library search
@@ -126,7 +134,7 @@ In order to log in zhihu, this library search
 - firefox cookies database
 - chrome cookies database
 - pychrome: a python module to communicate with chrome browser.
-  open <https://www.zhihu.com/> to let user to log in
+  open <https://www.zhihu.com/> to let user log in
 
 A cookies will be cached. If you meet `403 Forbidden`, try:
 

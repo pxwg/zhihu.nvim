@@ -7,7 +7,6 @@ local M = {
     'zhihu.auth.firefox',
     'zhihu.auth.cache',
     'zhihu.auth.chrome',
-    'zhihu.auth.pychrome',
   }
 }
 

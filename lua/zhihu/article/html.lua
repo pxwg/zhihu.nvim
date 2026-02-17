@@ -104,7 +104,7 @@ function M.Article:update()
   if self.question_id == nil then
     if tonumber(self.itemId) == nil then
       local Post = require 'zhihu.api.article.post'.API
-      local api = Post:from_html(self.title, tostring(self.root))
+      local api = Post:from_article(self)
       local resp = api:request()
       self.itemId = resp.status_code == 200 and resp.json().id or resp.status
     end

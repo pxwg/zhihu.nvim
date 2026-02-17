@@ -23,18 +23,17 @@ setmetatable(M.API, {
 })
 
 ---factory method.
----@param question_id string
----@param content string
+---@param article table
 ---@return table
-function M.API:from_html(question_id, content)
+function M.API:from_article(article)
   local body = {
-    content = content,
-    draft_type = "normal",
-    delta_time = 30,
+    content = tostring(article.root),
+    draft_type = article.draft_type,
+    delta_time = article.delta_time,
     settings = {
       reshipment_settings = "allowed",
       comment_permission = "all",
-      can_reward = false,
+      can_reward = article.can_reward,
       tagline = "",
       disclaimer_status = "close",
       disclaimer_type = "none",
@@ -42,12 +41,12 @@ function M.API:from_html(question_id, content)
         is_report = true,
       },
       push_activity = false,
-      table_of_contents_enabled = false,
+      table_of_contents_enabled = article.table_of_contents,
       thank_inviter_status = "close",
       thank_inviter = "",
     }
   }
-  return self:from_body(body, question_id)
+  return self:from_body(body, article.question_id)
 end
 
 return M

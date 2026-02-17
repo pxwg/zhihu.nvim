@@ -61,6 +61,7 @@ build = {
       ["zhihu.api.post.article"] = "lua/zhihu/api/post/article.lua",
       ["zhihu.api.post.answer"] = "lua/zhihu/api/post/answer.lua",
       ["zhihu.api.post.image"] = "lua/zhihu/api/post/image.lua",
+      ["zhihu.api.post.publish"] = "lua/zhihu/api/post/publish.lua",
       ["zhihu.api.patch"] = "lua/zhihu/api/patch.lua",
       ["zhihu.api.put"] = "lua/zhihu/api/put.lua",
       ["zhihu.article.templates.Untitled"] = "lua/zhihu/article/templates/Untitled.md",

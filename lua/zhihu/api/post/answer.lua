@@ -1,5 +1,5 @@
 --- init a zhihu answer
-local API = require 'zhihu.api'.API
+local API = require 'zhihu.api.post'.API
 local M = {
   API = {
     url = "https://www.zhihu.com/api/v4/questions/%s/draft",

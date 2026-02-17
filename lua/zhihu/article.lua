@@ -36,7 +36,7 @@ function M.open(id, question_id, modifiable)
   end
   local url
   if tonumber(id) or tonumber(question_id) then
-    local API = require'zhihu.api.article.get'.API
+    local API = require'zhihu.api.get'.API
     local api = API.from_id(id, question_id)
     url = api.url
     if modifiable and tonumber(id) then

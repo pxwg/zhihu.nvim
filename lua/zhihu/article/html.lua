@@ -4,7 +4,7 @@ local fs = require 'vim.fs'
 local split = require 'vim.shared'.split
 local json = require 'vim.json'
 
-local Get = require 'zhihu.api.article.get'.API
+local Get = require 'zhihu.api.get'.API
 local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
 
@@ -13,7 +13,6 @@ local M = {
   error_selector = ".ErrorPage-text",
   attribute = "data-zop",
   Article = {
-    itemId = "",
     title = "Untitled",
     table_of_contents = false,
     delta_time = 30,
@@ -70,10 +69,10 @@ function M.Article:from_id(id, question_id)
   local resp = api:request()
   local text = resp.status_code == 200 and resp.text or resp.status
   local article = self:from_html(text)
-  if article.itemId then
-    assert(article.itemId == id)
-  else
+  if article.itemId == nil then
     article.itemId = id
+  else
+    assert(article.itemId == id)
   end
   article.question_id = question_id
   return article
@@ -103,7 +102,7 @@ function M.Article:update()
   end
   if self.question_id == nil then
     if tonumber(self.itemId) == nil then
-      local Post = require 'zhihu.api.article.post'.API
+      local Post = require 'zhihu.api.post.article'.API
       local api = Post:from_article(self)
       local resp = api:request()
       self.itemId = resp.status_code == 200 and resp.json().id or resp.status
@@ -114,10 +113,10 @@ function M.Article:update()
   end
   local api
   if self.question_id then
-    local Post = require 'zhihu.api.answer.post'.API
+    local Post = require 'zhihu.api.post.answer'.API
     api = Post:from_html(self.question_id, tostring(self.root))
   else
-    local Patch = require 'zhihu.api.article.patch'.API
+    local Patch = require 'zhihu.api.patch'.API
     api = Patch:from_article(self)
   end
   local resp = api:request()

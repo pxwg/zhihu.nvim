@@ -1,4 +1,4 @@
---- download a zhihu article
+--- download a zhihu article or answer
 local requests = require "requests"
 local auth = require 'zhihu.auth'
 local M = {

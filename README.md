@@ -6,11 +6,10 @@
 
 ## Features
 
-- [x] Convert local markdown files into Zhihu articles and send them to the draft box;
-- [x] Using user-defined scripts to convert other file types into Zhihu articles, then upload them to the draft box.
 - [x] Synchronizing Zhihu articles to local markdown files;
-- [x] Support editing Zhihu answers;
-- [ ] Support direct publishing of Zhihu articles and answers (bypassing the draft box);
+- [x] Convert local markdown files into Zhihu articles and send them to the draft box;
+- [x] Support direct publishing of Zhihu articles and answers (bypassing the draft box);
+- [x] Using user-defined scripts to convert other file types into Zhihu articles
 - [ ] Add [blink-cmp](https://github.com/Saghen/blink.cmp) to auto complete @(user name list) and # tags (c.f.: [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)).
 - [ ] Develop and test a more robust conversion library to achieve 100% compatibility with Zhihu-flavored HTML.
 

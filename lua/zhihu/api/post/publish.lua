@@ -96,18 +96,18 @@ function M.API:from_article(article)
   -- 内容格式错误
   -- https://www.zhihu.com/creator/editor-setting
   if article.reshipment_settings ~= nil then
-    body.reprint = { reshipment_settings = article.reshipment_settings }
+    body.data.reprint = { reshipment_settings = article.reshipment_settings }
   end
   if article.comment_permission ~= nil then
-    body.commentsPermission = { comment_permission = article.comment_permission }
+    body.data.commentsPermission = { comment_permission = article.comment_permission }
   end
   if article.can_reward ~= nil then
-    body.appreciate = { can_reward = article.can_reward }
+    body.data.appreciate = { can_reward = article.can_reward }
   end
 
   -- 发布失败
   if article.question_id then
-    body.hybrid = {
+    body.data.hybrid = {
       html = tostring(article.root),
     }
   end

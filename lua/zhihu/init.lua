@@ -1,11 +1,28 @@
 ---lazy load
 -- luacheck: ignore 111 113
 ---@diagnostic disable: undefined-global
-local M = {}
+local M = {
+  opts = {
+    article = {}
+  }
+}
 
 ---set up
-function M.setup()
-  M.create_autocmds()
+---@param opts table
+function M.setup(opts)
+  M.opts = vim.tbl_extend(M.opts, opts, "force")
+end
+
+---override default value, only run once
+function M.init()
+  if M.is_init then
+    return
+  end
+  local Article = require 'zhihu.article.html'.Article
+  for k, v in pairs(M.opts.article) do
+    Article[k] = v
+  end
+  M.is_init = true
 end
 
 ---create autocmds
@@ -17,6 +34,7 @@ function M.create_autocmds(augroup_id)
     pattern = "zhihu://*",
     group = augroup_id,
     callback = function()
+      M.init()
       require "zhihu.article".read_cb()
     end
   })
@@ -24,6 +42,7 @@ function M.create_autocmds(augroup_id)
     pattern = "zhihu://*",
     group = augroup_id,
     callback = function()
+      M.init()
       require "zhihu.article".write_cb()
     end
   })

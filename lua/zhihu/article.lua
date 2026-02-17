@@ -27,21 +27,21 @@ end
 ---nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
 ---@param id integer?
 ---@param question_id integer?
----@param modifiable boolean?
-function M.open(id, question_id, modifiable)
-  id = id or vim.b.article.itemId
-  question_id = question_id or vim.b.article.question_id
-  if modifiable == nil then
-    modifiable = vim.bo.modifiable
+---@param edit boolean?
+function M.open(id, question_id, edit)
+  if not vim.bo.modifiable then
+    edit = false
+  end
+  local Article = M.Articles[vim.o.filetype] or M.Articles[0]
+  local article
+  if id == nil and question_id == nil then
+    article = Article(vim.b.article)
+  else
+    article = Article { itemId = id, question_id = question_id }
   end
   local url
-  if tonumber(id) or tonumber(question_id) then
-    local API = require'zhihu.api.get'.API
-    local api = API.from_id(id, question_id)
-    url = api.url
-    if modifiable and tonumber(id) then
-      url = url .. '/edit'
-    end
+  if article.itemId or article.question_id then
+    url = article:get_url(edit)
   else
     url = vim.api.nvim_buf_get_name(0)
     if url:match "zhihu://" then
@@ -70,7 +70,7 @@ function M.read_cb()
 
   article.root = nil
   vim.b.article = article
-  if Article.authorName and article.authorName ~= Article.authorName then
+  if article.authorName ~= (Article.authorName or article.authorName) then
     vim.o.modifiable = false
   end
 end
@@ -83,28 +83,18 @@ function M.write_cb()
   local Article = M.Articles[vim.o.filetype] or M.Articles[0]
   local article = Article(vim.b.article)
   if vim.o.modified then
-    vim.o.modified = false
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
     article:set_lines(lines)
-    article.modified = true
   end
-  local error = article:update()
+  local error = article:write()
   if error then
     vim.notify(error, vim.log.levels.ERROR)
+  else
+    vim.o.modified = false
   end
 
   article.root = nil
   vim.b.article = article
-end
-
----callback for ExitPre
----TODO: publish
-function M.exit_cb()
-  local Article = M.Articles[vim.o.filetype] or M.Articles[0]
-  local article = Article(vim.b.article)
-  if article.modified then
-    article:publish()
-  end
 end
 
 return M

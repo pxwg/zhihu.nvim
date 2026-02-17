@@ -4,7 +4,6 @@ local fs = require 'vim.fs'
 local split = require 'vim.shared'.split
 local json = require 'vim.json'
 
-local Get = require 'zhihu.api.get'.API
 local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
 
@@ -19,6 +18,8 @@ local M = {
     can_reward = false,
     isTitleImageFullScreen = false,
     draft_type = "normal",
+    disclaimer_type = "none",
+    disclaimer_status = "closed",
   },
 }
 M.template_path = fs.joinpath(
@@ -66,6 +67,7 @@ setmetatable(M.Article, {
 ---@param question_id string?
 ---@return table
 function M.Article:from_id(id, question_id)
+  local Get = require 'zhihu.api.get'.API
   local api = Get.from_id(id, question_id)
   local resp = api:request()
   local text = resp.status_code == 200 and resp.text or resp.status
@@ -94,23 +96,53 @@ function M.Article:from_html(html)
   return self(article)
 end
 
----update article
+---write an article or answer
+---@param publish boolean?
 ---@return string? error
-function M.Article:update()
+function M.Article:write(publish)
+  if publish == nil then
+    publish = self.disclaimer_type and self.disclaimer_status and true
+  end
+  if publish then
+    return self:publish()
+  end
+  return self:upload()
+end
+
+---publish an article or answer
+---@return string? error
+function M.Article:publish()
+  local Post = require 'zhihu.api.post.publish'.API
+  local api = Post:from_article(self)
+  local resp = api:request()
+  if resp.status_code ~= 200 then
+    return resp.status
+  end
+  local output = resp.json()
+  if output.code ~= 0 then
+    return output.message
+  end
+  local publish = json.decode(output.data.result).publish
+  self.itemId = publish.id
+  self.authorName = publish.author.name
+  assert(self.question_id == publish.question.id)
+end
+
+---upload an article or answer to draft box
+---@return string? error
+function M.Article:upload()
   -- nothing need to be updated
   if self.root == nil and self.titleImage == nil then
     return
   end
-  if self.question_id == nil then
-    if tonumber(self.itemId) == nil then
-      local Post = require 'zhihu.api.post.article'.API
-      local api = Post:from_article(self)
-      local resp = api:request()
-      self.itemId = resp.status_code == 200 and resp.json().id or resp.status
+  if self.question_id == nil and self.itemId == nil then
+    local Post = require 'zhihu.api.post.article'.API
+    local api = Post:from_article(self)
+    local resp = api:request()
+    if resp.status_code ~= 200 then
+      return resp.status
     end
-    if tonumber(self.itemId) == nil then
-      return self.itemId
-    end
+    self.itemId = resp.json().id
   end
   local API
   if self.question_id then
@@ -120,10 +152,9 @@ function M.Article:update()
   end
   local api = API:from_article(self)
   local resp = api:request()
-  if resp.status_code == 200 then
-    return
+  if resp.status_code ~= 200 then
+    return resp.status
   end
-  return resp.status
 end
 
 ---split article to lines
@@ -147,6 +178,23 @@ M.Article.set_content = M.Article.set_html
 function M.Article:set_lines(lines)
   local text = table.concat(lines, "\n")
   self:set_content(text)
+end
+
+---get URL
+---@param edit boolean?
+---@return string url
+function M.Article:get_url(edit)
+  if edit == nil then
+    local publish = self.disclaimer_type and self.disclaimer_status and true
+    edit = not publish
+  end
+  local API = require 'zhihu.api.get'.API
+  local api = API.from_id(self.itemId, self.question_id)
+  local url = api.url
+  if edit and self.itemId then
+    url = url .. '/edit'
+  end
+  return url
 end
 
 return M

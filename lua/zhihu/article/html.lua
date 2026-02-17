@@ -7,6 +7,25 @@ local json = require 'vim.json'
 local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
 
+---@class Article
+---@field itemId string? answer id or article id, will create one if empty
+---@field question_id string? question_id id, empty if it is an article
+---@field title string? article title or question title
+---@field authorName string? author name
+---https://www.zhihu.com/creator/editor-setting
+---@field can_reward boolean? 送礼物设置
+---@field comment_permission "all"? 评论权限
+---@field reshipment_settings "allowed"? 转载设置
+---@field table_of_contents boolean? enable TOC
+---@field isTitleImageFullScreen boolean? article title image is fullscreen
+---@field draft_type string?
+---@field delta_time integer?
+---@field disclaimer_status string?
+---@field disclaimer_type string?
+---@field thank_inviter_status string?
+---@field thank_inviter string?
+---@field root table?
+
 local M = {
   selector = ".RichText.ztext",
   error_selector = ".ErrorPage-text",
@@ -15,11 +34,12 @@ local M = {
     title = "Untitled",
     table_of_contents = false,
     delta_time = 30,
-    can_reward = false,
     isTitleImageFullScreen = false,
     draft_type = "normal",
-    disclaimer_type = "none",
     disclaimer_status = "closed",
+    disclaimer_type = "none",
+    thank_inviter_status = "close",
+    thank_inviter = "",
   },
 }
 M.template_path = fs.joinpath(
@@ -38,8 +58,8 @@ local _meta = getmetatable(M.Article.root)
 _meta.__tostring = M.Article.root.gettext
 setmetatable(M.Article.root, _meta)
 
----@param article table?
----@return table article
+---@param article Article?
+---@return Article article
 function M.Article:new(article)
   article = article or {}
   setmetatable(article, {
@@ -65,7 +85,7 @@ setmetatable(M.Article, {
 ---factory method. wrap `from_html`
 ---@param id string
 ---@param question_id string?
----@return table
+---@return Article article
 function M.Article:from_id(id, question_id)
   local Get = require 'zhihu.api.get'.API
   local api = Get.from_id(id, question_id)
@@ -83,7 +103,7 @@ end
 
 ---factory method.
 ---@param html string?
----@return table
+---@return Article article
 function M.Article:from_html(html)
   html = html or ""
   local root = parse(html)

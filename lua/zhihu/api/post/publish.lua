@@ -60,8 +60,9 @@ function M.API:from_article(article)
     contentId = article.itemId
   end
   local body = {
-    action = "answer",
+    action = article.question_id and "answer" or "article",
     data = {
+      -- 内容格式错误
       hybridInfo = M.empty_array_mt,
       toFollower = M.empty_array_mt,
       publish = { traceId = M.get_trace_id() },
@@ -80,16 +81,8 @@ function M.API:from_article(article)
       hybrid = {
         html = tostring(article.root),
       },
-      reprint = {
-        reshipment_settings = "allowed",
-      },
-      commentsPermission = { comment_permission = "all" },
-      appreciate = {
-        can_reward = false,
-        tagline = "",
-      },
       publishSwitch = {
-        draft_type = "normal",
+        draft_type = article.draft_type,
       },
       creationStatement = {
         disclaimer_type = article.disclaimer_type,
@@ -98,11 +91,22 @@ function M.API:from_article(article)
       contentsTables = { table_of_contents_enabled = false },
       commercialReportInfo = { isReport = 0 },
       thanksInvitation = {
-        thank_inviter_status = "close",
-        thank_inviter = "",
+        thank_inviter_status = article.thank_inviter_status,
+        thank_inviter = article.thank_inviter,
       },
     }
   }
+  -- 内容格式错误
+  -- https://www.zhihu.com/creator/editor-setting
+  if article.reshipment_settings ~= nil then
+    body.reprint = { reshipment_settings = article.reshipment_settings }
+  end
+  if article.comment_permission ~= nil then
+    body.commentsPermission = { comment_permission = article.comment_permission }
+  end
+  if article.can_reward ~= nil then
+    body.appreciate = { can_reward = article.can_reward }
+  end
   return self:from_body(body)
 end
 

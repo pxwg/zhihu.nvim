@@ -11,15 +11,16 @@ local M = {
     ["reward_setting"] = {
       ["can_reward"] = false
     },
-    ["disclaimer_type"] = "none",
     ["reshipment_settings"] = "allowed",
     ["thank_inviter"] = "",
     ["comment_permission"] = "all",
     ["commercial_zhitask_bind_info"] = json.null,
+    ["column"] = json.null,
     ["is_report"] = false,
     ["thank_inviter_status"] = "close",
     ["table_of_contents_enabled"] = false,
     ["disclaimer_status"] = "close",
+    ["disclaimer_type"] = "none",
     ["commercial_report_info"] = {
       ["is_report"] = false
     }
@@ -55,13 +56,10 @@ setmetatable(M.API, {
 ---@param article table
 ---@return table
 function M.API:from_article(article)
-  local contentId
-  if tonumber(article.itemId) then
-    contentId = article.itemId
-  end
   local body = {
     action = article.question_id and "answer" or "article",
     data = {
+      -- if uses {}
       -- 内容格式错误
       hybridInfo = M.empty_array_mt,
       toFollower = M.empty_array_mt,
@@ -75,11 +73,9 @@ function M.API:from_article(article)
       },
       draft = {
         disabled = 1,
-        contentId = contentId,
-        isPublished = contentId ~= nil,
-      },
-      hybrid = {
-        html = tostring(article.root),
+        id = not article.question_id and article.itemId or nil,
+        contentId = article.question_id and article.itemId,
+        isPublished = article.isPublished,
       },
       publishSwitch = {
         draft_type = article.draft_type,
@@ -96,6 +92,7 @@ function M.API:from_article(article)
       },
     }
   }
+
   -- 内容格式错误
   -- https://www.zhihu.com/creator/editor-setting
   if article.reshipment_settings ~= nil then
@@ -106,6 +103,13 @@ function M.API:from_article(article)
   end
   if article.can_reward ~= nil then
     body.appreciate = { can_reward = article.can_reward }
+  end
+
+  -- 发布失败
+  if article.question_id then
+    body.hybrid = {
+      html = tostring(article.root),
+    }
   end
   return self:from_body(body)
 end

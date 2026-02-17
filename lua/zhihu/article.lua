@@ -11,15 +11,16 @@ M.Articles[0] = M.Articles.markdown
 
 ---convert filename to id
 ---@param filename string?
----@return string id
+---@return string? id
 ---@return string? question_id
+---@return string? title
 function M.filename_to_id(filename)
   -- luacheck: ignore 111 113
   ---@diagnostic disable: undefined-global
   filename = filename or vim.api.nvim_buf_get_name(0)
   local id = fs.basename(filename):match "^[^.]+" or ""
   local question_id = fs.dirname(filename):match "%d+"
-  return id, question_id
+  return tonumber(id) and id, question_id, not tonumber(id) and id or nil
 end
 
 ---open article's URL.
@@ -58,12 +59,12 @@ function M.read_cb()
   vim.cmd "filetype detect"
 
   local Article = M.Articles[vim.o.filetype] or M.Articles[0]
-  local id, question_id = M.filename_to_id()
+  local id, question_id, title = M.filename_to_id()
   local article
-  if tonumber(id) then
+  if id then
     article = Article:from_id(id, question_id)
   else
-    article = Article { question_id = question_id }
+    article = Article { question_id = question_id, title = title }
   end
   local lines = article:get_lines()
   vim.api.nvim_buf_set_lines(0, 0, -1, true, lines)

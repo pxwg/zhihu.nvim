@@ -12,6 +12,7 @@ local md_to_html = require("markdown_to_html").md_to_html
 ---@field question_id string? question_id id, empty if it is an article
 ---@field title string? article title or question title
 ---@field authorName string? author name
+---@field isPublished boolean?
 ---https://www.zhihu.com/creator/editor-setting
 ---@field can_reward boolean? 送礼物设置
 ---@field comment_permission "all"? 评论权限
@@ -62,6 +63,7 @@ setmetatable(M.Article.root, _meta)
 ---@return Article article
 function M.Article:new(article)
   article = article or {}
+  article.isPublished = article.itemId ~= nil
   setmetatable(article, {
     __tostring = self.tostring,
     __index = self
@@ -120,8 +122,21 @@ end
 ---@param publish boolean?
 ---@return string? error
 function M.Article:write(publish)
+  -- nothing need to be updated
+  if self.root == nil and self.titleImage == nil then
+    return
+  end
   if publish == nil then
     publish = self.disclaimer_type and self.disclaimer_status and true
+  end
+  if self.question_id == nil and self.itemId == nil then
+    local Post = require 'zhihu.api.post.article'.API
+    local api = Post:from_article(self)
+    local resp = api:request()
+    if resp.status_code ~= 200 then
+      return resp.status
+    end
+    self.itemId = resp.json().id
   end
   if publish then
     return self:publish()
@@ -132,6 +147,12 @@ end
 ---publish an article or answer
 ---@return string? error
 function M.Article:publish()
+  if self.question_id == nil then
+    local error = self:upload()
+    if error then
+      return error
+    end
+  end
   local Post = require 'zhihu.api.post.publish'.API
   local api = Post:from_article(self)
   local resp = api:request()
@@ -143,27 +164,15 @@ function M.Article:publish()
     return output.message
   end
   local publish = json.decode(output.data.result).publish
+  self.isPublished = true
   self.itemId = publish.id
-  self.authorName = publish.author.name
-  assert(self.question_id == publish.question.id)
+  self.authorName = publish.author and publish.author.name
+  assert(self.question_id == (publish.question and publish.question.id))
 end
 
 ---upload an article or answer to draft box
 ---@return string? error
 function M.Article:upload()
-  -- nothing need to be updated
-  if self.root == nil and self.titleImage == nil then
-    return
-  end
-  if self.question_id == nil and self.itemId == nil then
-    local Post = require 'zhihu.api.post.article'.API
-    local api = Post:from_article(self)
-    local resp = api:request()
-    if resp.status_code ~= 200 then
-      return resp.status
-    end
-    self.itemId = resp.json().id
-  end
   local API
   if self.question_id then
     API = require 'zhihu.api.post.answer'.API

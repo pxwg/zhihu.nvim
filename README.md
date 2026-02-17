@@ -79,13 +79,7 @@ After editing,
 :write
 ```
 
-will save the article to draft.
-
-```vim
-:quit
-```
-
-will publish draft.
+will publish it.
 
 ```vim
 :nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>

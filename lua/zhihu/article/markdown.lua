@@ -7,8 +7,8 @@ local M = {
   }
 }
 
----@param article table?
----@return table article
+---@param article Article?
+---@return Article article
 function M.Article:new(article)
   article = article or {}
   article = Article(article)

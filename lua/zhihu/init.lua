@@ -3,6 +3,7 @@
 ---@diagnostic disable: undefined-global
 local M = {
   opts = {
+    ---@type Article
     article = {}
   }
 }

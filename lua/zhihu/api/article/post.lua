@@ -23,15 +23,14 @@ setmetatable(M.API, {
 })
 
 ---factory method.
----@param title string
----@param content string
+---@param article table
 ---@return table
-function M.API:from_html(title, content)
+function M.API:from_article(article)
   local body = {
-    title = title,
-    content = content,
-    delta_time = 0,
-    can_reward = false,
+    title = article.title,
+    content = tostring(article.root),
+    delta_time = article.delta_time,
+    can_reward = article.can_reward,
   }
   return self:from_body(body)
 end

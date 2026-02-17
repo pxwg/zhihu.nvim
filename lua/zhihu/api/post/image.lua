@@ -1,6 +1,6 @@
 --- init a zhihu image
 local md5 = require "md5"
-local API = require 'zhihu.api'.API
+local API = require 'zhihu.api.post'.API
 local M = {
   API = {
     url = "https://api.zhihu.com/images",

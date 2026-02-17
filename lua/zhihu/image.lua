@@ -1,7 +1,7 @@
 --- a class to get/post/patch zhihu image in HTML
 local json = require 'vim.json'
-local Post = require 'zhihu.api.image.post'.API
-local Put = require 'zhihu.api.image.put'.API
+local Post = require 'zhihu.api.post.image'.API
+local Put = require 'zhihu.api.put'.API
 local M = {
   url = "https://picx.zhimg.com/%s",
   Image = {

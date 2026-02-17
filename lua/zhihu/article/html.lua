@@ -18,6 +18,7 @@ local M = {
     delta_time = 30,
     can_reward = false,
     isTitleImageFullScreen = false,
+    draft_type = "normal",
   },
 }
 M.template_path = fs.joinpath(
@@ -111,14 +112,13 @@ function M.Article:update()
       return self.itemId
     end
   end
-  local api
+  local API
   if self.question_id then
-    local Post = require 'zhihu.api.post.answer'.API
-    api = Post:from_html(self.question_id, tostring(self.root))
+    API = require 'zhihu.api.post.answer'.API
   else
-    local Patch = require 'zhihu.api.patch'.API
-    api = Patch:from_article(self)
+    API = require 'zhihu.api.patch'.API
   end
+  local api = API:from_article(self)
   local resp = api:request()
   if resp.status_code == 200 then
     return

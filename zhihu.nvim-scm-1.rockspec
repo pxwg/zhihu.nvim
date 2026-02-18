@@ -46,6 +46,9 @@ build = {
     "chrome_cookie",
     "markdown_to_html",
   },
+  copy_directories = {
+    "plugin",
+  },
   install = {
     lua = {
       ["zhihu.auth.scripts.firefox"] = "lua/zhihu/auth/scripts/firefox.sql",

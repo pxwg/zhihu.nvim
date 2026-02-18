@@ -60,7 +60,7 @@ function M.API:from_article(article)
     action = article.question_id and "answer" or "article",
     data = {
       -- if uses {}
-      -- 内容格式错误
+      -- 1: 内容格式错误
       hybridInfo = M.empty_array_mt,
       toFollower = M.empty_array_mt,
       publish = { traceId = M.get_trace_id() },
@@ -73,9 +73,11 @@ function M.API:from_article(article)
       },
       draft = {
         disabled = 1,
-        id = not article.question_id and article.itemId or nil,
-        contentId = article.question_id and article.itemId,
         isPublished = article.isPublished,
+      },
+      -- 4000: 发布失败，请稍后再试
+      reprint = {
+        reshipment_settings = article.reshipment_settings,
       },
       publishSwitch = {
         draft_type = article.draft_type,
@@ -93,11 +95,11 @@ function M.API:from_article(article)
     }
   }
 
+  -- 4000: 发布失败，请稍后再试
+  body.data.draft[article.question_id and "contentId" or "id"] = article.itemId
+
   -- 内容格式错误
   -- https://www.zhihu.com/creator/editor-setting
-  if article.reshipment_settings ~= nil then
-    body.data.reprint = { reshipment_settings = article.reshipment_settings }
-  end
   if article.comment_permission ~= nil then
     body.data.commentsPermission = { comment_permission = article.comment_permission }
   end
@@ -105,7 +107,7 @@ function M.API:from_article(article)
     body.data.appreciate = { can_reward = article.can_reward }
   end
 
-  -- 发布失败
+  -- 1: 发布失败
   if article.question_id then
     body.data.hybrid = {
       html = tostring(article.root),

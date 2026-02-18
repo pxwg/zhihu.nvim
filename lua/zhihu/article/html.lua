@@ -41,6 +41,7 @@ local M = {
     disclaimer_type = "none",
     thank_inviter_status = "close",
     thank_inviter = "",
+    reshipment_settings = "allowed",
   },
 }
 M.template_path = fs.joinpath(
@@ -111,7 +112,10 @@ function M.Article:from_html(html)
   local root = parse(html)
   local tag = root:select(("[%s]"):format(M.attribute))[1]
   local article = json.decode(tag and htmlEntities.decode(tag.attributes[M.attribute]) or "{}")
-  article.root = root:select(M.selector)[1] or root:select(M.error_selector)[1] or root
+  local roots = root:select(M.selector)
+  -- [1] = question,
+  -- [2] = answer,
+  article.root = roots[#roots] or root:select(M.error_selector)[1] or root
   if article.root.root ~= article.root then
     article.root = parse(article.root:gettext())
   end

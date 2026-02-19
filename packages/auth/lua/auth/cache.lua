@@ -2,7 +2,7 @@
 local fs = require 'vim.fs'
 local json = require 'vim.json'
 local PlatformDirs = require 'platformdirs'.PlatformDirs
-local Cookies = require 'zhihu.auth.auth'.Cookies
+local Cookies = require 'auth.auth'.Cookies
 local M = {
     cookies_path = fs.joinpath(PlatformDirs { appname = "nvim" }:user_state_dir(), "zhihu.json")
 }

@@ -1,12 +1,12 @@
 ---get cookies.
 ---all modules under auth must provide a function `get_cookies()`.
-local set_cookies = require 'zhihu.auth.cache'.set_cookies
-local Cookies = require 'zhihu.auth.auth'.Cookies
+local set_cookies = require 'auth.cache'.set_cookies
+local Cookies = require 'auth.auth'.Cookies
 local M = {
   auths = {
-    'zhihu.auth.firefox',
-    'zhihu.auth.cache',
-    'zhihu.auth.chrome',
+    'auth.firefox',
+    'auth.cache',
+    'auth.chrome',
   }
 }
 
@@ -17,7 +17,7 @@ function M.get_cookies(...)
     local auth = require(name)
     local cookies = auth.get_cookies(...)
     if #tostring(cookies) > 0 then
-      if auth ~= require 'zhihu.auth.cache' then
+      if auth ~= require 'auth.cache' then
         set_cookies(cookies)
       end
       return cookies

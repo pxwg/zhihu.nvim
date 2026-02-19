@@ -1,0 +1,36 @@
+package = "auth"
+version = "0.0.1"
+lua = ">= 5.1"
+
+[description]
+summary = "A library to get cookies from firefox or chrome."
+detailed = "created for zhihu.nvim, also can be used for other similar plugins, such as csdn.nvim"
+maintainer = "Wu"
+labels = ["neovim"]
+homepage = "https://github.com/pxwg/zhihu.nvim/tree/main/packages/auth"
+license = 'MIT'
+
+[source]
+url = "https://github.com/rimeinn/rime.nvim/archive/$(VERSION).zip"
+dir = "rime.nvim-$(VERSION)/packages/$(PACKAGE)"
+
+[dependencies]
+platformdirs = " >= 0.0.1"
+lsqlite3 = " >= 0.0.1"
+
+[test]
+type = "busted"
+
+[build]
+type = "rust-mlua"
+
+[build.modules]
+chrome_cookie = "chrome_cookie"
+
+[build.install.lua]
+"auth.scripts.firefox" = "lua/auth/scripts/firefox.sql"
+"auth.auth" = "lua/auth/auth.lua"
+"auth.cache" = "lua/auth/cache.lua"
+"auth.chrome" = "lua/auth/chrome.lua"
+"auth.firefox" = "lua/auth/firefox.lua"
+"auth" = "lua/auth.lua"

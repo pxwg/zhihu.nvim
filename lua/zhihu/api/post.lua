@@ -1,7 +1,7 @@
 ---a common class for json API
 local requests = require "requests"
 local json = require 'vim.json'
-local auth = require 'zhihu.auth'
+local auth = require 'auth'
 local M = {
   API = {
     url = "",

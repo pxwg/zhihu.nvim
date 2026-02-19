@@ -2,7 +2,6 @@ package.path = package.path .. ';lua/?.lua'
 
 local fs = require 'vim.fs'
 
-local auth = require "zhihu.auth"
 local filename_to_id = require "zhihu.article".filename_to_id
 local Article = require "zhihu.article.html".Article
 local Image = require "zhihu.image".Image
@@ -14,9 +13,6 @@ local dir = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
 -- luacheck: ignore 113
 ---@diagnostic disable: undefined-global
 describe("test zhihu", function()
-    it("tests get cookies", function()
-        assert.are.equal(#auth.dumps_cookies() > 0, true)
-    end)
     local article = Article:from_id "581677880"
     it("tests get article", function()
         assert.are.equal(article.title, "深度学习并行训练算法一锅炖: DDP, TP, PP, ZeRO")

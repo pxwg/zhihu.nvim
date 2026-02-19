@@ -3,7 +3,7 @@ local requests = require "requests"
 local guess = require 'mimetypes'.guess
 local sha1 = require 'sha1'
 local base64 = require 'vim.base64'
-local auth = require 'zhihu.auth'
+local auth = require 'auth'
 local M = {
   string_to_sign = [[PUT
 

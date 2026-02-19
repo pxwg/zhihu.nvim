@@ -1,6 +1,6 @@
 --- download a zhihu article or answer
 local requests = require "requests"
-local auth = require 'zhihu.auth'
+local auth = require 'auth'
 local M = {
   url = "https://www.zhihu.com/question/%s",
   field = "/answer/%s",

@@ -1,6 +1,7 @@
 ---get cookies from chrome by chrome_cookie
 local uv = require 'vim.uv'
 local fs = require 'vim.fs'
+local fn = require 'vim.fn'
 local PlatformDirs = require 'platformdirs'.PlatformDirs
 local chrome_cookie = require 'chrome_cookie'
 local Cookies = require 'auth.auth'.Cookies
@@ -23,15 +24,17 @@ function M.get_cookies_path()
 end
 
 ---Extract Zhihu cookies from Chrome database
----@param cookie_path string?
+---@param host string The host for which to retrieve cookies.
+---@param cookies_path string?
 ---@param password string?
----@param host string? The host for which to retrieve cookies.
 ---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
-function M.get_cookies(cookie_path, password, host)
-  cookie_path = cookie_path or M.get_cookies_path()
+function M.get_cookies(host, cookies_path, password)
+  cookies_path = cookies_path or M.get_cookies_path()
+  if fn.filereadable(cookies_path) then
+    return Cookies()
+  end
   password = password or chrome_cookie.get_chrome_password()
-  host = host or ".zhihu.com"
-  local cookies = chrome_cookie.get_cookies_for_host(cookie_path, password, host)
+  local cookies = chrome_cookie.get_cookies_for_host(cookies_path, password, host)
   for k, v in pairs(cookies) do
     -- HACK: Remove the first 56 rubbish characters from the cookie value
     cookies[k] = v:sub(57)

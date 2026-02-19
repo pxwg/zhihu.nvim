@@ -8,4 +8,4 @@ SELECT
 FROM
   moz_cookies
 WHERE
-  host = '.zhihu.com';
+  host = '%s';

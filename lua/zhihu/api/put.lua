@@ -49,7 +49,7 @@ function M.API:new(api)
   setmetatable(api, {
     __index = self
   })
-  api.headers.Cookie = auth.dumps_cookies()
+  api.headers.Cookie = auth.dumps_cookies ".zhihu.com"
   return api
 end
 

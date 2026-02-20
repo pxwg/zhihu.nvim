@@ -6,6 +6,7 @@ local json = require 'vim.json'
 
 local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
+local zfh = require "zfh"
 
 ---@class Article
 ---@field itemId string? answer id or article id, will create one if empty
@@ -42,6 +43,8 @@ local M = {
     thank_inviter_status = "close",
     thank_inviter = "",
     reshipment_settings = "allowed",
+    writer = zfh.writer,
+    reader = zfh.reader,
   },
 }
 M.template_path = fs.joinpath(
@@ -89,7 +92,7 @@ end
 ---Convert a table<string, string> to string
 ---@return string
 function M.Article:tostring()
-  return tostring(self.root)
+  return self.reader(tostring(self.root))
 end
 
 setmetatable(M.Article, {
@@ -226,7 +229,11 @@ function M.Article:set_html(html)
   self.root = root:select(M.selector)[1] or root
 end
 
-M.Article.set_content = M.Article.set_html
+---set content
+---@param content string
+function M.Article:set_content(content)
+  self:set_html(self.writer(content))
+end
 
 ---set lines
 ---@param lines string[]

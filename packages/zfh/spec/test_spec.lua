@@ -1,7 +1,7 @@
 package.path = package.path .. ';lua/?.lua'
 
 local fs = require 'vim.fs'
-local generator = require "zfh.markdown".generator
+local generator = require "zfh.generator.markdown".generator
 local dir = fs.dirname(debug.getinfo(1).source:match("@?(.*)"))
 
 describe("test converting html to markdown", function()

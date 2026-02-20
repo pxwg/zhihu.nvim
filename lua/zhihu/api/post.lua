@@ -1,7 +1,7 @@
 ---a common class for json API
 local requests = require "requests"
 local json = require 'vim.json'
-local auth = require 'auth'
+local dumps_cookies = require 'zhihu.api'.dumps_cookies
 local M = {
   API = {
     url = "",
@@ -22,7 +22,7 @@ function M.API:new(api)
   setmetatable(api, {
     __index = self
   })
-  api.headers.Cookie = auth.dumps_cookies ".zhihu.com"
+  api.headers.Cookie = dumps_cookies()
   return api
 end
 

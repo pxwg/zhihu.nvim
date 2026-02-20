@@ -1,11 +1,13 @@
----get cookies from firefox by lsqlite3
+---get cookies from firefox cookies database
 local uv = require 'vim.uv'
 local fs = require 'vim.fs'
-local fn = require 'vim.fn'
 local lsqlite3 = require "lsqlite3"
 local PlatformDirs = require 'platformdirs'.PlatformDirs
 local Cookies = require 'auth.auth'.Cookies
-local M = {}
+local M = {
+  Auth = {
+  }
+}
 
 ---Get the Firefox cookies.sqlite path for the current user
 ---@return string cookies_path Full path to Cookies file or nil if not found
@@ -25,16 +27,26 @@ function M.get_cookies_path()
   return fs.joinpath(dir, basename, "cookies.sqlite")
 end
 
----Extract Zhihu cookies from Firefox database
+---@param auth table?
+---@return table auth
+function M.Auth:new(auth)
+  auth = auth or {}
+  auth.path = auth.path or M.get_cookies_path()
+  setmetatable(auth, {
+    __index = self
+  })
+  return auth
+end
+
+setmetatable(M.Auth, {
+  __call = M.Auth.new
+})
+
+---extract cookies
 ---@param host string The host for which to retrieve cookies.
----@param cookies_path string?
 ---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
-function M.get_cookies(host, cookies_path)
-  cookies_path = cookies_path or M.get_cookies_path()
-  if fn.filereadable(cookies_path) then
-    return Cookies()
-  end
-  local db = lsqlite3.open(cookies_path)
+function M.Auth:get_cookies(host)
+  local db = lsqlite3.open(self.path)
 
   local sql_file = fs.joinpath(
     fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
@@ -42,7 +54,7 @@ function M.get_cookies(host, cookies_path)
   )
   local f = io.open(sql_file)
   local sql = ""
-  if f ~= nil then
+  if f then
     sql = f:read()
     if sql:sub(1, 2) == "#!" then
       sql = f:read "*a"

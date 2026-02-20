@@ -50,6 +50,7 @@ build = {
   },
   install = {
     lua = {
+      ["zhihu.api"] = "lua/zhihu/api.lua",
       ["zhihu.api.get"] = "lua/zhihu/api/get.lua",
       ["zhihu.api.post"] = "lua/zhihu/api/post.lua",
       ["zhihu.api.post.article"] = "lua/zhihu/api/post/article.lua",

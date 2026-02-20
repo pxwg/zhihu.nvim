@@ -17,6 +17,7 @@ dir = "rime.nvim-$(VERSION)/packages/$(PACKAGE)"
 [dependencies]
 platformdirs = " >= 0.0.1"
 lsqlite3 = " >= 0.0.1"
+lua-cjson = " >= 0.0.1"
 
 [test]
 type = "busted"
@@ -31,6 +32,8 @@ chrome_cookie = "chrome_cookie"
 "auth.scripts.firefox" = "lua/auth/scripts/firefox.sql"
 "auth.auth" = "lua/auth/auth.lua"
 "auth.cache" = "lua/auth/cache.lua"
+"auth.chained" = "lua/auth/chained.lua"
 "auth.chrome" = "lua/auth/chrome.lua"
 "auth.firefox" = "lua/auth/firefox.lua"
+"auth.json" = "lua/auth/json.lua"
 "auth" = "lua/auth.lua"

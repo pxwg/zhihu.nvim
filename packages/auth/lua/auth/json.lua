@@ -1,8 +1,11 @@
----cache cookies
-local Auth = require 'auth.chained'.Auth
+---get cookies from json cache
+local fs = require 'vim.fs'
+local json = require 'vim.json'
+local PlatformDirs = require 'platformdirs'.PlatformDirs
+local Cookies = require 'auth.auth'.Cookies
 local M = {
   Auth = {
-    cookies_map = {}
+    path = fs.joinpath(PlatformDirs { appname = "nvim" }:user_state_dir(), "cookies.json")
   }
 }
 
@@ -10,7 +13,6 @@ local M = {
 ---@return table auth
 function M.Auth:new(auth)
   auth = auth or {}
-  auth.auth = auth.auth or Auth()
   setmetatable(auth, {
     __index = self
   })
@@ -25,11 +27,14 @@ setmetatable(M.Auth, {
 ---@param host string The host for which to retrieve cookies.
 ---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
 function M.Auth:get_cookies(host)
-  if self.cookies_map[host] == nil then
-    self.cookies_map[host] = self.auth:get_cookies(host)
-    self:set_cookies(host, self.cookies_map[host])
+  local f = io.open(self.path)
+  local text = "{}"
+  if f then
+    text = f:read "*a"
+    f:close()
   end
-  return self.cookies_map[host]
+  local cookies = json.decode(text)[host]
+  return Cookies(cookies)
 end
 
 ---add cookies to cache
@@ -37,7 +42,20 @@ end
 ---@param cookies table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
 ---@return boolean
 function M.Auth:set_cookies(host, cookies)
-  return self.auth:set_cookies(host, cookies)
+  local f = io.open(self.path, "w+")
+  if f == nil then
+    return false
+  end
+  local text = f:read "*a"
+  local data = {}
+  if text ~= "" then
+    data = json.decode(text)
+  end
+  data[host] = cookies
+  text = json.encode(data)
+  f:write(text)
+  f:close()
+  return true
 end
 
 return M

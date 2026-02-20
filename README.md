@@ -122,23 +122,7 @@ vi zhihu://question_id/new.md
 
 ### Zhihu Auth
 
-In order to log in zhihu, this library search
-
-- firefox cookies database
-- chrome cookies database
-- pychrome: a python module to communicate with chrome browser.
-  open <https://www.zhihu.com/> to let user log in
-
-A cookies will be cached. If you meet `403 Forbidden`, try:
-
-1. quit browser: avoid browser lock cookies database
-2. restart neovim: fetch latest cookies from browser cookies database
-
-If it doesn't work, try:
-
-1. log in zhihu again: update cookies of browser cookies database
-2. quit browser
-3. restart neovim
+See [auth](/packages/auth).
 
 ### Zhihu Image
 

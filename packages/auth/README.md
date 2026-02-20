@@ -41,6 +41,19 @@ print(tostring(auth:get_cookies ".zhihu.com"))
 -- ******
 ```
 
+## Tips
+
+If you meet `403 Forbidden`, try:
+
+1. quit browser: avoid browser lock cookies database
+2. restart neovim/lua: fetch latest cookies from browser cookies database
+
+If it doesn't work, try:
+
+1. relog in website (such as zhihu): update cookies of browser cookies database
+2. quit browser
+3. restart neovim/lua
+
 ## Related Projects
 
 - [lua-cookie](https://github.com/mah0x211/lua-cookie): parse cookies string to

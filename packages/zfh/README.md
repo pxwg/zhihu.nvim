@@ -1,44 +1,48 @@
 # Zhihu flavored HTML
 
 <https://www.zhihu.com/api/v4/content/publish> uses a various HTML standard.
-So we need a specification for it like
-[Github flavored markdown](https://github.github.com/gfm/).
+So we need a specification for it.
 
 ## Spec
 
 We only record the difference from [standard HTML](https://html.spec.whatwg.org/multipage/).
-You can use [pandoc](https://pandoc.org/) to generate standard HTML from
-markdown.
+We list by the order:
+
+1. render result
+2. [Github flavored markdown](https://github.github.com/gfm/)
+3. Zhihu flavored HTML
+4. [pandoc](https://pandoc.org/)'s HTML: `pandoc test.md`
+5. [typst](https://typst.app/)'s HTML: `typst compile --features=html -f html test.typ`
 
 ### Fenced code blocks
 
 ```python
-x = True if 2 > 1 else False
+import numpy
 ```
 
 ``````markdown
 ```python
-x = True if 2 > 1 else False
+import numpy
 ```
 ``````
+
+```html
+<pre lang="python">import numpy</pre>
+```
 
 ```html
 <div class="sourceCode" id="cb1">
 <pre class="sourceCode python">
 <code class="sourceCode python">
 <span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>
-x <span class="op">=</span>
-<span class="va">True</span> <span class="cf">if</span>
-<span class="dv">2</span> <span class="op">&gt;</span> <span class="dv">1</span>
-<span class="cf">else</span> <span class="va">False</span>
-</span>
+<span class="im">import</span> numpy</span>
 </code>
 </pre>
 </div>
 ```
 
 ```html
-<pre lang="python">x = True if 2 &gt; 1 else False</pre>
+<pre><code data-lang="python"><span style="color: #d73948">import</span> numpy</code></pre>
 ```
 
 ### Images
@@ -50,6 +54,13 @@ x <span class="op">=</span>
 ```
 
 ```html
+<img src="https://pica.zhimg.com/80/v2-91c9434b826e4e271820b84637c0856c"
+data-caption="caption" data-size="normal" data-watermark="watermark"
+data-original-src="https://pica.zhimg.com/80/v2-91c9434b826e4e271820b84637c0856c"
+data-watermark-src="" data-private-watermark-src="">
+```
+
+```html
 <figure>
 <img src="https://pica.zhimg.com/80/v2-91c9434b826e4e271820b84637c0856c"
 title="title" alt="caption" />
@@ -57,12 +68,7 @@ title="title" alt="caption" />
 </figure>
 ```
 
-```html
-<img src="https://pica.zhimg.com/80/v2-91c9434b826e4e271820b84637c0856c"
-data-caption="caption" data-size="normal" data-watermark="watermark"
-data-original-src="https://pica.zhimg.com/80/v2-91c9434b826e4e271820b84637c0856c"
-data-watermark-src="" data-private-watermark-src="">
-```
+typst doesn't allow online image.
 
 ### Inline math
 
@@ -73,12 +79,14 @@ $\alpha_1$
 ```
 
 ```html
-<span class="math inline"><em>α</em><sub>1</sub></span>
+<img eeimg="1" src="//www.zhihu.com/equation?tex=\alpha_1" alt="\alpha_1">
 ```
 
 ```html
-<img eeimg="1" src="//www.zhihu.com/equation?tex=\alpha_1" alt="\alpha_1">
+<span class="math inline"><em>α</em><sub>1</sub></span>
 ```
+
+warning: equation was ignored during HTML export
 
 ### Display math
 
@@ -89,12 +97,14 @@ $$\alpha_1$$
 ```
 
 ```html
-<p><span class="math display"><em>α</em><sub>1</sub></span></p>
+<p><img eeimg="1" src="//www.zhihu.com/equation?tex=\alpha_1" alt="\alpha_1"></p>
 ```
 
 ```html
-<p><img eeimg="1" src="//www.zhihu.com/equation?tex=\alpha_1" alt="\alpha_1"></p>
+<p><span class="math display"><em>α</em><sub>1</sub></span></p>
 ```
+
+warning: equation was ignored during HTML export
 
 ### Footnote
 
@@ -106,6 +116,11 @@ text[^1]
 text[^1]
 
 [^1]: footnote
+```
+
+```html
+<p>text<sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup><p>footnote</p></div>
 ```
 
 ```html
@@ -121,8 +136,12 @@ role="doc-backlink">↩︎</a></p></li>
 ```
 
 ```html
-<p>text<sup class="footnote-reference"><a href="#1">1</a></sup></p>
-<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup><p>footnote</p></div>
+<p>text<a id="loc-1" href="#loc-2" role="doc-noteref"><sup>1</sup></a></p>
+<section role="doc-endnotes">
+  <ol style="list-style-type: none">
+    <li id="loc-2"><a href="#loc-1" role="doc-backlink"><sup>1</sup></a>footnote</li>
+  </ol>
+</section>
 ```
 
 ## Usage

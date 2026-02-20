@@ -60,6 +60,17 @@ local _meta = getmetatable(M.Article.root)
 _meta.__tostring = M.Article.root.gettext
 setmetatable(M.Article.root, _meta)
 
+---convert filename to id
+---@param url string
+---@return string? id
+---@return string? question_id
+---@return string? title
+function M.url_to_id(url)
+  local id = fs.basename(url):match "^[^.]+" or ""
+  local question_id = fs.dirname(url):match "%d+"
+  return tonumber(id) and id, question_id, not tonumber(id) and id or nil
+end
+
 ---@param article Article?
 ---@return Article article
 function M.Article:new(article)
@@ -84,6 +95,17 @@ end
 setmetatable(M.Article, {
   __call = M.Article.new
 })
+
+---factory method. wrap `from_id`
+---@param url string
+---@return Article article
+function M.Article:from_url(url)
+  local id, question_id, title = M.url_to_id(url)
+  if id then
+    return self:from_id(id, question_id)
+  end
+  return self { question_id = question_id, title = title }
+end
 
 ---factory method. wrap `from_html`
 ---@param id string

@@ -1,5 +1,5 @@
 package = "zfh"
-version = "0.0.1"
+version = "0.0.2"
 lua = ">= 5.1"
 
 [description]
@@ -17,6 +17,7 @@ dir = "zhihu.nvim-$(VERSION)/packages/$(PACKAGE)"
 [dependencies]
 htmlparser = " >= 0.0.1"
 html-entities = " >= 0.0.1"
+luasocket = " >= 0.0.1"
 vim = " >= 0.0.1"
 
 [test]

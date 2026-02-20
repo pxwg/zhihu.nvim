@@ -21,12 +21,11 @@ function M.open(id, question_id, edit)
     edit = false
   end
   local Article = M.Articles[vim.o.filetype] or M.Articles[0]
-  local article
-  if id == nil and question_id == nil then
-    article = Article(vim.b.article)
-  else
-    article = Article { itemId = id, question_id = question_id }
+  local article = { itemId = id, question_id = question_id }
+  if article.itemId == nil and article.question_id == nil then
+    article = vim.b.article
   end
+  article = Article(article)
   local url
   if article.itemId or article.question_id then
     url = article:get_url(edit)

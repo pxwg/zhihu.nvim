@@ -33,8 +33,8 @@ type = "rust-mlua"
 markdown_to_html = "markdown_to_html"
 
 [build.install.lua]
-"zfh.markdown" = "lua/zfh/markdown.lua"
-"zfh" = "lua/zfh.lua"
+"zfh.generator" = "lua/zfh/generator.lua"
+"zfh.generator.markdown" = "lua/zfh/generator/markdown.lua"
 
 [build.install.bin]
 zfh = "bin/zfh.lua"

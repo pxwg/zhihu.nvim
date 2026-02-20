@@ -1,6 +1,6 @@
 package.path = package.path .. ';lua/?.lua'
 
-local filename_to_id = require "zhihu.article".filename_to_id
+local url_to_id = require "zhihu.article.html".url_to_id
 local Article = require "zhihu.article.html".Article
 local Image = require "zhihu.image".Image
 local template_path = require "zhihu.article.html".template_path
@@ -34,18 +34,18 @@ end)
 
 describe("test filename to id", function()
     it("tests answer", function()
-        local id, question_id = filename_to_id("zhihu://www.zhihu.com/question/470216447/answer/2006440722123998810.md")
+        local id, question_id = url_to_id("zhihu://www.zhihu.com/question/470216447/answer/2006440722123998810.md")
         assert.are.equal(id, "2006440722123998810")
         assert.are.equal(question_id, "470216447")
-        id, question_id = filename_to_id("zhihu://www.zhihu.com/question/470216447/answer/new.md")
+        id, question_id = url_to_id("zhihu://www.zhihu.com/question/470216447/answer/new.md")
         assert.are.equal(id, nil)
         assert.are.equal(question_id, "470216447")
     end)
     it("tests article", function()
-        local id, question_id = filename_to_id("zhihu://zhuanlan.zhihu.com/p/2004918133526373893.html")
+        local id, question_id = url_to_id("zhihu://zhuanlan.zhihu.com/p/2004918133526373893.html")
         assert.are.equal(id, "2004918133526373893")
         assert.are.equal(question_id, nil)
-        id, question_id = filename_to_id("zhihu://new.md")
+        id, question_id = url_to_id("zhihu://new.md")
         assert.are.equal(id, nil)
         assert.are.equal(question_id, nil)
     end)

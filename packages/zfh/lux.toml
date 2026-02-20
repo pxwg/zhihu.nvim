@@ -35,6 +35,9 @@ markdown_to_html = "markdown_to_html"
 [build.install.lua]
 "zfh.generator" = "lua/zfh/generator.lua"
 "zfh.generator.markdown" = "lua/zfh/generator/markdown.lua"
+"zfh.translator" = "lua/zfh/translator.lua"
+"zfh.translator.cmd" = "lua/zfh/translator/cmd.lua"
+"zfh" = "lua/zfh.lua"
 
 [build.install.bin]
-zfh = "bin/zfh.lua"
+zfh = "bin/zfh"

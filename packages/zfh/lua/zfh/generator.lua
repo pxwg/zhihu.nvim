@@ -26,7 +26,10 @@ end
 function M.Generator:new(generator)
   generator = generator or {}
   setmetatable(generator, {
-    __index = self
+    __index = self,
+    __call = function(...)
+      return generator.translate(...)
+    end
   })
   return generator
 end

@@ -23,6 +23,9 @@ vim = " >= 0.0.1"
 [test]
 type = "busted"
 
+[deploy]
+wrap_bin_scripts = false
+
 [build]
 type = "rust-mlua"
 
@@ -32,3 +35,6 @@ markdown_to_html = "markdown_to_html"
 [build.install.lua]
 "zfh.markdown" = "lua/zfh/markdown.lua"
 "zfh" = "lua/zfh.lua"
+
+[build.install.bin]
+zfh = "bin/zfh.lua"

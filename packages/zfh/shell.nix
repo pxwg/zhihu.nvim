@@ -7,6 +7,7 @@ mkShell {
   name = "zfh";
   buildInputs = [
     cargo
+    pandoc
 
     (luajit.withPackages (
       p: with p; [

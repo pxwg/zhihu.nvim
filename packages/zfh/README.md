@@ -1,7 +1,8 @@
-# zfh
+# Zhihu flavored HTML
 
 <https://www.zhihu.com/api/v4/content/publish> uses a various HTML standard.
-So we need a specification for it.
+So we need a specification for it like
+[Github flavored markdown](https://github.github.com/gfm/).
 
 ## Spec
 
@@ -135,6 +136,16 @@ local md_to_html = require'markdown_to_html'.md_to_html
 print(md_to_html(text))
 ```
 
+Or use pandoc:
+
+```sh
+$ bin/zfh /the/path/of/test.md
+# HTML output
+```
+
 ## Related Projects
 
-- [Github flavored markdown](https://github.github.com/gfm/)
+- [zhconv](https://github.com/pluveto/ZhihuFormulaConvert): convert LaTeX
+  formula to zfh
+- [md2zhihu](https://github.com/drmingdrmer/md2zhihu): convert markdown to zhihu
+  markdown

@@ -184,7 +184,3 @@ assert(markdown == html_to_md(md_to_html(markdown)))
 
 - [zhihu_obsidian](https://github.com/dongguaguaguagua/zhihu_obsidian)
 - [VSCode-Zhihu](https://github.com/niudai/VSCode-Zhihu)
-
-## Related Projects
-
-- [md2zhihu](https://github.com/drmingdrmer/md2zhihu): convert markdown to zhihu markdown

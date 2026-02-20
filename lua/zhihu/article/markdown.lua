@@ -1,7 +1,7 @@
 --- a class to get/post/patch zhihu article in markdown
 local Article = require "zhihu.article.html".Article
-local md_to_html = require("markdown_to_html").md_to_html
-local generator = require "zhihu.article.generator.markdown".generator
+local md_to_html = require "markdown_to_html".md_to_html
+local generator = require "zfh.markdown".generator
 local M = {
   Article = {
   }

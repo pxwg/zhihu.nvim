@@ -3,9 +3,9 @@ local htmlEntities = require 'htmlEntities'
 local url = require'socket.url'
 local fn = require 'vim.fn'
 
-local settext = require 'zhihu.article.generator.generator'.settext
-local ChainedGenerator = require 'zhihu.article.generator.generator'.ChainedGenerator
-local SelectorGenerator = require 'zhihu.article.generator.generator'.SelectorGenerator
+local settext = require 'zfh'.settext
+local ChainedGenerator = require 'zfh'.ChainedGenerator
+local SelectorGenerator = require 'zfh'.SelectorGenerator
 
 local M = {
   head = SelectorGenerator {

@@ -37,7 +37,10 @@ end
 ---@param cookies table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
 ---@return boolean
 function M.Auth:set_cookies(host, cookies)
-  return self.auth:set_cookies(host, cookies)
+  if self.auth.set_cookies then
+    return self.auth:set_cookies(host, cookies)
+  end
+  return true
 end
 
 return M

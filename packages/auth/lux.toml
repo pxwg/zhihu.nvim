@@ -1,5 +1,5 @@
 package = "auth"
-version = "0.0.1"
+version = "0.0.2"
 lua = ">= 5.1"
 
 [description]
@@ -11,8 +11,8 @@ homepage = "https://github.com/pxwg/zhihu.nvim/tree/main/packages/auth"
 license = 'MIT'
 
 [source]
-url = "https://github.com/rimeinn/rime.nvim/archive/$(VERSION).zip"
-dir = "rime.nvim-$(VERSION)/packages/$(PACKAGE)"
+url = "https://github.com/pxwg/zhihu.nvim/archive/$(VERSION).zip"
+dir = "zhihu.nvim-$(VERSION)/packages/$(PACKAGE)"
 
 [dependencies]
 platformdirs = " >= 0.0.1"

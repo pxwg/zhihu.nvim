@@ -24,8 +24,7 @@ description = {
 
 build_dependencies = {}
 
-dependencies = { "lua >= 5.1", "lua-requests-temp", "htmlparser", "lua-cjson", "md5", "sha1",
-  "base64", "html-entities", "mimetypes", "uuid", "auth" }
+dependencies = { "lua >= 5.1", "lua-requests-temp", "lua-cjson", "htmlparser", "html-entities", "md5", "sha1", "base64", "uuid", "mimetypes", "auth", "zfh" }
 
 test_dependencies = {}
 
@@ -41,33 +40,8 @@ if modrev == 'scm' or modrev == 'dev' then
 end
 
 build = {
-  type = 'rust-mlua',
-  modules = {
-    "markdown_to_html",
-  },
+  type = 'builtin',
   copy_directories = {
     "plugin",
   },
-  install = {
-    lua = {
-      ["zhihu.api"] = "lua/zhihu/api.lua",
-      ["zhihu.api.get"] = "lua/zhihu/api/get.lua",
-      ["zhihu.api.post"] = "lua/zhihu/api/post.lua",
-      ["zhihu.api.post.article"] = "lua/zhihu/api/post/article.lua",
-      ["zhihu.api.post.answer"] = "lua/zhihu/api/post/answer.lua",
-      ["zhihu.api.post.image"] = "lua/zhihu/api/post/image.lua",
-      ["zhihu.api.post.publish"] = "lua/zhihu/api/post/publish.lua",
-      ["zhihu.api.patch"] = "lua/zhihu/api/patch.lua",
-      ["zhihu.api.put"] = "lua/zhihu/api/put.lua",
-      ["zhihu.article.templates.Untitled"] = "lua/zhihu/article/templates/Untitled.md",
-      ["zhihu.article.generator.generator"] = "lua/zhihu/article/generator/generator.lua",
-      ["zhihu.article.generator.markdown"] = "lua/zhihu/article/generator/markdown.lua",
-      ["zhihu.article.html"] = "lua/zhihu/article/html.lua",
-      ["zhihu.article.markdown"] = "lua/zhihu/article/markdown.lua",
-      ["zhihu.article"] = "lua/zhihu/article.lua",
-      ["zhihu.image"] = "lua/zhihu/image.lua",
-      ["zhihu.init"] = "lua/zhihu/init.lua",
-    }
-  },
 }
-

@@ -21,7 +21,9 @@ jobs:
           toolchain: stable
           override: true
       - name: Run tests
-        run: cargo test --features=lua51
+        run: |
+          cargo test --features=lua51 --manifest-path=packages/auth/Cargo.toml
+          cargo test --features=lua51 --manifest-path=packages/zfh/Cargo.toml
       - uses: nvim-neorocks/luarocks-tag-release@v7
         env:
           LUAROCKS_API_KEY: ${{secrets.LUAROCKS_API_KEY}}

@@ -1,11 +1,14 @@
----get cookies from chrome by chrome_cookie
+---get cookies from chrome cookies database
 local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local fn = require 'vim.fn'
 local PlatformDirs = require 'platformdirs'.PlatformDirs
 local chrome_cookie = require 'chrome_cookie'
 local Cookies = require 'auth.auth'.Cookies
-local M = {}
+local M = {
+  Auth = {
+  }
+}
 
 ---Get the Chrome Cookies file path for the current user
 ---@return string cookies_path Full path to Cookies file or nil if not found
@@ -23,18 +26,29 @@ function M.get_cookies_path()
   return fs.joinpath(dir, "Default", "Cookies")
 end
 
----Extract Zhihu cookies from Chrome database
----@param host string The host for which to retrieve cookies.
----@param cookies_path string?
----@param password string?
----@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
-function M.get_cookies(host, cookies_path, password)
-  cookies_path = cookies_path or M.get_cookies_path()
-  if fn.filereadable(cookies_path) then
-    return Cookies()
+---@param auth table?
+---@return table auth
+function M.Auth:new(auth)
+  auth = auth or {}
+  auth.path = auth.path or M.get_cookies_path()
+  if fn.filereadable(auth.path) == 1 then
+    auth.password = auth.password or chrome_cookie.get_chrome_password()
   end
-  password = password or chrome_cookie.get_chrome_password()
-  local cookies = chrome_cookie.get_cookies_for_host(cookies_path, password, host)
+  setmetatable(auth, {
+    __index = self
+  })
+  return auth
+end
+
+setmetatable(M.Auth, {
+  __call = M.Auth.new
+})
+
+---extract cookies
+---@param host string The host for which to retrieve cookies.
+---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
+function M.Auth:get_cookies(host)
+  local cookies = chrome_cookie.get_cookies_for_host(self.path, self.password, host)
   for k, v in pairs(cookies) do
     -- HACK: Remove the first 56 rubbish characters from the cookie value
     cookies[k] = v:sub(57)

@@ -3,7 +3,7 @@ local requests = require "requests"
 local guess = require 'mimetypes'.guess
 local sha1 = require 'sha1'
 local base64 = require 'vim.base64'
-local auth = require 'auth'
+local dumps_cookies = require 'zhihu.api'.dumps_cookies
 local M = {
   string_to_sign = [[PUT
 
@@ -49,7 +49,7 @@ function M.API:new(api)
   setmetatable(api, {
     __index = self
   })
-  api.headers.Cookie = auth.dumps_cookies ".zhihu.com"
+  api.headers.Cookie = dumps_cookies()
   return api
 end
 

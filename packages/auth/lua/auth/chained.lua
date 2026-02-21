@@ -1,4 +1,5 @@
 ---get cookies from many auths by an order
+---@module auth.chained
 local fn = require 'vim.fn'
 local Cookies = require 'auth.auth'.Cookies
 local M = {

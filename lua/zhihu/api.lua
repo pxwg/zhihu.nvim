@@ -1,4 +1,4 @@
----cache auth
+---cache auth for zhihu API
 local M = {
   auth = require 'auth.cache'.Auth()
 }

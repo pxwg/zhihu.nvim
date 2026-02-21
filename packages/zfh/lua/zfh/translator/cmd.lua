@@ -1,4 +1,5 @@
 ---use pandoc/typst to convert HTML
+---@module zfh.translator.cmd
 local CMDTranslator = require 'zfh.translator'.CMDTranslator
 local M = {
   readers = {

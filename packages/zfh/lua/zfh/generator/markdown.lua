@@ -1,4 +1,5 @@
 ---Convert HTML content to Markdown
+---@module zfh.generator.markdown
 local htmlEntities = require 'htmlEntities'
 local url = require'socket.url'
 local fn = require 'vim.fn'

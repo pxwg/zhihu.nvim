@@ -1,11 +1,11 @@
---- publish a zhihu article or answer
--- luacheck: ignore 111 113
----@diagnostic disable: undefined-global
+---publish a zhihu article or answer
 local json = require 'cjson'
 local uuid = require 'uuid'
 uuid.set_rng(uuid.rng.math_random())
 local API = require 'zhihu.api.post'.API
 local M = {
+  ---@diagnostic disable: undefined-global
+  -- luacheck: ignore 111 113
   empty_array_mt = vim and vim.empty_dict() or json.empty_array_mt,
   pc_business_params = {
     ["reward_setting"] = {

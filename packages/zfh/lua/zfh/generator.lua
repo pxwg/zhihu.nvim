@@ -27,7 +27,7 @@ function M.Generator:new(generator)
   generator = generator or {}
   setmetatable(generator, {
     __index = self,
-    __call = generator.translate,
+    __call = self.translate,
   })
   return generator
 end
@@ -77,7 +77,7 @@ function M.ChainedGenerator:new(generator)
   generator = M.Generator(generator)
   setmetatable(generator, {
     __index = self,
-    __call = generator.translate,
+    __call = self.translate,
   })
   return generator
 end
@@ -105,7 +105,7 @@ function M.SelectorGenerator:new(generator)
   generator = M.Generator(generator)
   setmetatable(generator, {
     __index = self,
-    __call = generator.translate,
+    __call = self.translate,
   })
   return generator
 end

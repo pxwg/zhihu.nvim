@@ -10,7 +10,7 @@ local M = {
       html = function(...)
         return ...
       end,
-      markdown = md_to_html,
+      markdown = generator,
       _ = reader,
     }
   },
@@ -19,7 +19,7 @@ local M = {
       html = function(...)
         return ...
       end,
-      markdown = generator,
+      markdown = md_to_html,
       _ = writer,
     }
   },

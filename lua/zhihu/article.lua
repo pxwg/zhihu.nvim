@@ -27,6 +27,8 @@ local zfh = require "zfh"
 ---@field thank_inviter_status string?
 ---@field thank_inviter string?
 ---@field root table?
+---@field reader function?
+---@field writer function?
 
 local M = {
   selector = ".RichText.ztext",

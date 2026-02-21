@@ -1,14 +1,8 @@
 ---get article according to filetype
 -- luacheck: ignore 111 113
 ---@diagnostic disable: undefined-global
-local M = {
-  Articles = {
-    html = require 'zhihu.article.html'.Article,
-    markdown = require 'zhihu.article.markdown'.Article,
-  },
-}
--- default
-M.Articles[0] = M.Articles.markdown
+local Article = require 'zhihu.article'.Article
+local M = {}
 
 ---open article's URL.
 ---for example:
@@ -20,7 +14,6 @@ function M.open(id, question_id, edit)
   if not vim.bo.modifiable then
     edit = false
   end
-  local Article = M.Articles[vim.o.filetype] or M.Articles[0]
   local article = { itemId = id, question_id = question_id }
   if article.itemId == nil and article.question_id == nil then
     article = vim.b.article
@@ -44,7 +37,6 @@ function M.read_cb()
   vim.o.buftype = "acwrite"
   vim.cmd "filetype detect"
 
-  local Article = M.Articles[vim.o.filetype] or M.Articles[0]
   local article = Article:from_url(vim.api.nvim_buf_get_name(0))
   local lines = article:get_lines()
   vim.api.nvim_buf_set_lines(0, 0, -1, true, lines)
@@ -61,7 +53,6 @@ function M.write_cb()
   if vim.o.modifiable == false then
     return
   end
-  local Article = M.Articles[vim.o.filetype] or M.Articles[0]
   local article = Article(vim.b.article)
   if vim.o.modified then
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)

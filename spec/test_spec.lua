@@ -1,10 +1,10 @@
 package.path = package.path .. ';lua/?.lua'
 
-local url_to_id = require "zhihu.article.html".url_to_id
-local Article = require "zhihu.article.html".Article
+local url_to_id = require "zhihu.article".url_to_id
+local Article = require "zhihu.article".Article
 local Image = require "zhihu.image".Image
-local template_path = require "zhihu.article.html".template_path
-local generator = require "zfh.markdown".generator
+local template_path = require "zhihu.article".template_path
+local generator = require "zfh.generator.markdown".generator
 
 -- luacheck: ignore 113
 ---@diagnostic disable: undefined-global

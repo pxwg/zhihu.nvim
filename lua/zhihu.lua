@@ -19,7 +19,7 @@ function M.init()
   if M.is_init then
     return
   end
-  local Article = require 'zhihu.article.html'.Article
+  local Article = require 'zhihu.article'.Article
   for k, v in pairs(M.opts.article) do
     Article[k] = v
   end

@@ -1,4 +1,5 @@
 ---cache cookies
+---@module auth.cache
 local Auth = require 'auth.chained'.Auth
 local M = {
   Auth = {

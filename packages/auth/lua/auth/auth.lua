@@ -1,4 +1,5 @@
 ---Provide a class for cookies
+---@module auth.auth
 local M = {
   Cookies = {}
 }

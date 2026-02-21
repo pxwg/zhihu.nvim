@@ -1,4 +1,5 @@
 ---get cookies from chrome cookies database
+---@module auth.chrome
 local uv = require 'vim.uv'
 local fs = require 'vim.fs'
 local fn = require 'vim.fn'

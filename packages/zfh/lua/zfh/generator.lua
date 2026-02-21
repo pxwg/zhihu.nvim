@@ -1,4 +1,5 @@
 ---Code generators for article
+---@module zfh.generator
 local parse = require 'htmlparser'.parse
 local htmlEntities = require 'htmlEntities'
 local deepcopy = require 'vim.shared'.deepcopy

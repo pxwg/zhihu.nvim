@@ -1,4 +1,5 @@
 ---get cookies from json cache
+---@module auth.json
 local fs = require 'vim.fs'
 local json = require 'vim.json'
 local PlatformDirs = require 'platformdirs'.PlatformDirs

@@ -8,28 +8,6 @@ local parse = require 'htmlparser'.parse
 local md_to_html = require("markdown_to_html").md_to_html
 local zfh = require "zfh"
 
----@class Article
----@field itemId string? answer id or article id, will create one if empty
----@field question_id string? question_id id, empty if it is an article
----@field title string? article title or question title
----@field authorName string? author name
----@field isPublished boolean?
----https://www.zhihu.com/creator/editor-setting
----@field can_reward boolean? 送礼物设置
----@field comment_permission "all"? 评论权限
----@field reshipment_settings "allowed"? 转载设置
----@field table_of_contents boolean? enable TOC
----@field isTitleImageFullScreen boolean? article title image is fullscreen
----@field draft_type string?
----@field delta_time integer?
----@field disclaimer_status string?
----@field disclaimer_type string?
----@field thank_inviter_status string?
----@field thank_inviter string?
----@field root table?
----@field reader function?
----@field writer function?
-
 local M = {
   selector = ".RichText.ztext",
   error_selector = ".ErrorPage-text",

@@ -81,7 +81,7 @@ After editing,
 will publish it.
 
 ```vim
-:nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
+:nnoremap <localleader>lv :lua require'zhihu.nvim'.open()<CR>
 ```
 
 Press `<localleader>lv` to view the article in your browser.
@@ -112,6 +112,27 @@ If you try to open a non-existent article, you will see:
 [去往首页](https://www.zhihu.com)
 ```
 
+You can customize default options of article. See <lua/zhihu/_meta.lua>.
+
+```lua
+require'zhihu'.setup {
+  article = {
+    writer = function(...)
+      if vim.o.filetype == 'typst' then
+        return require'zfh.translator.cmd'.writer.typst(...)
+      end
+      return ...
+    end
+  }
+}
+```
+
+Then you can use typst to answer the question.
+
+```vim
+:e zhihu://www.zhihu.com/question/XXXXXXXX/answer/new.typ
+```
+
 ### Zhihu Answer
 
 Similar with article.
@@ -140,9 +161,7 @@ Every image must be on zhihu like
 You can update zhihu article by:
 
 ```lua
-local Article = require 'zhihu.article.markdown'.Article
--- or if your prefer using HTML to write article
--- local Article = require 'zhihu.article.html'.Article
+local Article = require 'zhihu.article'.Article
 local id = "your_article_id"
 local article
 if id then
@@ -151,12 +170,12 @@ if id then
 else
   article = Article { title = "title" }
 end
-local f = io.open "/the/path/of/your/article.md"
+local f = io.open "/the/path/of/your/article.html"
 if f then
-  local markdown = f:read "*a"
+  local html = f:read "*a"
   f:close()
-  article:set_content(markdown)
-  article:update()
+  article:set_content(html)
+  article:write()
 end
 ```
 

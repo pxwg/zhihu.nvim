@@ -1,6 +1,4 @@
 ---lazy load
--- luacheck: ignore 111 113
----@diagnostic disable: undefined-global
 local M = {
   opts = {
     ---@type Article
@@ -11,6 +9,8 @@ local M = {
 ---set up
 ---@param opts table
 function M.setup(opts)
+  -- luacheck: ignore 111 113
+  ---@diagnostic disable: undefined-global
   M.opts = vim.tbl_extend(M.opts, opts, "force")
 end
 

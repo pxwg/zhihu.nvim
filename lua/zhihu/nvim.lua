@@ -1,6 +1,6 @@
----get article according to filetype
--- luacheck: ignore 111 113
+---get callbacks for article
 ---@diagnostic disable: undefined-global
+-- luacheck: ignore 111 113
 local Article = require 'zhihu.article'.Article
 local M = {}
 

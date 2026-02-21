@@ -1,4 +1,5 @@
----use pandoc/typst to convert HTML
+---default reader/writer
+---@module zfh
 local Translator = require 'zfh.translator'.Translator
 local reader = require 'zfh.translator.cmd'.readers.pandoc
 local writer = require 'zfh.translator.cmd'.writers.pandoc

@@ -158,7 +158,9 @@ print(md_to_html(text))
 Or use pandoc:
 
 ```sh
-$ bin/zfh /the/path/of/test.md
+$ pandoc --lua-filter=bin/zfh /the/path/of/test.md
+# or
+$ zfh /the/path/of/test.md
 # HTML output
 ```
 

@@ -25,7 +25,7 @@ function M.Translator:new(translator)
   translator = translator or {}
   setmetatable(translator, {
     __index = self,
-    __call = translator.translate,
+    __call = self.translate,
   })
   return translator
 end
@@ -50,7 +50,7 @@ function M.CMDTranslator:new(translator)
   translator = M.Translator(translator)
   setmetatable(translator, {
     __index = self,
-    __call = translator.translate,
+    __call = self.translate,
   })
   return translator
 end

@@ -154,6 +154,28 @@ Every image must be on zhihu like
 :let b:article.titleImage = "https://picx.zhimg.com/v2-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
+## Integration
+
+### [nerdfont.vim](https://github.com/lambdalisue/nerdfont.vim)
+
+```vim
+let g:nerdfont#path#pattern#customs = {
+      \ '^zhihu://': '',
+      \ }
+```
+
+### [vim-airline](https://github.com/vim-airline/vim-airline)
+
+```vim
+let g:airline#extensions#tabline#formatter = 'zhihu'
+```
+
+### [airline-renderer-nerdfont.vim](https://github.com/Freed-Wu/airline-renderer-nerdfont.vim)
+
+```vim
+let g:_airline_orig_formatter = 'zhihu'
+```
+
 ## API
 
 ### Update zhihu article

@@ -54,9 +54,12 @@ function M.write_cb()
     return
   end
   local article = Article(vim.b.article)
-  if vim.o.modified then
+  if vim.o.modified or article.titleImage then
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
     article:set_lines(lines)
+  else
+    -- nothing need to be updated
+    return
   end
   local error = article:write()
   if error then

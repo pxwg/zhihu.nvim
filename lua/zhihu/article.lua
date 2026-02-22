@@ -131,10 +131,6 @@ end
 ---@param publish boolean?
 ---@return string? error
 function M.Article:write(publish)
-  -- nothing need to be updated
-  if self.root == nil and self.titleImage == nil then
-    return
-  end
   if publish == nil then
     publish = self.disclaimer_type and self.disclaimer_status and true
   end

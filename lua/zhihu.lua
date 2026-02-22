@@ -11,7 +11,7 @@ local M = {
 function M.setup(opts)
   -- luacheck: ignore 111 113
   ---@diagnostic disable: undefined-global
-  M.opts = vim.tbl_extend(M.opts, opts, "force")
+  M.opts = vim.tbl_extend("force", M.opts, opts or {})
 end
 
 ---override default value, only run once

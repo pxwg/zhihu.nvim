@@ -4,6 +4,8 @@
 
 [中文文档](https://zhuanlan.zhihu.com/p/1998903214075027613)
 
+![screenshot](https://github.com/user-attachments/assets/d594635d-1980-440b-8454-02a179be3d13)
+
 ## Features
 
 - [x] Synchronizing Zhihu articles to local markdown files;

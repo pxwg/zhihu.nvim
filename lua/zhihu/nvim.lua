@@ -4,9 +4,33 @@
 local Article = require 'zhihu.article'.Article
 local M = {}
 
+---open a prompt for image
+---for example:
+---inoremap <C-L> <C-O>:lua require'zhihu.nvim'.input()<CR>
+---@param prompt string?
+function M.input(prompt)
+  prompt = prompt or 'Enter image file path: '
+  vim.ui.input({
+    prompt = prompt, completion = 'file'
+  }, M.on_confirm)
+end
+
+---callback for `input`
+---@param input string
+function M.on_confirm(input)
+  if input == nil then
+    return
+  end
+  local Image = require'zhihu.image'.Image
+  local url = tostring(Image.from_file(input))
+  if url then
+    vim.api.nvim_put({ url }, "b", false, true)
+  end
+end
+
 ---open article's URL.
 ---for example:
----nnoremap <localleader>lv :lua require'zhihu.article'.open()<CR>
+---nnoremap <localleader>lv :lua require'zhihu.nvim'.open()<CR>
 ---@param id integer?
 ---@param question_id integer?
 ---@param edit boolean?

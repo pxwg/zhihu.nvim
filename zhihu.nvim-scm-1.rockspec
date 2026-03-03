@@ -43,6 +43,5 @@ build = {
   type = 'builtin',
   copy_directories = {
     "plugin",
-    "autoload",
   },
 }

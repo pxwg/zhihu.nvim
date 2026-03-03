@@ -172,12 +172,6 @@ let g:nerdfont#path#pattern#customs = {
 let g:airline#extensions#tabline#formatter = 'zhihu'
 ```
 
-### [airline-renderer-nerdfont.vim](https://github.com/Freed-Wu/airline-renderer-nerdfont.vim)
-
-```vim
-let g:_airline_orig_formatter = 'zhihu'
-```
-
 ## API
 
 ### Update zhihu article

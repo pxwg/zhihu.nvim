@@ -1,10 +1,10 @@
 ---Convert HTML content to Markdown
 ---@module zfh.generator.markdown
 local htmlEntities = require 'htmlEntities'
-local url = require'socket.url'
 local fn = require 'vim.fn'
 
 local settext = require 'zfh.generator'.settext
+local strip = require 'zfh.generator'.strip
 local ChainedGenerator = require 'zfh.generator'.ChainedGenerator
 local SelectorGenerator = require 'zfh.generator'.SelectorGenerator
 
@@ -56,7 +56,11 @@ local M = {
   },
   figure = SelectorGenerator {
     selector = "figure",
-    template = "\n\n![%s](%s)\n\n",
+    template = [[
+
+![%s](%s)
+
+]],
   },
   h = {},
   ol = SelectorGenerator {
@@ -102,11 +106,7 @@ end
 ---@return string? code
 function M.a:convert_(node)
   local href = node.attributes.href or ""
-  local result = url.parse(href)
-  if result.host == "link.zhihu.com" then
-    href = url.unescape((result.query or ""):match("target=([^;]+)") or "")
-  end
-  local c = self.template:format(fn.trim(node:getcontent()), href)
+  local c = self.template:format(fn.trim(node:getcontent()), strip(href))
   settext(node, c)
 end
 
@@ -134,11 +134,11 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.code_block:convert_(node)
-  local pre = node:select"pre"[1]
+  local pre = node:select "pre"[1]
   if not pre then
     return
   end
-  local code = pre:select"code"[1]
+  local code = pre:select "code"[1]
   if not code then
     return
   end
@@ -197,8 +197,8 @@ function M.table:convert_(node)
   local c = "\n\n"
   for i, tr in ipairs(node:select "tr") do
     local tds = {}
-    for _, tr in ipairs(tr:select "tr") do
-      table.insert(tds, tr:getcontent())
+    for _, th in ipairs(tr:select "th") do
+      table.insert(tds, th:getcontent())
     end
     for _, td in ipairs(tr:select "td") do
       table.insert(tds, td:getcontent())

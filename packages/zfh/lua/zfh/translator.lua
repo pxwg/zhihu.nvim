@@ -64,24 +64,8 @@ setmetatable(M.CMDTranslator, {
 ---@param text string
 ---@return string
 function M.CMDTranslator:translate(text)
-  -- luacheck: ignore 111 113
-  ---@diagnostic disable: undefined-global
-  local temp = fs.joinpath(os.getenv "TEMP" or "/tmp", "zfh.txt")
-  local f = io.open(temp, "w")
-  if f == nil then
-    return text
-  end
-  f:write(text)
-  f:close()
-  local cmd = self.cmd:format(temp, vim and vim.o.filetype or "markdown")
-  local p = io.popen(cmd)
-  if p == nil then
-    return text
-  end
-  text = p:read "*a"
-  p:close()
-  os.remove(temp)
-  text = fn.trim(text)
+  local cmd = self.cmd:format(vim and vim.o.filetype or "markdown")
+  text = fn.trim(fn.system(cmd, text))
   return text
 end
 

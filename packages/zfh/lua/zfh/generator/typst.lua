@@ -83,7 +83,10 @@ local M = {
     selector = "table",
     template = [[
 
-#table(columns: %d, %s)
+#table(
+  columns: %d,
+  %s
+)
 
 ]],
   },
@@ -210,25 +213,20 @@ end
 ---@return string? code
 function M.table:convert_(node)
   local c = ""
-  local tds = {}
-  local tr = node:select "tr"[1]
-  if tr then
+  local columns = 0
+  local lines = {}
+  for _, tr in ipairs(node:select "tr") do
+    local tds = {}
     for _, th in ipairs(tr:select "th") do
       table.insert(tds, ("%q"):format(th:getcontent()))
     end
     for _, td in ipairs(tr:select "td") do
       table.insert(tds, ("%q"):format(td:getcontent()))
     end
+    table.insert(lines, table.concat(tds, ', '))
+    columns = #tds
   end
-  local columns = #tds
-  tds = {}
-  for _, th in ipairs(node:select "th") do
-    table.insert(tds, ("%q"):format(th:getcontent()))
-  end
-  for _, td in ipairs(node:select "td") do
-    table.insert(tds, ("%q"):format(td:getcontent()))
-  end
-  c = c .. table.concat(tds, ", ")
+  c = c .. table.concat(lines, ",\n  ")
   c = self.template:format(columns, c)
   settext(node, c)
 end

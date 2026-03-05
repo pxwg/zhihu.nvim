@@ -1,5 +1,5 @@
 package = "zfh"
-version = "0.0.5"
+version = "0.0.6"
 lua = ">= 5.1"
 
 [description]
@@ -35,6 +35,7 @@ markdown_to_html = "markdown_to_html"
 [build.install.lua]
 "zfh.generator" = "lua/zfh/generator.lua"
 "zfh.generator.markdown" = "lua/zfh/generator/markdown.lua"
+"zfh.generator.typst" = "lua/zfh/generator/typst.lua"
 "zfh.translator" = "lua/zfh/translator.lua"
 "zfh.translator.cmd" = "lua/zfh/translator/cmd.lua"
 "zfh" = "lua/zfh.lua"

@@ -87,7 +87,7 @@ local M = {
     selector = "blockquote",
     template = [[
 
-#quote[%s]
+#quote(block: true)[%s]
 
 ]],
   },

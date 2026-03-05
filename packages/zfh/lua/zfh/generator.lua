@@ -22,6 +22,18 @@ function M.settext(node, c)
   node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
 end
 
+---Strip <https://link.zhihu.com/?target=> from URL
+---@param href string
+---@return string
+function M.strip(href)
+  local url = require 'socket.url'
+  local result = url.parse(href)
+  if result.host == "link.zhihu.com" then
+    href = url.unescape((result.query or ""):match("target=([^;]+)") or "")
+  end
+  return href
+end
+
 ---@param generator table?
 ---@return table generator
 function M.Generator:new(generator)

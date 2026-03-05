@@ -21,8 +21,16 @@ local M = {
     selector = "i",
     template = "*%s*",
   },
+  em = SelectorGenerator {
+    selector = "em",
+    template = "*%s*",
+  },
   b = SelectorGenerator {
     selector = "b",
+    template = "_%s_",
+  },
+  strong = SelectorGenerator {
+    selector = "strong",
     template = "_%s_",
   },
   tex = SelectorGenerator {
@@ -203,10 +211,20 @@ end
 function M.table:convert_(node)
   local c = ""
   local tds = {}
+  local tr = node:select "tr"[1]
+  if tr then
+    for _, th in ipairs(tr:select "th") do
+      table.insert(tds, ("%q"):format(th:getcontent()))
+    end
+    for _, td in ipairs(tr:select "td") do
+      table.insert(tds, ("%q"):format(td:getcontent()))
+    end
+  end
+  local columns = #tds
+  tds = {}
   for _, th in ipairs(node:select "th") do
     table.insert(tds, ("%q"):format(th:getcontent()))
   end
-  local columns = #tds
   for _, td in ipairs(node:select "td") do
     table.insert(tds, ("%q"):format(td:getcontent()))
   end
@@ -226,7 +244,9 @@ M.generator = ChainedGenerator {
   M.head,
   M.br,
   M.i,
+  M.em,
   M.b,
+  M.strong,
   M.tex,
   M.span,
   M.a,

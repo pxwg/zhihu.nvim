@@ -21,8 +21,16 @@ local M = {
     selector = "i",
     template = "*%s*",
   },
+  em = SelectorGenerator {
+    selector = "em",
+    template = "*%s*",
+  },
   b = SelectorGenerator {
     selector = "b",
+    template = "**%s**",
+  },
+  strong = SelectorGenerator {
+    selector = "strong",
     template = "**%s**",
   },
   tex = SelectorGenerator {
@@ -228,7 +236,9 @@ M.generator = ChainedGenerator {
   M.head,
   M.br,
   M.i,
+  M.em,
   M.b,
+  M.strong,
   M.tex,
   M.span,
   M.a,

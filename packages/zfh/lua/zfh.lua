@@ -5,6 +5,7 @@ local html_to_pandoc = require 'zfh.translator.cmd'.readers.pandoc
 local pandoc_to_html = require 'zfh.translator.cmd'.writers.pandoc
 local typst_to_html = require 'zfh.translator.cmd'.writers.typst
 local html_to_md = require "zfh.generator.markdown".generator
+local html_to_typst = require "zfh.generator.typst".generator
 local md_to_html = require "markdown_to_html".md_to_html
 local M = {
   reader = Translator {
@@ -13,6 +14,7 @@ local M = {
         return ...
       end,
       markdown = html_to_md,
+      typst = html_to_typst,
       _ = html_to_pandoc,
     }
   },

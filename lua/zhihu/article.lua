@@ -172,6 +172,7 @@ function M.Article:publish()
     return output.message
   end
   local publish = json.decode(output.data.result).publish
+  self.title = publish.question and publish.question.title or self.title
   self.isPublished = true
   self.itemId = publish.id
   self.authorName = publish.author and publish.author.name

@@ -2,6 +2,7 @@
 ---@diagnostic disable: undefined-global
 -- luacheck: ignore 111 113
 local Article = require 'zhihu.article'.Article
+local uv = require 'luv'
 local M = {}
 
 ---open a prompt for image
@@ -21,7 +22,10 @@ function M.on_confirm(input)
   if input == nil then
     return
   end
-  local Image = require'zhihu.image'.Image
+  local Image = require 'zhihu.image'.Image
+  if input:sub(1, 2) == '~/' then
+    input = uv.os_homedir() .. '/' .. input:sub(3)
+  end
   local url = tostring(Image.from_file(input))
   if url then
     vim.api.nvim_put({ url }, "b", false, true)

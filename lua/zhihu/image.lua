@@ -1,11 +1,13 @@
 --- a class to get/post/patch zhihu image in HTML
-local json = require 'vim.json'
+local socket = require "socket"
 local Post = require 'zhihu.api.post.image'.API
 local Put = require 'zhihu.api.put'.API
+local Get = require 'zhihu.api.get'.API
 local M = {
-  url = "https://picx.zhimg.com/%s",
+  sleep_seconds = 0,
+  max_retry = 10,
   Image = {
-    upload_file = {}
+    src = "",
   }
 }
 
@@ -27,7 +29,23 @@ setmetatable(M.Image, {
 ---Convert a table<string, string> to string
 ---@return string
 function M.Image:tostring()
-  return M.url:format(self.upload_file.object_key or "")
+  return self.src
+end
+
+---create from an id
+---@param id string
+---@return table image
+function M.Image.from_id(id)
+  local api = Get.from_id(id, nil, true)
+  local resp
+  for _ = 1, M.max_retry do
+    resp = api:request()
+    if resp.status_code == 200 and resp.json().status == "success" then
+      return M.Image(resp.json())
+    end
+    socket.sleep(M.sleep_seconds)
+  end
+  return M.Image { src = resp.status }
 end
 
 ---create from a file path
@@ -37,13 +55,12 @@ function M.Image.from_file(file)
   local api = Post:from_file(file)
   local resp = api:request()
   if resp.status_code ~= 200 then
-    return M.Image { upload_file = { image_id = resp.status } }
+    return M.Image { src = resp.status }
   end
   local image = M.Image(resp.json())
   -- image exists
   if image.upload_file.state == 1 then
-    image.upload_file.object_key = ("v2-%s"):format(json.decode(api.data).image_hash)
-    return image
+    return M.Image.from_id(image.upload_file.image_id)
   end
   assert(image.upload_file.state == 2)
 
@@ -52,9 +69,9 @@ function M.Image.from_file(file)
   if resp.status_code == 200 then
     image.upload_file.state = 1
   else
-    image.upload_file.image_id = resp.status
+    image.src = resp.status
   end
-  return image
+  return M.Image.from_id(image.upload_file.image_id)
 end
 
 ---create from a file path
@@ -65,9 +82,9 @@ function M.Image.from_hash(hash)
   local resp = api:request()
   local image
   if resp.status_code ~= 200 then
-    image = { upload_file = { image_id = resp.status } }
+    image = M.Image { src = resp.status }
   end
-    image = resp.json()
+  image = resp.json()
   return M.Image(image)
 end
 

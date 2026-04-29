@@ -2,10 +2,13 @@
 local requests = require "requests"
 local dumps_cookies = require 'zhihu.api'.dumps_cookies
 local M = {
-  url = "https://www.zhihu.com/question/%s",
-  field = "/answer/%s",
+  url = {
+    image = "https://api.zhihu.com/images/%s",
+    question = "https://www.zhihu.com/question/%s",
+    zhuanlan = "https://zhuanlan.zhihu.com/p/%s",
+  },
   API = {
-    url = "https://zhuanlan.zhihu.com/p/%s",
+    url = "/answer/%s",
     headers = {
       ["User-Agent"] =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
@@ -40,17 +43,20 @@ setmetatable(M.API, {
 ---lua < 5.3 use double as number, which result in overflow
 ---@param id string
 ---@param question_id string?
+---@param image boolean?
 ---@return table
-function M.API.from_id(id, question_id)
+function M.API.from_id(id, question_id, image)
   local api = {}
   if question_id then
     local field = ""
     if tonumber(id) then
-      field = M.field:format(id)
+      field = M.API.url:format(id)
     end
-    api.url = M.url:format(question_id) .. field
+    api.url = M.url.question:format(question_id) .. field
+  elseif image then
+    api.url = M.url.image:format(id)
   else
-    api.url = M.API.url:format(id)
+    api.url = M.url.zhuanlan:format(id)
   end
   return M.API(api)
 end

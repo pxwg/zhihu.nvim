@@ -27,7 +27,6 @@ function M.init()
 end
 
 ---create autocmds
----TODO: callback for exit
 ---@param augroup_id integer?
 function M.create_autocmds(augroup_id)
   augroup_id = augroup_id or vim.api.nvim_create_augroup("zhihu", {})

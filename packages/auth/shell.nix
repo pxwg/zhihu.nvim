@@ -5,6 +5,10 @@
 with pkgs;
 mkShell {
   name = "auth";
+  env = {
+    SQLITE_INCDIR = "${sqlite.dev}/include";
+    SQLITE_LIBDIR = "${sqlite.out}/lib";
+  };
   buildInputs = [
     pkg-config
     sqlite

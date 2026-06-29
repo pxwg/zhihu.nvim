@@ -9,6 +9,10 @@ mkShell {
     cargo
     pandoc
 
+    # typst-lua
+    openssl
+    pkg-config
+
     (luajit.withPackages (
       p: with p; [
         busted

@@ -11,6 +11,7 @@ mkShell {
     OPENSSL_LIBDIR = "${openssl.out}/lib";
   };
   buildInputs = [
+    # lua-requests
     openssl
 
     (luajit.withPackages (

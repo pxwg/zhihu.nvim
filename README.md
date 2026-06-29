@@ -65,6 +65,8 @@ return {
 vi zhihu://XXX.md
 # or
 vi zhihu://XXX.html
+# or
+vi zhihu://XXX.typst
 ```
 
 or in neovim:
@@ -127,12 +129,6 @@ require'zhihu'.setup {
     end
   }
 }
-```
-
-Then you can use typst to answer the question.
-
-```vim
-:e zhihu://www.zhihu.com/question/XXXXXXXX/answer/new.typ
 ```
 
 ### Zhihu Answer

@@ -1,5 +1,5 @@
 package = "zfh"
-version = "0.0.6"
+version = "0.0.7"
 lua = ">= 5.1"
 
 [description]
@@ -19,6 +19,7 @@ htmlparser = " >= 0.0.1"
 html-entities = " >= 0.0.1"
 luasocket = " >= 0.0.1"
 vim = " >= 0.0.1"
+typst-lua-temp = " >= 0.0.1"
 
 [test]
 type = "busted"

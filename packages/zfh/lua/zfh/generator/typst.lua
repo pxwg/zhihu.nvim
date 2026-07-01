@@ -4,11 +4,32 @@ local htmlEntities = require 'htmlEntities'
 local fn = require 'vim.fn'
 
 local settext = require 'zfh.generator'.settext
+local find = require 'zfh.generator'.find
 local strip = require 'zfh.generator'.strip
 local ChainedGenerator = require 'zfh.generator'.ChainedGenerator
 local SelectorGenerator = require 'zfh.generator'.SelectorGenerator
 
 local M = {
+  mitex = [[
+#import "@preview/mitex:0.2.7": mi as _mi, mitex as _mitex
+#let mitex(it) = context if target() == "html" {
+  html.elem("p", attrs: (style: "display: flex; justify-content: center;"))[
+    #html.elem("img", attrs: (
+      src: "//www.zhihu.com/equation?tex=" + it.text,
+      eeimg: "1",
+      alt: it.text,
+    ))
+  ]
+} else {
+  _mitex(it)
+}
+#let mi(it) = context if target() == "html" {
+  html.elem("img", attrs: (src: "//www.zhihu.com/equation?tex=" + it.text, eeimg: "1", alt: it.text))
+} else {
+  _mi(it)
+}
+
+]],
   head = SelectorGenerator {
     selector = "head",
     template = "",
@@ -19,19 +40,19 @@ local M = {
   },
   i = SelectorGenerator {
     selector = "i",
-    template = "*%s*",
+    template = "_%s_",
   },
   em = SelectorGenerator {
     selector = "em",
-    template = "*%s*",
+    template = "_%s_",
   },
   b = SelectorGenerator {
     selector = "b",
-    template = "_%s_",
+    template = "*%s*",
   },
   strong = SelectorGenerator {
     selector = "strong",
-    template = "_%s_",
+    template = "*%s*",
   },
   tex = SelectorGenerator {
     selector = ".ztext-math",
@@ -48,9 +69,9 @@ local M = {
     selector = "div.highlight",
     template = [[
 
-```%s
+%s%s
 %s
-```
+%s
 ]],
   },
   code = SelectorGenerator {
@@ -112,7 +133,7 @@ local M = {
 for i = 1, 6 do
   M.h[i] = SelectorGenerator {
     selector = ("h%d"):format(i),
-    template = "\n" .. string.rep("#", i) .. " %s\n",
+    template = "\n" .. string.rep("=", i) .. " %s\n",
   }
 end
 
@@ -142,23 +163,7 @@ function M.tex:convert_(node)
   end
   local c = template:format(latex)
   settext(node, c)
-  return [[#import "@preview/mitex:0.2.7": mi as _mi, mitex as _mitex
-#let mitex(it) = context if target() == "html" {
-  html.elem("p", attrs: (style: "display: flex; justify-content: center;"))[
-    #html.elem("img", attrs: (
-      src: "//www.zhihu.com/equation?tex=" + it.text,
-      eeimg: "1",
-      alt: it.text,
-    ))
-  ]
-} else {
-  _mitex(it)
-}
-#let mi(it) = context if target() == "html" {
-  html.elem("img", attrs: (src: "//www.zhihu.com/equation?tex=" + it.text, eeimg: "1", alt: it.text))
-} else {
-  _mi(it)
-}]]
+  return "mitex"
 end
 
 ---convert a HTML tag to other language's AST node
@@ -173,7 +178,9 @@ function M.code_block:convert_(node)
   if not code then
     return
   end
-  local c = self.template:format((code.classes[1] or ""):gsub("^language--", ""), fn.trim(code:getcontent()))
+  local text = code:getcontent()
+  local header = find(text)
+  local c = self.template:format(header, (code.classes[1] or ""):gsub("^language--", ""), fn.trim(text), header)
   settext(node, c)
 end
 
@@ -280,7 +287,10 @@ M.generator = ChainedGenerator {
 function M.generator:generate(node)
   local new_node, code = self:emit(node)
   local text = htmlEntities.decode(new_node:gettext())
-  return fn.trim(code .. "\n" .. text)
+  if code ~= "" then
+    code = M.mitex
+  end
+  return code .. fn.trim(text):gsub("\n\n    \n", "\n\n")
 end
 
 return M

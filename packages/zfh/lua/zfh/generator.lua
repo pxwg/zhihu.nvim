@@ -22,6 +22,25 @@ function M.settext(node, c)
   node.root._text = node.root._text:sub(1, node._openstart - 1) .. c .. node.root._text:sub(node._closeend + 1)
 end
 
+---@param text string
+---@param char string?
+---@param min integer?
+---@param max integer?
+---@return string
+function M.find(text, char, min, max)
+  char = char or "`"
+  min = min or 3
+  max = max or 10
+  local n = max
+  for i = min, max - 1 do
+    if not ("\n" .. htmlEntities.decode(text)):match("\n" .. char:rep(i)) then
+      n = i
+      break
+    end
+  end
+  return char:rep(n)
+end
+
 ---Strip <https://link.zhihu.com/?target=> from URL
 ---@param href string
 ---@return string
@@ -63,7 +82,7 @@ end
 function M.Generator:generate(node)
   local new_node, code = self:emit(node)
   local text = htmlEntities.decode(new_node:gettext())
-  return fn.trim(text .. "\n" .. code)
+  return code .. fn.trim(text)
 end
 
 ---emit HTML tag to other language's AST node purely
@@ -148,7 +167,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.SelectorGenerator:convert_(node)
-  local c = self.template:format(fn.trim(node:getcontent()):gsub("\n%s*", ""))
+  local c = self.template:format(fn.trim(node:getcontent()))
   M.settext(node, c)
 end
 

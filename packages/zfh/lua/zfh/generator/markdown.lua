@@ -4,6 +4,7 @@ local htmlEntities = require 'htmlEntities'
 local fn = require 'vim.fn'
 
 local settext = require 'zfh.generator'.settext
+local find = require 'zfh.generator'.find
 local strip = require 'zfh.generator'.strip
 local ChainedGenerator = require 'zfh.generator'.ChainedGenerator
 local SelectorGenerator = require 'zfh.generator'.SelectorGenerator
@@ -48,9 +49,9 @@ local M = {
     selector = "div.highlight",
     template = [[
 
-```%s
+%s%s
 %s
-```
+%s
 ]],
   },
   code = SelectorGenerator {
@@ -147,7 +148,9 @@ function M.code_block:convert_(node)
   if not code then
     return
   end
-  local c = self.template:format((code.classes[1] or ""):gsub("^language--", ""), fn.trim(code:getcontent()))
+  local text = code:getcontent()
+  local header = find(text)
+  local c = self.template:format(header, (code.classes[1] or ""):gsub("^language--", ""), text, header)
   settext(node, c)
 end
 
@@ -157,7 +160,7 @@ end
 function M.sup:convert_(node)
   local c = self.template:format(node.attributes["data-numero"] or "")
   settext(node, c)
-  local text = ("%s: %s %s\n"):format(c, node.attributes["data-text"] or "", node.attributes["data-url"] or "")
+  local text = ("\n%s: %s %s"):format(c, node.attributes["data-text"] or "", node.attributes["data-url"] or "")
   return htmlEntities.decode(text)
 end
 
@@ -253,5 +256,14 @@ M.generator = ChainedGenerator {
   M.body,
   M.html
 }
+
+---generate other markup language from HTML node
+---@param node table
+---@return string code
+function M.generator:generate(node)
+  local new_node, code = self:emit(node)
+  local text = htmlEntities.decode(new_node:gettext())
+  return fn.trim(text):gsub("\n\n    \n", "\n\n") .. code
+end
 
 return M

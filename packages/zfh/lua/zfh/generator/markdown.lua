@@ -51,7 +51,6 @@ local M = {
 ```%s
 %s
 ```
-
 ]],
   },
   code = SelectorGenerator {
@@ -67,7 +66,6 @@ local M = {
     template = [[
 
 ![%s](%s)
-
 ]],
   },
   h = {},
@@ -85,11 +83,11 @@ local M = {
   },
   p = SelectorGenerator {
     selector = "p",
-    template = "%s\n\n",
+    template = "%s\n",
   },
   blockquote = SelectorGenerator {
     selector = "blockquote",
-    template = "> %s\n",
+    template = "\n> %s\n",
   },
   div = SelectorGenerator {
     selector = "div",
@@ -105,7 +103,7 @@ local M = {
 for i = 1, 6 do
   M.h[i] = SelectorGenerator {
     selector = ("h%d"):format(i),
-    template = "\n\n" .. string.rep("#", i) .. " %s\n\n",
+    template = "\n" .. string.rep("#", i) .. " %s\n",
   }
 end
 
@@ -131,7 +129,6 @@ function M.tex:convert_(node)
 $$
 %s
 $$
-
 ]]
   end
   local c = template:format(latex)
@@ -178,7 +175,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.ol:convert_(node)
-  local c = "\n\n"
+  local c = "\n"
   for i, li in ipairs(node:select "li") do
     c = c .. self.template:format(i, li:getcontent())
   end
@@ -190,7 +187,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.ul:convert_(node)
-  local c = "\n\n"
+  local c = "\n"
   for _, li in ipairs(node:select "li") do
     c = c .. self.template:format(li:getcontent())
   end
@@ -202,7 +199,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.table:convert_(node)
-  local c = "\n\n"
+  local c = "\n"
   for i, tr in ipairs(node:select "tr") do
     local tds = {}
     for _, th in ipairs(tr:select "th") do
@@ -224,7 +221,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.blockquote:convert_(node)
-  local c = "\n\n"
+  local c = "\n"
   for line in fn.trim(node:getcontent()):gmatch "[^\n\r]+" do
     c = c .. self.template:format(line)
   end

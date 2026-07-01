@@ -63,8 +63,7 @@ end
 function M.Generator:generate(node)
   local new_node, code = self:emit(node)
   local text = htmlEntities.decode(new_node:gettext())
-  text = text:gsub("\n\n\n+", "\n\n")
-  return fn.trim(text .. "\n\n" .. code)
+  return fn.trim(text .. "\n" .. code)
 end
 
 ---emit HTML tag to other language's AST node purely
@@ -149,7 +148,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.SelectorGenerator:convert_(node)
-  local c = self.template:format(fn.trim(node:getcontent()))
+  local c = self.template:format(fn.trim(node:getcontent()):gsub("\n%s*", ""))
   M.settext(node, c)
 end
 

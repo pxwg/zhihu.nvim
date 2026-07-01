@@ -35,7 +35,7 @@ local M = {
   },
   tex = SelectorGenerator {
     selector = ".ztext-math",
-    template = "#mi[%s]",
+    template = "#mi(`%s`)",
   },
   span = SelectorGenerator {
     selector = "span",
@@ -51,7 +51,6 @@ local M = {
 ```%s
 %s
 ```
-
 ]],
   },
   code = SelectorGenerator {
@@ -66,8 +65,7 @@ local M = {
     selector = "figure",
     template = [[
 
-#image(%q)
-
+#html.img(alt: %q, src: %q)
 ]],
   },
   h = {},
@@ -87,19 +85,17 @@ local M = {
   columns: %d,
   %s
 )
-
 ]],
   },
   p = SelectorGenerator {
     selector = "p",
-    template = "%s\n\n",
+    template = "\n%s\n",
   },
   blockquote = SelectorGenerator {
     selector = "blockquote",
     template = [[
 
 #quote(block: true)[%s]
-
 ]],
   },
   div = SelectorGenerator {
@@ -116,7 +112,7 @@ local M = {
 for i = 1, 6 do
   M.h[i] = SelectorGenerator {
     selector = ("h%d"):format(i),
-    template = "\n\n" .. string.rep("#", i) .. " %s\n\n",
+    template = "\n" .. string.rep("#", i) .. " %s\n",
   }
 end
 
@@ -139,15 +135,30 @@ function M.tex:convert_(node)
     latex = latex:sub(1, -2)
     template = [[
 
-#mitex(`
+#mitex(```tex
 %s
-`)
-
+```)
 ]]
   end
   local c = template:format(latex)
   settext(node, c)
-  return '#import "@preview/mitex:0.2.6": *'
+  return [[#import "@preview/mitex:0.2.7": mi as _mi, mitex as _mitex
+#let mitex(it) = context if target() == "html" {
+  html.elem("p", attrs: (style: "display: flex; justify-content: center;"))[
+    #html.elem("img", attrs: (
+      src: "//www.zhihu.com/equation?tex=" + it.text,
+      eeimg: "1",
+      alt: it.text,
+    ))
+  ]
+} else {
+  _mitex(it)
+}
+#let mi(it) = context if target() == "html" {
+  html.elem("img", attrs: (src: "//www.zhihu.com/equation?tex=" + it.text, eeimg: "1", alt: it.text))
+} else {
+  _mi(it)
+}]]
 end
 
 ---convert a HTML tag to other language's AST node
@@ -188,7 +199,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.ol:convert_(node)
-  local c = "\n\n"
+  local c = "\n"
   for i, li in ipairs(node:select "li") do
     c = c .. self.template:format(i, li:getcontent())
   end
@@ -200,7 +211,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.ul:convert_(node)
-  local c = "\n\n"
+  local c = "\n"
   for _, li in ipairs(node:select "li") do
     c = c .. self.template:format(li:getcontent())
   end
@@ -269,8 +280,7 @@ M.generator = ChainedGenerator {
 function M.generator:generate(node)
   local new_node, code = self:emit(node)
   local text = htmlEntities.decode(new_node:gettext())
-  text = text:gsub("\n\n\n+", "\n\n")
-  return fn.trim(code .. "\n\n" .. text)
+  return fn.trim(code .. "\n" .. text)
 end
 
 return M

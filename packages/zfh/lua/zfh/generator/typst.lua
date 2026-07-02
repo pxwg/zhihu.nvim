@@ -10,7 +10,13 @@ local ChainedGenerator = require 'zfh.generator'.ChainedGenerator
 local SelectorGenerator = require 'zfh.generator'.SelectorGenerator
 
 local M = {
-  mitex = [[
+  preamble = {
+    c = [[
+#show raw.where(block: true): it => context if target() == "html" {
+  html.elem("pre", attrs: (lang: it.lang))[#it.text]
+} else { it }
+]],
+    t = [[
 #import "@preview/mitex:0.2.7": mi as _mi, mitex as _mitex
 #let mitex(it) = context if target() == "html" {
   html.elem("p", attrs: (style: "display: flex; justify-content: center;"))[
@@ -28,8 +34,8 @@ local M = {
 } else {
   _mi(it)
 }
-
-]],
+]]
+  },
   head = SelectorGenerator {
     selector = "head",
     template = "",
@@ -133,7 +139,8 @@ local M = {
 for i = 1, 6 do
   M.h[i] = SelectorGenerator {
     selector = ("h%d"):format(i),
-    template = "\n" .. string.rep("=", i) .. " %s\n",
+    -- zhihu will increase the heading level by 1
+    template = "\n" .. string.rep("=", math.max(1, i - 1)) .. " %s\n",
   }
 end
 
@@ -163,7 +170,7 @@ function M.tex:convert_(node)
   end
   local c = template:format(latex)
   settext(node, c)
-  return "mitex"
+  return "t"
 end
 
 ---convert a HTML tag to other language's AST node
@@ -182,6 +189,7 @@ function M.code_block:convert_(node)
   local header = find(text)
   local c = self.template:format(header, (code.classes[1] or ""):gsub("^language--", ""), fn.trim(text), header)
   settext(node, c)
+  return "c"
 end
 
 ---convert a HTML tag to other language's AST node
@@ -287,10 +295,16 @@ M.generator = ChainedGenerator {
 function M.generator:generate(node)
   local new_node, code = self:emit(node)
   local text = htmlEntities.decode(new_node:gettext())
-  if code ~= "" then
-    code = M.mitex
+  local new_code = ""
+  for k, v in pairs(M.preamble) do
+    if code:match(k) then
+      new_code = new_code .. v
+    end
   end
-  return code .. fn.trim(text):gsub("\n\n    \n", "\n\n")
+  if new_code ~= "" then
+    new_code = new_code .. "\n"
+  end
+  return new_code .. fn.trim(text):gsub("\n\n    \n", "\n\n")
 end
 
 return M

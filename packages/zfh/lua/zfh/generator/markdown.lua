@@ -104,7 +104,8 @@ local M = {
 for i = 1, 6 do
   M.h[i] = SelectorGenerator {
     selector = ("h%d"):format(i),
-    template = "\n" .. string.rep("#", i) .. " %s\n",
+    -- zhihu will increase the heading level by 1
+    template = "\n" .. string.rep("#", math.max(1, i - 1)) .. " %s\n",
   }
 end
 

@@ -1,6 +1,7 @@
 ---get cookies from firefox cookies database
 ---@module auth.firefox
 local uv = require 'vim.uv'
+local uri = require 'vim.uri'
 local fs = require 'vim.fs'
 local lsqlite3 = require "lsqlite3"
 local PlatformDirs = require 'platformdirs'.PlatformDirs
@@ -47,7 +48,8 @@ setmetatable(M.Auth, {
 ---@param host string The host for which to retrieve cookies.
 ---@return table<string, string> cookies A table where keys are cookie names and values are cookie values for the specified host.
 function M.Auth:get_cookies(host)
-  local db = lsqlite3.open(self.path)
+  local url = uri.uri_from_fname(self.path) .. "?immutable=1&mode=ro"
+  local db = lsqlite3.open(url, lsqlite3.OPEN_READONLY + lsqlite3.OPEN_URI)
 
   local sql_file = fs.joinpath(
     fs.dirname(debug.getinfo(1).source:match("@?(.*)")),

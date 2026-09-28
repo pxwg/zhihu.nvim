@@ -2,7 +2,7 @@
 local M = {
   opts = {
     ---@type Article
-    article = {}
+    article = {},
   }
 }
 
@@ -15,15 +15,15 @@ function M.setup(opts)
 end
 
 ---override default value, only run once
-function M.init()
-  if M.is_init then
+function M.init_article()
+  if M.article_inited then
     return
   end
   local Article = require 'zhihu.article'.Article
   for k, v in pairs(M.opts.article) do
     Article[k] = v
   end
-  M.is_init = true
+  M.article_inited = true
 end
 
 ---create autocmds
@@ -34,7 +34,7 @@ function M.create_autocmds(augroup_id)
     pattern = "zhihu://*",
     group = augroup_id,
     callback = function()
-      M.init()
+      M.init_article()
       require "zhihu.nvim.callback".read_cb()
     end
   })
@@ -42,7 +42,7 @@ function M.create_autocmds(augroup_id)
     pattern = "zhihu://*",
     group = augroup_id,
     callback = function()
-      M.init()
+      M.init_article()
       require "zhihu.nvim.callback".write_cb()
     end
   })

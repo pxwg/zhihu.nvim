@@ -20,5 +20,12 @@ mkShell {
         ldoc
       ]
     ))
+
+    (python3.withPackages (
+      p: with p; [
+        pillow
+        numpy
+      ]
+    ))
   ];
 }

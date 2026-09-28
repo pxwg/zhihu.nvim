@@ -2,7 +2,7 @@ package.path = package.path .. ';lua/?.lua'
 
 local url_to_article = require "zhihu.article".url_to_article
 local Article = require "zhihu.article".Article
-local Image = require "zhihu.image".Image
+local Uploader = require "zhihu.image".Uploader
 local template_path = require "zhihu.article".template_path
 local generator = require "zfh.generator.markdown".generator
 
@@ -13,9 +13,9 @@ describe("test zhihu", function()
     it("tests get article", function()
         assert.are.equal(article.title, "深度学习并行训练算法一锅炖: DDP, TP, PP, ZeRO")
     end)
-    local image = Image.from_hash "36828cdbb31942c394c5d2ea92aef201"
-    it("tests get image", function()
-        assert.are.equal(image.upload_file.state, 1)
+    local uploader = Uploader.from_hash("36828cdbb31942c394c5d2ea92aef201", "", "")
+    it("tests uploader", function()
+        assert.are.equal(uploader.upload_file.state, 1)
     end)
 end)
 

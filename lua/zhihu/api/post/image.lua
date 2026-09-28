@@ -1,24 +1,10 @@
 --- init a zhihu image
-local md5 = require "md5"
 local API = require 'zhihu.api.post'.API
 local M = {
   API = {
     url = "https://api.zhihu.com/images",
   }
 }
-
----Reads a file as binary and calculates its SHA256 hash.
----@param file string The absolute path to the file
----@return string hash of the file content
-function M.md5(file)
-  local f = io.open(file)
-  local text = ""
-  if f then
-    text = f:read"*a"
-    f:close()
-  end
-  return md5.sumhexa(text)
-end
 
 ---@param api table?
 ---@return table api
@@ -48,10 +34,10 @@ function M.API:from_hash(hash)
 end
 
 ---factory method.
----@param file string
+---@param content string
 ---@return table
-function M.API:from_file(file)
-  local hash = M.md5(file)
+function M.API:from_content(content)
+  local hash = require "md5".sumhexa(content)
   return self:from_hash(hash)
 end
 

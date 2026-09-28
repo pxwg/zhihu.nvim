@@ -6,29 +6,63 @@ local M = {}
 
 ---open a prompt for image
 ---for example:
----inoremap <C-L> <C-O>:lua require'zhihu.nvim'.input()<CR>
+---inoremap <C-Q> <C-O>:lua require'zhihu.nvim'.input()<CR>
+---@param opts table?
 ---@param prompt string?
-function M.input(prompt)
+function M.input(opts, prompt)
+  opts = opts or {}
   prompt = prompt or 'Enter image file path: '
   vim.ui.input({
     prompt = prompt, completion = 'file'
-  }, M.on_confirm)
+  }, function(input)
+    return M.on_confirm(opts.input, opts.src_type, opts.regnames, opts.max_retry, opts.sleep_seconds)
+  end)
 end
 
 ---callback for `input`
 ---@param input string
-function M.on_confirm(input)
+---@param src_type "src" | "original_src" | "watermark_src" | "animation_cover_src"?
+---@param regnames string[]?
+---@param max_retry integer?
+---@param sleep_seconds integer?
+function M.on_confirm(input, src_type, regnames, max_retry, sleep_seconds)
   if input == nil then
     return
   end
-  local Image = require 'zhihu.image'.Image
+  regnames = regnames or { "+", "*" }
   if input:sub(1, 2) == '~/' then
     input = uv.os_homedir() .. '/' .. input:sub(3)
   end
-  local url = tostring(Image.from_file(input))
-  if url then
-    vim.api.nvim_put({ url }, "b", false, true)
+  local Uploader = require 'zhihu.image'.Uploader
+  local uploader = Uploader.from_file(input)
+  local id = tostring(uploader)
+  vim.notify(uploader.status, id == "" and vim.log.levels.ERROR, {
+    title = "zhihu.nvim",
+  })
+  if id == "" then
+    return
   end
+  local image = require 'zhihu.image'.fetch_image_sync(id, max_retry, sleep_seconds)
+  image.src_type = src_type or image.src_type
+  local url = tostring(image)
+  if url == "" then
+    vim.notify(image.status, vim.log.levels.ERROR, {
+      title = "zhihu.nvim",
+    })
+    return
+  end
+  for _, regname in ipairs(regnames) do
+    if regname == "." then
+      vim.api.nvim_put({ url }, "b", false, true)
+    else
+      vim.fn.setreg(regname, url)
+    end
+  end
+  vim.notify(image.status .. "copied to register " .. table.concat(regnames, ', '),
+    vim.log.levels.INFO,
+    {
+      title = "zhihu.nvim",
+    })
 end
 
 ---open article's URL.

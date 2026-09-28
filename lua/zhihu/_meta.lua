@@ -38,3 +38,19 @@
 ---@field upload_vendor string
 ---@field upload_token upload_token
 ---@field upload_file upload_file
+
+---@class Uploader: upload_response
+---@field status string
+
+---@class image_response
+---@field animation_cover_src string? "https://pic-private.zhihu.com/v2-b79782844dae1e15aa9419c502a84f0a~resize:1440:q75.png?source=1f5c5e47&expiration=1790586320&auth_key=1790586320-0-0-cd2ec5c6bc172c919fc2b2bcf6e94598&protocol=v2&sampling=False&animatedImagePlayCount=1&overTime=60&incremental=False&sceneCode=article_draft_web&animatedImageAutoPlay=False&retryCount=3&precoder=False"
+---@field original_hash string? "v2-b79782844dae1e15aa9419c502a84f0a"
+---@field original_src string? "https://pic-private.zhihu.com/v2-b79782844dae1e15aa9419c502a84f0a~resize:0:q75.png?source=1f5c5e47&expiration=1790586320&auth_key=1790586320-0-0-6f197d5d0c8d292a296ad5547a0b36c5&protocol=v2&sampling=False&animatedImagePlayCount=1&overTime=60&incremental=False&sceneCode=article_draft_web&animatedImageAutoPlay=False&retryCount=3&precoder=False"
+---@field src string? "https://pic-private.zhihu.com/v2-b79782844dae1e15aa9419c502a84f0a~resize:1440:q75.png?source=1f5c5e47&expiration=1790586320&auth_key=1790586320-0-0-cd2ec5c6bc172c919fc2b2bcf6e94598&protocol=v2&sampling=False&animatedImagePlayCount=1&overTime=60&incremental=False&sceneCode=article_draft_web&animatedImageAutoPlay=False&retryCount=3&precoder=False"
+---@field status "success" | "processing" | "init" | string?
+---@field watermark string? "original"
+---@field watermark_hash string? "v2-584ab838d9caedf0343ed6e82fa357f8"
+---@field watermark_src string? "https://pic-private.zhihu.com/v2-584ab838d9caedf0343ed6e82fa357f8~resize:1440:q75.png?source=1f5c5e47&expiration=1790586320&auth_key=1790586320-0-0-5b24a1460059ca5a958d9a37684d27ce&protocol=v2&sampling=False&animatedImagePlayCount=1&overTime=60&incremental=False&sceneCode=article_draft_web&animatedImageAutoPlay=False&retryCount=3&precoder=False"
+
+---@class Image: image_response
+---@field src_type "src" | "original_src" | "watermark_src" | "animation_cover_src"?

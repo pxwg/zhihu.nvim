@@ -42,27 +42,30 @@ function M.on_confirm(input, src_type, regnames, max_retry, sleep_seconds)
   if id == "" then
     return
   end
-  local image = require 'zhihu.image'.fetch_image_sync(id, max_retry, sleep_seconds)
-  image.src_type = src_type or image.src_type
-  local url = tostring(image)
-  if url == "" then
-    vim.notify(image.status, vim.log.levels.ERROR, {
-      title = "zhihu.nvim",
-    })
-    return
-  end
-  for _, regname in ipairs(regnames) do
-    if regname == "." then
-      vim.api.nvim_put({ url }, "b", false, true)
-    else
-      vim.fn.setreg(regname, url)
+  require 'zhihu.image'.fetch_image_async(id, max_retry, sleep_seconds, function(image)
+    image.src_type = src_type or image.src_type
+    local url = tostring(image)
+    if url == "" then
+      vim.notify(image.status, vim.log.levels.ERROR, {
+        title = "zhihu.nvim",
+      })
+      return
     end
-  end
-  vim.notify(image.status .. "copied to register " .. table.concat(regnames, ', '),
-    vim.log.levels.INFO,
-    {
-      title = "zhihu.nvim",
-    })
+    for _, regname in ipairs(regnames) do
+      if regname == "." then
+        vim.api.nvim_put({ url }, "b", false, true)
+      else
+        vim.schedule(function()
+          vim.fn.setreg(regname, url)
+        end)
+      end
+    end
+    vim.notify(image.status .. "copied to register " .. table.concat(regnames, ', '),
+      vim.log.levels.INFO,
+      {
+        title = "zhihu.nvim",
+      })
+  end)
 end
 
 ---open article's URL.

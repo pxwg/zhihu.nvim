@@ -1,6 +1,5 @@
 --- upload a zhihu image
 local requests = require "requests"
-local guess = require 'mimetypes'.guess
 local sha1 = require 'sha1'
 local base64 = require 'vim.base64'
 local dumps_cookies = require 'zhihu.api'.dumps_cookies
@@ -42,39 +41,38 @@ setmetatable(M.API, {
 })
 
 ---factory method.
----@param file string
+---@param content string
+---@param filetype string
 ---@param image upload_response
 ---@return table
-function M.API.from_image(file, image)
-  return M.API.from_upload_token(file, image.upload_file.object_key, image.upload_token)
+function M.API.from_image(content, filetype, image)
+  return M.API.from_upload_token(content, filetype, image.upload_file.object_key, image.upload_token)
 end
 
 ---factory method.
----@param file string
+---@param content string
+---@param filetype string
 ---@param object_key string
 ---@param upload_token upload_token
 ---@return table
-function M.API.from_upload_token(file, object_key, upload_token)
-  return M.API.from_access_token(file, object_key, upload_token.access_id, upload_token.access_token, upload_token.access_key)
+function M.API.from_upload_token(content, filetype, object_key, upload_token)
+  return M.API.from_access_token(content, filetype, object_key, upload_token.access_id, upload_token.access_token,
+    upload_token.access_key)
 end
 
 ---factory method.
----@param file string
+---@param content string
+---@param filetype string
 ---@param object_key string
 ---@param access_id string
 ---@param access_token string
 ---@param access_key string
 ---@return table
-function M.API.from_access_token(file, object_key, access_id, access_token, access_key)
-  local api = {}
-  local f = io.open(file, "rb")
-  if f then
-    api.data = f:read "*a"
-    f:close()
-  end
+function M.API.from_access_token(content, filetype, object_key, access_id, access_token, access_key)
+  local api = { data = content }
   api = M.API(api)
   api.url = api.url:format(object_key)
-  api.headers["Content-Type"] = guess(file) or api.headers["Content-Type"]
+  api.headers["Content-Type"] = filetype or api.headers["Content-Type"]
   api.headers["x-oss-date"] = os.date("!%a, %d %b %Y %H:%M:%S GMT")
   api.headers["x-oss-security-token"] = access_token
   local string_to_sign = M.string_to_sign:format(api.headers["Content-Type"], api.headers["x-oss-date"],

@@ -15,7 +15,7 @@ function M.input(opts, prompt)
   vim.ui.input({
     prompt = prompt, completion = 'file'
   }, function(input)
-    return M.on_confirm(opts.input, opts.src_type, opts.regnames, opts.max_retry, opts.sleep_seconds)
+    return M.on_confirm(input, opts.src_type, opts.regnames, opts.max_retry, opts.sleep_seconds)
   end)
 end
 

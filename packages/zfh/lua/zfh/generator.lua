@@ -167,7 +167,7 @@ end
 ---@param node table HTML content to be converted
 ---@return string? code
 function M.SelectorGenerator:convert_(node)
-  local c = self.template:format(fn.trim(node:getcontent()))
+  local c = self.template:format(node:getcontent())
   M.settext(node, c)
 end
 

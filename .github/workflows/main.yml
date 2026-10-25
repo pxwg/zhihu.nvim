@@ -11,7 +11,7 @@
   workflow_dispatch:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,20 +24,37 @@ jobs:
         run: |
           cargo test --features=lua51 --manifest-path=packages/auth/Cargo.toml
           cargo test --features=lua51 --manifest-path=packages/zfh/Cargo.toml
-      - uses: nvim-neorocks/luarocks-tag-release@v7
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate template.lua
+        run: |
+          perl -00ne 'print if $. == 2' ./*-scm-1.rockspec > template.lua
+      - uses: lumen-oss/luarocks-tag-release@v9
         env:
-          LUAROCKS_API_KEY: ${{secrets.LUAROCKS_API_KEY}}
+          LUX_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
+        with:
+          lux-version: latest
+          template: template.lua
+      - name: Pack
+        run: |
+          lx pack zhihu.nvim
+      - uses: actions/upload-artifact@v4
         if: "! startsWith(github.ref, 'refs/tags/')"
         with:
-          extra_luarocks_args: |
-            --force
-          version: scm
-          template: zhihu.nvim-scm-1.rockspec
-      - uses: nvim-neorocks/luarocks-tag-release@v7
-        env:
-          LUAROCKS_API_KEY: ${{secrets.LUAROCKS_API_KEY}}
+          path: |
+            *.rock
+      - uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          extra_luarocks_args: |
-            --force
-          template: zhihu.nvim-scm-1.rockspec
+          files: |
+            *.rock
+      - name: Upload
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          scripts/upload.sh ./*.rock
+        env:
+          LUAROCKS_API_KEY: ${{secrets.LUAROCKS_API_KEY}}

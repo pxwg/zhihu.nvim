@@ -9,10 +9,14 @@ mkShell {
     STDCPP_LIBDIR = "${stdenv.cc.cc.lib}/lib";
     OPENSSL_INCDIR = "${openssl.dev}/include";
     OPENSSL_LIBDIR = "${openssl.out}/lib";
+    SQLITE_INCDIR = "${sqlite.dev}/include";
+    SQLITE_LIBDIR = "${sqlite.out}/lib";
   };
   buildInputs = [
     # lua-requests
     openssl
+    # lsqlite3
+    sqlite
 
     (luajit.withPackages (
       p: with p; [

@@ -30,18 +30,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Generate template.lua
+      - name: Generate extra.rockspec
         run: |
-          perl -00ne 'print if $. == 2' ./*-scm-1.rockspec > template.lua
+          perl -00ne 'print if $. == 2' ./*-scm-1.rockspec > extra.rockspec
       - uses: lumen-oss/luarocks-tag-release@v9
         env:
           LUX_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
+          SQLITE_LIBDIR: /usr/lib/x86_64-linux-gnu
         with:
-          lux-version: latest
-          template: template.lua
+          lux_version: latest
       - name: Pack
+        env:
+          SQLITE_LIBDIR: /usr/lib/x86_64-linux-gnu
         run: |
-          lx pack zhihu.nvim
+          lx --lua-version=5.1 pack
       - uses: actions/upload-artifact@v4
         if: "! startsWith(github.ref, 'refs/tags/')"
         with:
@@ -57,4 +59,4 @@ jobs:
         run: |
           scripts/upload.sh ./*.rock
         env:
-          LUAROCKS_API_KEY: ${{secrets.LUAROCKS_API_KEY}}
+          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}

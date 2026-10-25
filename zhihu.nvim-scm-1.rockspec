@@ -1,47 +1,19 @@
-local git_ref = '$git_ref'
-local modrev = '$modrev'
-local specrev = '$specrev'
-
-local repo_url = '$repo_url'
-
 rockspec_format = '3.0'
-package = '$package'
-if modrev:sub(1, 1) == '$' then
-  modrev = "scm"
-  specrev = "1"
-  repo_url = "https://github.com/pxwg/zhihu.nvim"
-  package = repo_url:match("/([^/]+)/?$")
-end
-version = modrev .. '-' .. specrev
-
 description = {
-  summary = '$summary',
+  summary = '',
   detailed = '',
-  labels = { 'zhihu', 'tex', 'typst', 'neovim', },
-  homepage = '$homepage',
+  labels = {},
+  homepage = 'https://github.com/pxwg/zhihu.nvim',
   license = 'MIT',
 }
-
-build_dependencies = {}
-
-dependencies = { "lua >= 5.1", "lua-requests-temp", "lua-cjson", "htmlparser", "html-entities", "md5", "sha1", "base64", "uuid", "mimetypes", "auth", "zfh" }
-
-test_dependencies = {}
-
+package = description.homepage:match('/([^/]+)/?$')
+version = 'scm-1'
 source = {
-  url = repo_url .. '/archive/' .. git_ref .. '.zip',
-  dir = '$repo_name-' .. '$archive_dir_suffix',
+  url = description.homepage:gsub('https', 'git')
 }
-
-if modrev == 'scm' or modrev == 'dev' then
-  source = {
-    url = repo_url:gsub('https', 'git')
-  }
-end
-
 build = {
   type = 'builtin',
-  copy_directories = {
-    "plugin",
-  },
+  copy_directories = { 'plugin' },
 }
+
+dependencies = { "lua >= 5.1", "lua-requests-temp", "lua-cjson", "htmlparser", "html-entities", "md5", "sha1", "base64", "uuid", "mimetypes", "auth", "zfh" }

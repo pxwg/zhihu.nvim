@@ -4,12 +4,24 @@ local uv = require 'vim.uv'
 local uri = require 'vim.uri'
 local fs = require 'vim.fs'
 local lsqlite3 = require "lsqlite3"
+local datafile = require 'datafile'
 local PlatformDirs = require 'platformdirs'.PlatformDirs
 local Cookies = require 'auth.auth'.Cookies
 local M = {
-  Auth = {
-  }
+  sql = '',
+  Auth = {}
 }
+local _f = datafile.open("conf/firefox.sql") or
+    io.open(debug.getinfo(1).source:match("@?(.*/)[^/]+/[^/]+/[^/]+$") .. "etc/conf/firefox.sql")
+if _f then
+  M.sql = _f:read()
+  if M.sql:sub(1, 2) == "#!" then
+    M.sql = _f:read "*a"
+  else
+    M.sql = M.sql .. _f:read "*a"
+  end
+  _f:close()
+end
 
 ---Get the Firefox cookies.sqlite path for the current user
 ---@return string cookies_path Full path to Cookies file or nil if not found
@@ -51,22 +63,7 @@ function M.Auth:get_cookies(host)
   local url = uri.uri_from_fname(self.path) .. "?immutable=1&mode=ro"
   local db = lsqlite3.open(url, lsqlite3.OPEN_READONLY + lsqlite3.OPEN_URI)
 
-  local sql_file = fs.joinpath(
-    fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
-    "scripts", "firefox.sql"
-  )
-  local f = io.open(sql_file)
-  local sql = ""
-  if f then
-    sql = f:read()
-    if sql:sub(1, 2) == "#!" then
-      sql = f:read "*a"
-    else
-      sql = sql .. f:read "*a"
-    end
-    f:close()
-  end
-  sql = sql:format(host)
+  local sql = M.sql:format(host)
   if db:exec(sql) ~= 0 then
     return Cookies()
   end

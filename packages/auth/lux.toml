@@ -1,5 +1,5 @@
 package = "auth"
-version = "0.0.3"
+version = "0.0.4"
 lua = ">= 5.1"
 
 [description]
@@ -15,6 +15,7 @@ url = "https://github.com/pxwg/zhihu.nvim/archive/$(VERSION).zip"
 dir = "zhihu.nvim-$(VERSION)/packages/$(PACKAGE)"
 
 [dependencies]
+datafile = " >= 0.0.1"
 platformdirs = " >= 0.0.1"
 lsqlite3 = " >= 0.0.1"
 lua-cjson = " >= 0.0.1"
@@ -29,7 +30,6 @@ type = "rust-mlua"
 chrome_cookie = "chrome_cookie"
 
 [build.install.lua]
-"auth.scripts.firefox" = "lua/auth/scripts/firefox.sql"
 "auth.auth" = "lua/auth/auth.lua"
 "auth.cache" = "lua/auth/cache.lua"
 "auth.chained" = "lua/auth/chained.lua"
@@ -37,3 +37,6 @@ chrome_cookie = "chrome_cookie"
 "auth.firefox" = "lua/auth/firefox.lua"
 "auth.json" = "lua/auth/json.lua"
 "auth" = "lua/auth.lua"
+
+[build.install.conf]
+"firefox.sql" = "etc/conf/firefox.sql"

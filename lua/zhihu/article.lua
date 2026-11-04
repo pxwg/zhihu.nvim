@@ -3,9 +3,9 @@ local htmlEntities = require 'htmlEntities'
 local fs = require 'vim.fs'
 local split = require 'vim.shared'.split
 local json = require 'vim.json'
-
+local datafile = require 'datafile'
 local parse = require 'htmlparser'.parse
-local md_to_html = require("markdown_to_html").md_to_html
+local md_to_html = require "markdown_to_html".md_to_html
 local zfh = require "zfh"
 
 local M = {
@@ -27,12 +27,9 @@ local M = {
     reader = zfh.reader,
   },
 }
-M.template_path = fs.joinpath(
-  fs.dirname(debug.getinfo(1).source:match("@?(.*)")),
-  "templates", ("%s.md"):format(M.Article.title)
-)
 local _text = ""
-local _f = io.open(M.template_path)
+local _f = datafile.open("conf/Untitled.md") or
+    io.open(debug.getinfo(1).source:match("@?(.*/)[^/]+/[^/]+/[^/]+$") .. "etc/conf/Untitled.md")
 if _f then
   _text = _f:read "*a"
   _f:close()
